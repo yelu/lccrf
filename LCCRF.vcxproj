@@ -88,6 +88,7 @@
     <ClInclude Include="FWBW.h" />
     <ClInclude Include="IDAllocator.h" />
     <ClInclude Include="LCCRF.h" />
+    <ClInclude Include="SGD.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

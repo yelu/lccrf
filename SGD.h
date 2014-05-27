@@ -13,7 +13,10 @@ public:
 	typedef function<double (vector<double>&, TrainingExampleType&)> DerivativeFunction;
 	typedef function<double (vector<double>&, list<TrainingExampleType>&)> ObjectFunction;
 
-	SGD(list<TrainingExampleType>& traniningSet, vector<double> weights, vector<DerivativeFunction>& derivatives, ObjectFunction& object):
+	SGD(list<TrainingExampleType>& traniningSet,
+		vector<double> weights,
+		vector<DerivativeFunction>& derivatives,
+		ObjectFunction& object):
 		_trainingSet(traniningSet), _derivatives(derivatives), _object(object), _weights(weights)
 	{
 	}
