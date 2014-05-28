@@ -1,7 +1,7 @@
 #pragma once
 
-#include <boost/function.hpp>
-using boost::function;
+#include <functional>
+using std::function;
 #include <list>
 using std::list;
 #include <string>
@@ -10,12 +10,14 @@ using std::wstring;
 using std::vector;
 #include "IDAllocator.h"
 
-struct Word
+typedef vector<wstring> X;
+typedef int Y;
+struct Token
 {
-	vector<wstring> x;
-	int y;
+	X x;
+	Y y;
 };
-typedef vector<Word> TraningCase;
+typedef vector<Token> Document;
 
 class LCCRF
 {
@@ -24,16 +26,18 @@ public:
 	virtual ~LCCRF(void);
 
 	static double Phi(int s1, int s2, int j,
-		const TraningCase& traningCase, 
+		const Document& traningExample, 
 		vector<double> weights,
-		vector<function <int (const TraningCase&, int, int, int)>> hypothesises);
-	void MakeDervative(list<TraningCase>& traningCases, int k);
-	void MakeLikelihood(list<TraningCase>& traningCases);
+		vector<function <int (const Document&, int, int, int)>> features);
+
+	void MakeDervative(list<Document>&, int);
+
+	void MakeLikelihood(list<Document>&);
 private:
 
 	function<double (vector<double>)> _likelihood;
 	vector<function <double (vector<double>&)>> _derivatives;
-	vector<function <int (const TraningCase&, int, int, int)>> _hypothesises;
+	vector<function <int (const Document&, int, int, int)>> _features;
 	IDAllocator _yIDAllocator;
 };
 

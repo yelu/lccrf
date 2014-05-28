@@ -5,7 +5,7 @@ FWBW::FWBW(void)
 {
 }
 
-FWBW::FWBW(boost::function<double (int, int, int)>& phi, int sCount, int jCount):
+FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount):
 	_phi(phi), 
 	_sCount(sCount),
 	_jCount(jCount),

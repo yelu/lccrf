@@ -1,13 +1,14 @@
 #pragma once
 
 #include <boost/multi_array.hpp>
-#include <boost/function.hpp>
+#include <functional>
+using std::function;
 
 class FWBW
 {
 public:
 	FWBW(void);
-	FWBW(boost::function<double (int, int, int)>&, int, int);
+	FWBW(function<double (int, int, int)>&, int, int);
 	virtual ~FWBW(void);
 
 	const boost::multi_array<double, 3>& GetQMatrix();
@@ -26,7 +27,7 @@ private:
 	boost::multi_array<double, 2> _betaMatrix;
 	boost::multi_array<double, 3> _muMatrix;
 	boost::multi_array<double, 3> _qMatrix;
-	boost::function<double (int, int, int)> _phi;
+	function<double (int, int, int)> _phi;
 	double _z;
 };
 
