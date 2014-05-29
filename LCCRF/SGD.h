@@ -21,6 +21,15 @@ public:
 		ObjectFunction& object):
 		_trainingSet(traniningSet), _derivatives(derivatives), _object(object), _weights(weights)
 	{
+		_isObjectProvided = true;
+	}
+
+	SGD(list<TrainingExampleType>& traniningSet,
+		vector<double>& weights,
+		vector<DerivativeFunction>& derivatives):
+		_trainingSet(traniningSet), _derivatives(derivatives), _weights(weights)
+	{
+		_isObjectProvided = false;
 	}
 
 	const vector<double>& Run(double learningRate, int batch = 1, int maxIteration = 1)
@@ -44,9 +53,9 @@ public:
 			{
 				TrainABatch(learningRate, begin, _trainingSet.end());
 			}
-			if(IsConveraged(lastObjectValue))
+			if(_isObjectProvided && IsConveraged(lastObjectValue))
 			{
-				printf("converged.");
+				printf("converged. %d \n", i);
 				break;
 			}
 		}
@@ -68,14 +77,16 @@ public:
 		}
 	}
 
-	bool IsConveraged(double lastObjectValue)
+	bool IsConveraged(double& lastObjectValue)
 	{
 		double newObjectValue = 0.0;
 		for(auto ite = _trainingSet.begin(); ite != _trainingSet.end(); ite++)
 		{
 			newObjectValue += _object(_weights, *ite);
 		}
-		if(abs(newObjectValue - lastObjectValue) < 10e-1) 
+		double delta = abs(newObjectValue - lastObjectValue);
+		lastObjectValue = newObjectValue;
+		if(delta < 10e-1) 
 		{
 			return true;
 		}
@@ -92,5 +103,6 @@ private:
 	vector<DerivativeFunction> _derivatives;
 	ObjectFunction _object;
 	vector<double>& _weights;
+	bool _isObjectProvided;
 };
 
