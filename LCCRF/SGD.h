@@ -2,19 +2,21 @@
 
 #include <functional>
 #include <vector>
+#include <list>
 #include <cmath>
 using std::function;
 using std::vector;
+using std::list;
 
-template<TrainingExampleType>
+template<typename TrainingExampleType>
 class SGD
 {
 public:
 	typedef function<double (vector<double>&, TrainingExampleType&)> DerivativeFunction;
-	typedef function<double (vector<double>&, list<TrainingExampleType>&)> ObjectFunction;
+	typedef function<double (vector<double>&, TrainingExampleType&)> ObjectFunction;
 
 	SGD(list<TrainingExampleType>& traniningSet,
-		vector<double> weights,
+		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives,
 		ObjectFunction& object):
 		_trainingSet(traniningSet), _derivatives(derivatives), _object(object), _weights(weights)
@@ -27,42 +29,48 @@ public:
 		for(int i = 0; i < maxIteration; i++)
 		{
 			int count = 0;
-			list<TrainingExampleType>::iterator begin = _trainingSet.begin();
+			typename list<TrainingExampleType>::iterator begin = _trainingSet.begin();
 			for(auto ite = _trainingSet.begin(); ite != _trainingSet.end(); ite++)
 			{
 				count++;
-				if(count >= batch)
+				if(count > batch)
 				{
 					TrainABatch(learningRate, begin, ite);
-					begin = ite + 1;
-					count = 0;
+					begin = ite;
+					count = 1;
 				}
 			}
-			TrainABatch(learningRate, begin, _trainingSet.end());
+			if(begin != _trainingSet.end())
+			{
+				TrainABatch(learningRate, begin, _trainingSet.end());
+			}
 			if(IsConveraged(lastObjectValue))
 			{
+				printf("converged.");
 				break;
 			}
 		}
+		return _weights;
 	}
 
-	void TrainABatch(double learningRate, list<TrainingExampleType>::iterator begin, list<TrainingExampleType>::iterator end)
+	void TrainABatch(double learningRate, typename list<TrainingExampleType>::iterator begin, typename list<TrainingExampleType>::iterator end)
 	{
-		for(int i = 0; i < _weights.size(); i++)
+		vector<double> oldWeights(_weights.size());
+		oldWeights.swap(_weights);
+		for(size_t i = 0; i < _weights.size(); i++)
 		{
 			double delta = 0.0;
 			for(auto ite = begin; ite != end; ite++)
 			{
-				delta += _derivative[i](_weights, *ite)
+				delta += _derivatives[i](oldWeights, *ite);
 			}
-			int& weight = _weights[i];
-			weight += (learningRate * delta);
+			_weights[i] = oldWeights[i] -  (learningRate * delta);
 		}
 	}
 
 	bool IsConveraged(double lastObjectValue)
 	{
-		int newObjectValue = 0.0;
+		double newObjectValue = 0.0;
 		for(auto ite = _trainingSet.begin(); ite != _trainingSet.end(); ite++)
 		{
 			newObjectValue += _object(_weights, *ite);
@@ -77,7 +85,7 @@ public:
 		}
 	}
 
-	virtual ~SGD(void);
+	virtual ~SGD(void){}
 	
 private:
 	list<TrainingExampleType>& _trainingSet;
