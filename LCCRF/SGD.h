@@ -37,6 +37,7 @@ public:
 		double lastObjectValue = 0.0;
 		for(int i = 0; i < maxIteration; i++)
 		{
+			printf("Iteration %d \n", i);
 			int count = 0;
 			typename list<TrainingExampleType>::iterator begin = _trainingSet.begin();
 			for(auto ite = _trainingSet.begin(); ite != _trainingSet.end(); ite++)
@@ -55,7 +56,6 @@ public:
 			}
 			if(_isObjectProvided && IsConveraged(lastObjectValue))
 			{
-				printf("converged. %d \n", i);
 				break;
 			}
 		}
@@ -71,7 +71,8 @@ public:
 			double delta = 0.0;
 			for(auto ite = begin; ite != end; ite++)
 			{
-				delta += _derivatives[i](oldWeights, *ite);
+				double d = _derivatives[i](oldWeights, *ite);
+				delta += d;
 			}
 			_weights[i] = oldWeights[i] -  (learningRate * delta);
 		}

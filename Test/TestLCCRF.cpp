@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 
 #include "../LCCRF/LCCRF.h"
 
-void MakeDocument(Document& doc, wstring xs[], int ys[], int len)
+void MakeDocument(Document& doc, wstring xs[], wstring ys[], int len)
 {
 	for(int i = 0; i < len; i++)
 	{
@@ -87,31 +87,31 @@ void MakeDocument(Document& doc, wstring xs[], int ys[], int len)
 
 void Test()
 {
-		list<Document> trainingSet;
+	list<Document> trainingSet;
 	Document doc;
 	wstring xs[] = {L"I", L"love", L"you"};
-	int ys[] = {0,1,2};
+	wstring ys[] = {L"0",L"1",L"2"};
 	MakeDocument(doc, xs, ys, 3);
 	trainingSet.push_back(doc);
 	
 	vector<LCCRF::FeatureType> fs;
 
-	LCCRF::FeatureType f1 = [](const Document& doc, int s1, int s2, int j)
+	LCCRF::FeatureType f1 = [](const Document& doc, wstring s1, wstring s2, int j)
 	{
 		if(j < 0 || j >= doc.size()) {return 0;}
-		if(doc[j].x[0] == L"I" && doc[j].y == 0) {return 1;}
+		if(doc[j].x[0] == L"I" && s2 == L"0") {return 1;}
 		return 0;
 	};
-	LCCRF::FeatureType f2 = [](const Document& doc, int s1, int s2, int j)
+	LCCRF::FeatureType f2 = [](const Document& doc, wstring s1, wstring s2, int j)
 	{
 		if(j < 0 || j >= doc.size()) {return 0;}
-		if(doc[j].x[0] == L"love" && doc[j].y == 1) {return 1;}
+		if(doc[j].x[0] == L"love" && s2 == L"1") {return 1;}
 		return 0;
 	};
-	LCCRF::FeatureType f3 = [](const Document& doc, int s1, int s2, int j)
+	LCCRF::FeatureType f3 = [](const Document& doc, wstring s1, wstring s2, int j)
 	{
 		if(j < 0 || j >= doc.size()) {return 0;}
-		if(doc[j].x[0] == L"you" && doc[j].y == 2) {return 1;}
+		if(doc[j].x[0] == L"you" && s2 == L"2") {return 1;}
 		return 0;
 	};
 
@@ -120,7 +120,7 @@ void Test()
 	fs.push_back(f3);
 
 	LCCRF lccrf(fs, 0.01);
-	lccrf.Learn(trainingSet, 1);
+	lccrf.Learn(trainingSet, 0.01, 1, 100);
 }
 
 

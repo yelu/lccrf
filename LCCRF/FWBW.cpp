@@ -14,7 +14,7 @@ FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount):
 	_muMatrix(boost::extents[_jCount][_sCount][_sCount]),
 	_qMatrix(boost::extents[_jCount][_sCount][_sCount])
 {
-	_z = 0.0;
+	_z = std::numeric_limits<double>::lowest();
 	_CalculateAlphaMatrix();
 	_CalculateBetaMatrix();
 }
@@ -27,15 +27,18 @@ void FWBW::_CalculateAlphaMatrix()
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		_alphaMatrix[0][s] = _phi(-1, s, 0);
+		double phi = _phi(-1, s, 0);
+		_alphaMatrix[0][s] = phi;
 	}
 	for(int j = 1; j < _jCount; j++)
 	{
 		for(int s1 = 0; s1 < _sCount; s1++)
 		{
+			_alphaMatrix[j][s1] = std::numeric_limits<double>::lowest();
 			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				_alphaMatrix[j][s1] = ExpPlus(_alphaMatrix[j][s1], _alphaMatrix[j-1][s2] + _phi(s2, s1, j));
+				double phi = ExpPlus(_alphaMatrix[j][s1], _alphaMatrix[j-1][s2] + _phi(s2, s1, j));
+				_alphaMatrix[j][s1] = phi;
 			}
 		}
 	}
@@ -51,9 +54,11 @@ void FWBW::_CalculateBetaMatrix()
 	{
 		for(int s = 0; s < _sCount; s++)
 		{
+			_betaMatrix[j][s] = std::numeric_limits<double>::lowest();
 			for(int k = 0; k < _sCount; k++)
 			{
-				_betaMatrix[j][s] = ExpPlus(_betaMatrix[j][s], _betaMatrix[j+1][k] + _phi(s, k, j+1));
+				double phi = ExpPlus(_betaMatrix[j][s], _betaMatrix[j+1][k] + _phi(s, k, j+1));
+				_betaMatrix[j][s] = phi;
 			}
 		}
 	}
@@ -90,6 +95,7 @@ void FWBW::_CalculateMuMatrix()
 
 void FWBW::_CalculateZ()
 {
+	_z = std::numeric_limits<double>::lowest();
 	for(int s = 0; s < _sCount; s++)
 	{
 		_z = ExpPlus(_z, _alphaMatrix[_jCount - 1][s]);

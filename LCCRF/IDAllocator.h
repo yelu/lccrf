@@ -11,7 +11,7 @@ public:
 	IDAllocator(void);
 	virtual ~IDAllocator(void);
 
-	int Allocate(wstring text)
+	int GetOrAllocateID(wstring text)
 	{
 		if(_textToIDMapping.count(text) != 0)
 		{
@@ -21,6 +21,15 @@ public:
 		_textToIDMapping[text] = _currentMaxID;
 		_idToTextMapping[_currentMaxID] = text;
 		return _currentMaxID;
+	}
+
+	wstring GetText(int id)
+	{
+		if(_idToTextMapping.count(id) != 0)
+		{
+			return _idToTextMapping[id];
+		}
+		return L"";
 	}
 
 	size_t Size()
