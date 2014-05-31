@@ -83,7 +83,6 @@
     <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TestSGD.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FWBW.h" />

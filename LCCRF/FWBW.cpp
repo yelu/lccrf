@@ -31,11 +31,11 @@ void FWBW::_CalculateAlphaMatrix()
 	}
 	for(int j = 1; j < _jCount; j++)
 	{
-		for(int s = 0; s < _sCount; s++)
+		for(int s1 = 0; s1 < _sCount; s1++)
 		{
-			for(int k = 0; k < _sCount; k++)
+			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				_alphaMatrix[j][s] += (_alphaMatrix[j-1][k] * _phi(k, s, j));
+				_alphaMatrix[j][s1] = ExpPlus(_alphaMatrix[j][s1], _alphaMatrix[j-1][s2] + _phi(s2, s1, j));
 			}
 		}
 	}
@@ -45,7 +45,7 @@ void FWBW::_CalculateBetaMatrix()
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		_betaMatrix[_jCount - 1][s] = 1.0;
+		_betaMatrix[_jCount - 1][s] = 0.0;	// log
 	}
 	for(int j = _jCount - 2; j >= 0; j--)
 	{
@@ -53,7 +53,7 @@ void FWBW::_CalculateBetaMatrix()
 		{
 			for(int k = 0; k < _sCount; k++)
 			{
-				_betaMatrix[j][s] += (_betaMatrix[j+1][k] * _phi(s, k, j+1));
+				_betaMatrix[j][s] = ExpPlus(_betaMatrix[j][s], _betaMatrix[j+1][k] + _phi(s, k, j+1));
 			}
 		}
 	}
@@ -76,12 +76,12 @@ void FWBW::_CalculateMuMatrix()
 					}
 					else
 					{
-						_muMatrix[j][s1][s2] = _alphaMatrix[j][s1] * _betaMatrix[j][s1];
+						_muMatrix[j][s1][s2] = _alphaMatrix[j][s1] + _betaMatrix[j][s1];
 					}
 				}
 				else
 				{
-					_muMatrix[j][s1][s2] = _alphaMatrix[j - 1][s1] * _phi(s1, s2, j) * _betaMatrix[j][s2];
+					_muMatrix[j][s1][s2] = _alphaMatrix[j - 1][s1] + _phi(s1, s2, j) + _betaMatrix[j][s2];
 				}
 			}
 		}
@@ -92,7 +92,7 @@ void FWBW::_CalculateZ()
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		_z += (_alphaMatrix[_jCount - 1][s]);
+		_z = ExpPlus(_z, _alphaMatrix[_jCount - 1][s]);
 	}
 }
 
@@ -106,7 +106,13 @@ const boost::multi_array<double, 3>& FWBW::GetQMatrix()
 		{
 			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				_qMatrix[j][s1][s2] = _muMatrix[j][s1][s2] / _z;
+				// fill _qMatrix[0][1..._sCount-1][0..._sCount] with 0.
+				if(0 == j && s1 != 0)
+				{
+					_qMatrix[j][s1][s2] = 0.0;
+					continue;
+				}
+				_qMatrix[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
 			}
 		}
 	}
@@ -115,7 +121,22 @@ const boost::multi_array<double, 3>& FWBW::GetQMatrix()
 
 double FWBW::GetZ()
 {
-	// todo: return log(_z)
 	_CalculateZ();
-	return _z;
+	return _z;	// log
+}
+
+
+double FWBW::ExpPlus(double exp1, double exp2)
+{
+	if(exp1 < exp2)
+	{
+		double t = exp1;
+		exp1 = exp2;
+		exp2  = t;
+	}
+	if(exp1 - exp2 > 20)
+	{
+		return exp1;
+	}
+	return exp2 + log(exp(exp1 - exp2) + 1);
 }

@@ -14,6 +14,8 @@ public:
 	const boost::multi_array<double, 3>& GetQMatrix();
 	double GetZ();
 
+	static double ExpPlus(double, double);
+
 private:
 	void _CalculateAlphaMatrix();
 	void _CalculateBetaMatrix();
@@ -23,11 +25,11 @@ private:
 private:
 	int _sCount;
 	int _jCount;
-	boost::multi_array<double, 2> _alphaMatrix;
-	boost::multi_array<double, 2> _betaMatrix;
-	boost::multi_array<double, 3> _muMatrix;
-	boost::multi_array<double, 3> _qMatrix;
+	boost::multi_array<double, 2> _alphaMatrix;	// log
+	boost::multi_array<double, 2> _betaMatrix;	// log
+	boost::multi_array<double, 3> _muMatrix;	// log
+	boost::multi_array<double, 3> _qMatrix;	//linear, probability [0,1]
 	function<double (int, int, int)> _phi;
-	double _z;
+	double _z; // log
 };
 
