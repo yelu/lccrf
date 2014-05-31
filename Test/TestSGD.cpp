@@ -13,19 +13,19 @@ protected:
 	}
 };
 
-	class Example
+class Example
+{
+public:
+	Example(double x1, double x2, double y)
 	{
-	public:
-		Example(double x1, double x2, double y)
-		{
-			this->x1 = x1;
-			this->x2 = x2;
-			this->y = y;
-		}
-		double x1;
-		double x2;
-		double y;
-	};
+		this->x1 = x1;
+		this->x2 = x2;
+		this->y = y;
+	}
+	double x1;
+	double x2;
+	double y;
+};
 
 TEST_F(SGDTestSuite, Test1)
 {
@@ -65,10 +65,11 @@ TEST_F(SGDTestSuite, Test1)
 	std::cout << res[0] << "\t" << res[1] << std::endl;
 	EXPECT_EQ(1, 1);
 }
-
+/*
 int main(int argc, char* argv[])
 {
 	testing::InitGoogleTest(&argc, argv);
 	int ret = RUN_ALL_TESTS();
 	return ret;
 }
+*/

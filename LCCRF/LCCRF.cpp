@@ -59,7 +59,7 @@ void LCCRF::MakeDervative()
 	};
 	for(size_t k = 0; k < _features.size(); k++)
 	{
-		function<double (vector<double>&, Document&)> derivativeK = [&](vector<double>& weights, Document& doc) {return derivative(weights, doc, k);};
+		function<double (vector<double>&, Document&)> derivativeK = [=](vector<double>& weights, Document& doc) {return derivative(weights, doc, k);};
 		_derivatives.push_back(derivativeK);
 	}
 }

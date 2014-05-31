@@ -15,6 +15,7 @@ typedef vector<wstring> X;
 typedef int Y;
 struct Token
 {
+	Token(X& _x, Y& _y):x(_x),y(_y){}
 	X x;
 	Y y;
 };
@@ -23,6 +24,9 @@ typedef vector<Token> Document;
 class LCCRF
 {
 public:
+
+	typedef function <int (const Document&, int, int, int)> FeatureType;
+
 	LCCRF(vector<function <int (const Document&, int, int, int)>>&, double learningRate);
 	virtual ~LCCRF(void);
 
@@ -38,11 +42,12 @@ public:
 	void Learn(list<Document>&, int maxIteration);
 
 	void Predict();
+
 private:
 
 	function<double (vector<double>&, Document&)> _likelihood;
 	vector<function<double (vector<double>&, Document&)>> _derivatives;
-	vector<function <int (const Document&, int, int, int)>> _features;
+	vector<FeatureType> _features;
 	IDAllocator _yIDAllocator;
 	double _learningRate;
 	vector<double> _weights;

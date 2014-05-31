@@ -15,16 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="FWBW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LCCRF.cpp">
+    <ClCompile Include="IDAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IDAllocator.cpp">
+    <ClCompile Include="LCCRF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +32,10 @@
     <ClInclude Include="FWBW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LCCRF.h">
+    <ClInclude Include="IDAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IDAllocator.h">
+    <ClInclude Include="LCCRF.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SGD.h">
