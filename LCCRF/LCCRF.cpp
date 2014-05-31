@@ -1,8 +1,9 @@
 #include "LCCRF.h"
 #include "FWBW.h"
 
-LCCRF::LCCRF(double learningRate = 0.01)
+LCCRF::LCCRF(vector<function <int (const Document&, int, int, int)>>& features, double learningRate = 0.01):_weights(features.size(), 0.0)
 {
+	_features = features;
 	_learningRate = learningRate;
 }
 
@@ -98,4 +99,15 @@ void LCCRF::MakeLikelihood()
 		return res1 - res2 - res3 * _learningRate / 2.0;
 	};
 	_likelihood = likelihood;
+}
+
+void LCCRF::Learn(list<Document>& traningSet, int maxIteration)
+{
+	// 1. make deriveatives
+	MakeDervative();
+	// 2. make likilihood
+	MakeLikelihood();
+	// 3. SGD
+	SGD<Document> sgd(traningSet, _weights, _derivatives, _likelihood);
+	sgd.Run(_learningRate, 1, maxIteration);
 }

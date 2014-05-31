@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "IDAllocator.h"
+#include "SGD.h"
 using std::function;
 using std::list;
 using std::wstring;
@@ -22,7 +23,7 @@ typedef vector<Token> Document;
 class LCCRF
 {
 public:
-	LCCRF(double learningRate);
+	LCCRF(vector<function <int (const Document&, int, int, int)>>&, double learningRate);
 	virtual ~LCCRF(void);
 
 	static double Phi(int s1, int s2, int j,
@@ -33,6 +34,10 @@ public:
 	void MakeDervative();
 
 	void MakeLikelihood();
+
+	void Learn(list<Document>&, int maxIteration);
+
+	void Predict();
 private:
 
 	function<double (vector<double>&, Document&)> _likelihood;
@@ -40,5 +45,6 @@ private:
 	vector<function <int (const Document&, int, int, int)>> _features;
 	IDAllocator _yIDAllocator;
 	double _learningRate;
+	vector<double> _weights;
 };
 
