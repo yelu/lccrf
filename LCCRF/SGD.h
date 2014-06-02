@@ -88,7 +88,7 @@ public:
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
 		printf("delta : %f\n", 0 - delta);
-		if(abs(delta) < 10e-10) 
+		if(abs(delta) < 10e-8) 
 		{
 			return true;
 		}
