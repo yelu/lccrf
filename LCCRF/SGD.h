@@ -34,7 +34,7 @@ public:
 
 	const vector<double>& Run(double learningRate, int batch = 1, int maxIteration = 1)
 	{
-		double lastObjectValue = 0.0;
+		double lastObjectValue = std::numeric_limits<double>::infinity();
 		for(int i = 0; i < maxIteration; i++)
 		{
 			printf("Iteration %d \n", i);
@@ -85,9 +85,10 @@ public:
 		{
 			newObjectValue += _object(_weights, *ite);
 		}
-		double delta = abs(newObjectValue - lastObjectValue);
+		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
-		if(delta < 10e-1) 
+		printf("delta : %f\n", 0 - delta);
+		if(abs(delta) < 10e-10) 
 		{
 			return true;
 		}

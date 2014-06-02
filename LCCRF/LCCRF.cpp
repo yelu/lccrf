@@ -1,7 +1,7 @@
 #include "LCCRF.h"
 #include "FWBW.h"
 
-LCCRF::LCCRF(vector<FeatureType>& features, double C = 1):_weights(features.size(), 1.0)
+LCCRF::LCCRF(vector<FeatureType>& features, double C = 1):_weights(features.size(), 0.0)
 {
 	_features = features;
 	_lambda = C;

@@ -119,8 +119,8 @@ void Test()
 	fs.push_back(f2);
 	fs.push_back(f3);
 
-	LCCRF lccrf(fs, 0.01);
-	lccrf.Learn(trainingSet, 0.01, 1, 100);
+	LCCRF lccrf(fs, 0.1);
+	lccrf.Learn(trainingSet, 1, 1, 1000);
 }
 
 
