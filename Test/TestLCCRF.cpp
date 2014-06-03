@@ -98,6 +98,34 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	EXPECT_NEAR(0.0807971, res, 10e-6);
 }
 
+TEST_F(LCCRFTestSuite, TestLikelihood)
+{
+	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
+	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
+
+	lccrf->Learn(trainingSet, 1, 1, 0);
+	double res = 0;
+	vector<double> weights;
+
+	weights.clear();
+	weights.push_back(0);
+	weights.push_back(0);
+	res = lccrf->_likelihood(weights, *(trainingSet.begin()));
+	EXPECT_NEAR(1.38629, res, 10e-6);
+	
+	weights.clear();
+	weights.push_back(1.0);
+	weights.push_back(1.0);
+	res = lccrf->_likelihood(weights, *(trainingSet.begin()));
+	EXPECT_NEAR(0.726523, res, 10e-6);
+
+	weights.clear();
+	weights.push_back(0.5);
+	weights.push_back(2.0);
+	res = lccrf->_likelihood(weights, *(trainingSet.begin()));
+	EXPECT_NEAR(0.813505, res, 10e-6);
+}
+
 int main(int argc, char* argv[])
 {
 	testing::InitGoogleTest(&argc, argv);
