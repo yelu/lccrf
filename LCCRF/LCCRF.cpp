@@ -21,8 +21,8 @@ double LCCRF::Phi(wstring s1, wstring s2, int j,
 	double ret = 0.0;
 	for(size_t i = 0; i < n; i++)
 	{
-		int featureWeight = features[i](doc, s1, s2, j);
-		ret += (weights[i] * featureWeight);
+		int featureHit = features[i](doc, s1, s2, j);
+		ret += (weights[i] * featureHit);
 	}
 	return ret;
 }
@@ -40,6 +40,7 @@ void LCCRF::MakeDervative()
 		{ return Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, weights, _features); };
 		FWBW fwbw(phi, labelCount, doc.size());
 		auto QMatrix = fwbw.GetQMatrix();
+		//fwbw.PrintQMatrix();
 		for(size_t j = 0; j < doc.size(); j++)
 		{
 			// If j is the first token, then j-1 is not avaliable, use -1 instead.
@@ -51,7 +52,9 @@ void LCCRF::MakeDervative()
 			{
 				for(int y2 = 0; y2 < labelCount; y2++)
 				{
-					res2 += (QMatrix[j][y1][y2] * _features[k](doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(y2), j));
+					double q = QMatrix[j][y1][y2];
+					double featureHit = _features[k](doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(y2), j);
+					res2 += (q * featureHit);
 				}
 			}
 

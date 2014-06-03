@@ -16,6 +16,8 @@ public:
 
 	static double ExpPlus(double, double);
 
+	void PrintQMatrix();
+
 private:
 	void _CalculateAlphaMatrix();
 	void _CalculateBetaMatrix();

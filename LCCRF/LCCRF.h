@@ -36,11 +36,11 @@ public:
 		vector<double>& weights,
 		vector<FeatureType>& features);
 
-	void AllocateIDForY();
-
 	void MakeDervative();
 
 	void MakeLikelihood();
+
+	void AllocateIDForY();
 
 	void Learn(list<Document>& traningSet, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 

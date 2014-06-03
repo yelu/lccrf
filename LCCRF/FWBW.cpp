@@ -1,4 +1,5 @@
 #include "FWBW.h"
+#include <iostream>
 
 
 FWBW::FWBW(void)
@@ -66,7 +67,7 @@ void FWBW::_CalculateBetaMatrix()
 
 void FWBW::_CalculateMuMatrix()
 {
-	for(int j = 0; j < _jCount - 1; j++)
+	for(int j = 0; j < _jCount; j++)
 	{
 		for(int s1 = 0; s1 < _sCount; s1++)
 		{
@@ -81,12 +82,17 @@ void FWBW::_CalculateMuMatrix()
 					}
 					else
 					{
-						_muMatrix[j][s1][s2] = _alphaMatrix[j][s1] + _betaMatrix[j][s1];
+						double a = _alphaMatrix[j][s2];
+						double b = _betaMatrix[j][s2];
+						_muMatrix[j][s1][s2] = a + b;
 					}
 				}
 				else
 				{
-					_muMatrix[j][s1][s2] = _alphaMatrix[j - 1][s1] + _phi(s1, s2, j) + _betaMatrix[j][s2];
+					double a = _alphaMatrix[j - 1][s1];
+					double p = _phi(s1, s2, j);
+					double b = _betaMatrix[j][s2];
+					_muMatrix[j][s1][s2] = a + p + b;
 				}
 			}
 		}
@@ -145,4 +151,20 @@ double FWBW::ExpPlus(double exp1, double exp2)
 		return exp1;
 	}
 	return exp2 + log(exp(exp1 - exp2) + 1);
+}
+
+void FWBW::PrintQMatrix()
+{
+	for(int j = 0; j < _jCount; j++)
+	{
+		printf("\nj = %d\n", j);
+		for(int s1 = 0; s1 < _sCount; s1++)
+		{
+			for(int s2 =0; s2 < _sCount; s2++)
+			{
+				std::cout << _qMatrix[j][s1][s2] << "\t";
+			}
+			std::cout << std::endl;
+		}
+	}
 }
