@@ -23,7 +23,7 @@ public:
 		{
 			return 0;
 		}
-		return _maxID;
+		return _maxID + 1;
 	}
 
 protected:
