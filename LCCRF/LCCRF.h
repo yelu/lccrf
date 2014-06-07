@@ -6,21 +6,11 @@
 #include <vector>
 #include "IDAllocator.h"
 #include "SGD.h"
+#include "Document.h"
 using std::function;
 using std::list;
 using std::wstring;
 using std::vector;
-
-typedef vector<wstring> X;
-typedef wstring Y;
-struct Token
-{
-	Token(X& _x, Y& _y):x(_x),y(_y){}
-	X x;
-	int yID;
-	Y y;
-};
-typedef vector<Token> Document;
 
 class LCCRF
 {

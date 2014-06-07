@@ -82,12 +82,18 @@
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />
+    <ClCompile Include="NGramFeaturizer.cpp" />
+    <ClCompile Include="TransitionFeaturizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Document.h" />
+    <ClInclude Include="Featurizer.h" />
     <ClInclude Include="FWBW.h" />
     <ClInclude Include="IDAllocator.h" />
     <ClInclude Include="LCCRF.h" />
+    <ClInclude Include="NGramFeaturizer.h" />
     <ClInclude Include="SGD.h" />
+    <ClInclude Include="TransitionFeaturizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

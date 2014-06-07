@@ -32,6 +32,26 @@ public:
 		return L"";
 	}
 
+	int Insert(wstring text, int id)
+	{
+		if(_textToIDMapping.count(text) != 0)
+		{
+			return _textToIDMapping[text];
+		}
+		_textToIDMapping[text] = id;
+		_idToTextMapping[id] = text;
+		return id;
+	}
+
+	bool Contains(wstring text)
+	{
+		if(_textToIDMapping.count(text) != 0)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	size_t Size()
 	{
 		return _textToIDMapping.size();
