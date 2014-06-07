@@ -30,13 +30,13 @@ protected:
 
 		LCCRF::FeatureType f1 = [](const Document& doc, wstring s1, wstring s2, int j)
 		{
-			if(j < 0 || j >= doc.size()) {return 0;}
+			if(j < 0 || j >= (int)(doc.size())) {return 0;}
 			if(doc[j].x[0] == L"I" && s2 == L"0") {return 1;}
 			return 0;
 		};
 		LCCRF::FeatureType f2 = [](const Document& doc, wstring s1, wstring s2, int j)
 		{
-			if(j < 0 || j >= doc.size()) {return 0;}
+			if(j < 0 || j >= (int)(doc.size())) {return 0;}
 			if(doc[j].x[0] == L"love" && s2 == L"1") {return 1;}
 			return 0;
 		};
