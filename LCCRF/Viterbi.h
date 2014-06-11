@@ -9,17 +9,9 @@ using std::vector;
 class Viterbi
 {
 public:
-	typedef function<double (int, int, int)> DistanceFunciton;
-	Viterbi(DistanceFunciton distanceFunciton, int, int);
+	Viterbi(void);
 	virtual ~Viterbi(void);
-	const vector<int>& GetPath();
-
-
+	static void GetPath(const boost::multi_array<double, 3>& graph, vector<int>& res);
 private:
-	DistanceFunciton _distance;
-	int _nState;
-	int _nStep;
-	vector<int> _path;
-	boost::multi_array<double, 2> _backTraceMatrix;
 };
 

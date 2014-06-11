@@ -1,12 +1,7 @@
 #include "Viterbi.h"
 
 
-Viterbi::Viterbi(DistanceFunciton distanceFunciton, int nState, int nStep):
-	_distance(distanceFunciton), 
-	_nState(nState), 
-	_nStep(nStep), 
-	_path(nStep, -1),
-	_backTraceMatrix(boost::extents[nStep][nState])
+Viterbi::Viterbi()
 {
 }
 
@@ -15,34 +10,41 @@ Viterbi::~Viterbi(void)
 {
 }
 
-const vector<int>& Viterbi::GetPath()
+void Viterbi::GetPath(const boost::multi_array<double, 3>& graph, vector<int>& res)
 {
-	vector<double> pi(_nState, 0);
-	for(int s = 0; s < _nState; s++)
+	int nStep = graph.shape()[0];
+	int nState = graph.shape()[1];
+	vector<double> pi(nState, 0);
+	boost::multi_array<int, 2> backTraceMatrix(boost::extents[nStep][nState]);
+
+	for(int s = 0; s < nState; s++)
 	{
-		_backTraceMatrix[0][s] = -1;
-		pi[s] = _distance(0, -1, s);
+		backTraceMatrix[0][s] = -1;
+		pi[s] = graph[0][0][s];
 	}
-	for(int j = 1; j < _nStep; j++)
-	{
-		vector<double> newPi(_nState, std::numeric_limits<double>::lowest());
-		for(int s1 = 0; s1 < _nState; s1++)
+
+	vector<double> newPi(nState, std::numeric_limits<double>::lowest());
+	for(int j = 1; j < nStep; j++)
+	{		
+		for(int s1 = 0; s1 < nState; s1++)
 		{
-			for(int s2 = 0; s2 < _nState; s2++)
+			for(int s2 = 0; s2 < nState; s2++)
 			{
-				double d = pi[s2] + _distance(j, s2, s1);
+				double d = pi[s2] + graph[j][s2][s1];
 				if(d > newPi[s1])
 				{
-					_backTraceMatrix[j][s1] = s2;
+					backTraceMatrix[j][s1] = s2;
 					newPi[s1] = d;
 				}
 			}
 		}
 		pi.swap(newPi);
 	}
+
+	// find the end point of optimal path.
 	int maxJ = -1;
 	double maxPath = std::numeric_limits<double>::lowest();
-	for(int s = 0; s < _nState; s++)
+	for(int s = 0; s < nState; s++)
 	{
 		if(pi[s] > maxPath)
 		{
@@ -50,9 +52,9 @@ const vector<int>& Viterbi::GetPath()
 			maxJ = s;
 		}
 	}
-	_path[_nStep - 1] = maxJ;
-	for(int j = _nStep - 2; j >= 0; j--)
+	res[nStep - 1] = maxJ;
+	for(int j = nStep - 2; j >= 0; j--)
 	{
-		_path[j] = _backTraceMatrix[j + 1][_path[j + 1]];
+		res[j] = backTraceMatrix[j + 1][res[j + 1]];
 	}
 }
