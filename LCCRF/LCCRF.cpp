@@ -1,9 +1,8 @@
 #include "LCCRF.h"
 #include "FWBW.h"
 
-LCCRF::LCCRF(vector<FeatureType>& features, double lambda = 1):_weights(features.size(), 0.0)
+LCCRF::LCCRF(FeatureManager& featureManager, double lambda = 1):_features(featureManager),_weights(featureManager.Size(), 0.0)
 {
-	_features = features;
 	_lambda = lambda;
 	_pTraningSet = NULL;
 }
@@ -15,14 +14,15 @@ LCCRF::~LCCRF(void)
 double LCCRF::Phi(wstring s1, wstring s2, int j,
 				  const Document& doc, 
 				  vector<double>& weights,
-		          vector<FeatureType>& features)
+				  FeatureManager& features)
 {
-	size_t n = features.size();
+	size_t n = features.Size();
 	double ret = 0.0;
-	for(size_t i = 0; i < n; i++)
+	set<int> hitFeatures;
+	features.Transform(doc, s1, s2, j, hitFeatures);
+	for(auto ite = hitFeatures.begin(); ite != hitFeatures.end(); ite++)
 	{
-		int featureHit = features[i](doc, s1, s2, j);
-		ret += (weights[i] * featureHit);
+		ret += (weights[*ite]);
 	}
 	return ret;
 }
@@ -47,13 +47,13 @@ void LCCRF::MakeDervative()
 			int y1 = -1;
 			if(0 == j){y1 = -1;}
 			else {y1 = doc[j - 1].yID;}
-			res1 += _features[k](doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j);
+			res1 += _features.IsHit(doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j, k);
 			for(int y1 = 0; y1 < labelCount; y1++)
 			{
 				for(int y2 = 0; y2 < labelCount; y2++)
 				{
 					double q = QMatrix[j][y1][y2];
-					double featureHit = _features[k](doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(y2), j);
+					double featureHit = _features.IsHit(doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(y2), j, k);
 					res2 += (q * featureHit);
 				}
 			}
@@ -61,7 +61,7 @@ void LCCRF::MakeDervative()
 		}
 		return 0 - (res1 - res2 - _lambda * weights[k]);
 	};
-	for(size_t k = 0; k < _features.size(); k++)
+	for(size_t k = 0; k < _features.Size(); k++)
 	{
 		function<double (vector<double>&, Document&)> derivativeK = [=](vector<double>& weights, Document& doc) {return derivative(weights, doc, k);};
 		_derivatives.push_back(derivativeK);
@@ -79,12 +79,14 @@ void LCCRF::MakeLikelihood()
 		// calculate res1
 		for(size_t j = 0; j < doc.size(); j++)
 		{
-			for(size_t h = 0; h < _features.size(); h++)
-			{
-				int y1 = -1;
-				if(0 == j){y1 = -1;}
-				else {y1 = doc[j - 1].yID;};
-				res1 += (weights[h] * _features[h](doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j));
+			int y1 = -1;
+			if(0 == j){y1 = -1;}
+			else {y1 = doc[j - 1].yID;};
+			set<int> hitFeatures;
+			_features.Transform(doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j, hitFeatures);
+			for(auto ite = hitFeatures.begin(); ite != hitFeatures.end(); ite++)
+			{			
+				res1 += (weights[*ite]);
 			}
 		}
 
@@ -95,7 +97,7 @@ void LCCRF::MakeLikelihood()
 		res2 += fwbw.GetZ(); // linear
 
 		double res3 = 0.0;
-		for(size_t w = 0; w < _features.size(); w++)
+		for(size_t w = 0; w < weights.size(); w++)
 		{
 			res3 += (weights[w] * weights[w]);
 		}

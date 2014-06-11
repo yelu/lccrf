@@ -1,5 +1,8 @@
 #include "NGramFeaturizer.h"
 #include <boost/lexical_cast.hpp>
+#include <fstream>
+using std::wofstream;
+using std::wifstream;
 
 NGramFeaturizer::NGramFeaturizer(int n):_n(n)
 {
@@ -17,7 +20,7 @@ const wstring& NGramFeaturizer::Name()
 	return _name;
 }
 
-wstring NGramFeaturizer::_MakeGram(const Document& doc, wstring s, int endPos)
+wstring NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos)
 {
 	// blank as seperator to seperator words. \t as seperotor to seperate tag.
 	wstring gram = L"";
@@ -45,7 +48,7 @@ void NGramFeaturizer::Fit(const Document& doc)
 	}
 }
 
-void NGramFeaturizer::Transform(const Document& doc, wstring s1, wstring s2, int j, set<int>& res)
+void NGramFeaturizer::Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res)
 {
 	if(j + 1 < _n || j >= (int)(doc.size()))
 	{
@@ -58,7 +61,7 @@ void NGramFeaturizer::Transform(const Document& doc, wstring s1, wstring s2, int
 	}
 }
 
-bool NGramFeaturizer::IsHit(const Document& doc, wstring s1, wstring s2, int j, int featureID)
+bool NGramFeaturizer::IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID)
 {
 	wstring gram = _MakeGram(doc, s2, j);
 	if(gram == _idAllocator.GetText(featureID))
@@ -66,4 +69,22 @@ bool NGramFeaturizer::IsHit(const Document& doc, wstring s1, wstring s2, int j, 
 		return true;
 	}
 	return false;
+}
+
+size_t NGramFeaturizer::Size()
+{
+	return _idAllocator.Size();
+}
+
+void NGramFeaturizer::Serialize(const wstring& filePath)
+{
+	std::wofstream ofs(filePath);
+	ofs << _n;
+	ofs << L"\n";
+	for(auto ite = _idAllocator.Begin(); ite != _idAllocator.End(); ite++)
+	{
+		ofs << (*ite).first << L"\t" << (*ite).second;
+		ofs << L"\n";
+	}
+	ofs.close();
 }

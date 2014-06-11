@@ -8,6 +8,7 @@ using std::wstring;
 class IDAllocator
 {
 public:
+
 	IDAllocator(void);
 	virtual ~IDAllocator(void);
 
@@ -55,6 +56,19 @@ public:
 	size_t Size()
 	{
 		return _textToIDMapping.size();
+	}
+
+	// for iterations.
+	typedef map<int, wstring>::const_iterator const_iterator;
+
+	map<int, wstring>::const_iterator Begin()
+	{
+		return _idToTextMapping.begin();
+	}
+
+	map<int, wstring>::const_iterator End()
+	{
+		return _idToTextMapping.end();
 	}
 
 private:

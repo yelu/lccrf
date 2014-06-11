@@ -1,5 +1,6 @@
 #include "TransitionFeaturizer.h"
-
+#include <fstream>
+using std::wofstream;
 
 TransitionFeaturizer::TransitionFeaturizer(void)
 {
@@ -11,7 +12,7 @@ TransitionFeaturizer::~TransitionFeaturizer(void)
 {
 }
 
-wstring TransitionFeaturizer::_MakeTransition(wstring s1, wstring s2)
+wstring TransitionFeaturizer::_MakeTransition(const wstring& s1, const wstring& s2)
 {
 	wstring tr = L"";
 	tr.append(s1);
@@ -39,7 +40,7 @@ void TransitionFeaturizer::Fit(const Document& doc)
 	}
 }
 
-void TransitionFeaturizer::Transform(const Document& doc, wstring s1, wstring s2, int j, set<int>& res)
+void TransitionFeaturizer::Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res)
 {
 	if(j < 1 || j >= (int)(doc.size()))
 	{
@@ -52,7 +53,7 @@ void TransitionFeaturizer::Transform(const Document& doc, wstring s1, wstring s2
 	}
 }
 
-bool TransitionFeaturizer::IsHit(const Document& doc, wstring s1, wstring s2, int j, int featureID)
+bool TransitionFeaturizer::IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID)
 {
 	wstring tr = _MakeTransition(s1, s2);
 	if(tr == _idAllocator.GetText(featureID))
@@ -60,4 +61,21 @@ bool TransitionFeaturizer::IsHit(const Document& doc, wstring s1, wstring s2, in
 		return true;
 	}
 	return false;
+}
+
+size_t TransitionFeaturizer::Size()
+{
+	return _idAllocator.Size();
+}
+
+void TransitionFeaturizer::Serialize(const wstring& filePath)
+{
+	std::wofstream ofs(filePath);
+	ofs << L"\n";
+	for(auto ite = _idAllocator.Begin(); ite != _idAllocator.End(); ite++)
+	{
+		ofs << (*ite).first << L"\t" << (*ite).second;
+		ofs << L"\n";
+	}
+	ofs.close();
 }

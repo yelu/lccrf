@@ -9,15 +9,15 @@ class Featurizer
 public:
 	Featurizer(void)
 	{
-		_maxID = -1;
 	};
 	virtual ~Featurizer(void){};
 	virtual void Fit(const Document& doc) = 0;
-	virtual void Transform(const Document& doc, wstring s1, wstring s2, int j, set<int>& res) = 0;
-	virtual bool IsHit(const Document& doc, wstring s1, wstring s2, int j, int featureID) = 0;
+	virtual void Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res) = 0;
+	virtual bool IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID) = 0;
 	virtual const wstring& Name() = 0;
+	virtual void Serialize(const wstring& filePath) = 0;
 
-	int GetFeatureCount()
+	static size_t Size()
 	{
 		if(_maxID < 0)
 		{
@@ -27,7 +27,7 @@ public:
 	}
 
 protected:
-	int AllocateID()
+	static int AllocateID()
 	{
 		_maxID++;
 		return _maxID;
@@ -35,6 +35,5 @@ protected:
 
 private:
 
-	int _maxID;
+	static int _maxID;
 };
-

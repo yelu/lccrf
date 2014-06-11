@@ -7,6 +7,7 @@
 #include "IDAllocator.h"
 #include "SGD.h"
 #include "Document.h"
+#include "FeatureManager.h"
 using std::function;
 using std::list;
 using std::wstring;
@@ -18,13 +19,13 @@ public:
 
 	typedef function <int (const Document&, wstring, wstring, int)> FeatureType;
 
-	LCCRF(vector<FeatureType>&, double);
+	LCCRF(FeatureManager&, double);
 	virtual ~LCCRF(void);
 
 	static double Phi(wstring s1, wstring s2, int j,
 		const Document& doc, 
 		vector<double>& weights,
-		vector<FeatureType>& features);
+		FeatureManager& features);
 
 	void MakeDervative();
 
@@ -40,7 +41,7 @@ private:
 
 	function<double (vector<double>&, Document&)> _likelihood;
 	vector<function<double (vector<double>&, Document&)>> _derivatives;
-	vector<FeatureType> _features;
+	FeatureManager& _features;
 	IDAllocator _yIDAllocator;
 	double _lambda;
 	vector<double> _weights;

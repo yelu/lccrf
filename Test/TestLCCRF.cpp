@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #define private public
 #include "../LCCRF/LCCRF.h"
+#include "../LCCRF/NGramFeaturizer.h"
+#include <memory>
 
 void MakeDocument(Document& doc, wstring xs[], wstring ys[], int len)
 {
@@ -26,24 +28,11 @@ protected:
 		MakeDocument(doc, xs, ys, n);
 		trainingSet.push_back(doc);
 	
-		vector<LCCRF::FeatureType> fs;
-
-		LCCRF::FeatureType f1 = [](const Document& doc, wstring s1, wstring s2, int j)
-		{
-			if(j < 0 || j >= (int)(doc.size())) {return 0;}
-			if(doc[j].x[0] == L"I" && s2 == L"0") {return 1;}
-			return 0;
-		};
-		LCCRF::FeatureType f2 = [](const Document& doc, wstring s1, wstring s2, int j)
-		{
-			if(j < 0 || j >= (int)(doc.size())) {return 0;}
-			if(doc[j].x[0] == L"love" && s2 == L"1") {return 1;}
-			return 0;
-		};
-
-		fs.push_back(f1);
-		fs.push_back(f2);
-		lccrf = new LCCRF(fs, 0.1);
+		std::shared_ptr<Featurizer> f(new NGramFeaturizer(1));
+		f->Fit(doc);
+		f->Serialize(L".\\NgramFeatures.txt");
+		featureManager.AddFeaturizer(f);
+		lccrf = new LCCRF(featureManager, 0.1);
 	}
 
 	static void TearDownTestCase() 
@@ -52,10 +41,12 @@ protected:
 
 	static LCCRF* lccrf;
 	static list<Document> trainingSet;
+	static FeatureManager featureManager;
 };
 
 LCCRF* LCCRFTestSuite::lccrf;
 list<Document> LCCRFTestSuite::trainingSet;
+FeatureManager LCCRFTestSuite::featureManager;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
