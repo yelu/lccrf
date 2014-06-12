@@ -23,14 +23,13 @@ const wstring& NGramFeaturizer::Name()
 wstring NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos)
 {
 	// blank as seperator to seperator words. \t as seperotor to seperate tag.
-	wstring gram = L"";
+	wstring gram = s;
+	gram.append(L" ");
 	for(int j = endPos - _n  + 1; j <= endPos; j++)
 	{
 		gram.append(doc[j].x[0]);
 		gram.append(L" ");
 	}
-	gram.append(L"\t");
-	gram.append(s);
 	return gram;
 }
 
@@ -92,4 +91,12 @@ void NGramFeaturizer::Serialize(const wstring& filePath)
 		ofs << L"\n";
 	}
 	ofs.close();
+}
+
+wstring NGramFeaturizer::FeatureToString(int featureID)
+{
+	wstring res = _name;
+	res.append(L".");
+	res.append(_idAllocator.GetText(featureID));
+	return res;
 }

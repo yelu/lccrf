@@ -17,6 +17,7 @@ public:
 	virtual const wstring& Name() = 0;
 	virtual void Serialize(const wstring& filePath) = 0;
 	virtual void Clear() = 0;
+	virtual wstring FeatureToString(int featureID){return L"";}
 
 	static void StaticClear()
 	{

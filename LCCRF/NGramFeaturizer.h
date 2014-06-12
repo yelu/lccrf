@@ -17,6 +17,7 @@ public:
 	size_t Size();
 	void Clear();
 	void Serialize(const wstring& filePath);
+	wstring FeatureToString(int featureID);
 
 private:
 

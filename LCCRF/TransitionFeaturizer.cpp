@@ -16,7 +16,7 @@ wstring TransitionFeaturizer::_MakeTransition(const wstring& s1, const wstring& 
 {
 	wstring tr = L"";
 	tr.append(s1);
-	tr.append(L"\t");
+	tr.append(L" ");
 	tr.append(s2);
 	return tr;
 }
@@ -83,4 +83,12 @@ void TransitionFeaturizer::Serialize(const wstring& filePath)
 		ofs << L"\n";
 	}
 	ofs.close();
+}
+
+wstring TransitionFeaturizer::FeatureToString(int featureID)
+{
+	wstring res = _name;
+	res.append(L".");
+	res.append(_idAllocator.GetText(featureID));
+	return res;
 }
