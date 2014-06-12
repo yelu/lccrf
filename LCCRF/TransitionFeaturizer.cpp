@@ -2,7 +2,7 @@
 #include <fstream>
 using std::wofstream;
 
-TransitionFeaturizer::TransitionFeaturizer(void)
+TransitionFeaturizer::TransitionFeaturizer()
 {
 	_name = L"Transition";
 }
@@ -26,17 +26,20 @@ const wstring& TransitionFeaturizer::Name()
 	return _name;
 }
 
-void TransitionFeaturizer::Fit(const Document& doc)
+void TransitionFeaturizer::Fit(const list<Document>& docs)
 {
-	for(int i = 1; i < (int)(doc.size()); i++)
+	for(auto doc = docs.begin(); doc != docs.end(); doc++)
 	{
-		wstring tr = _MakeTransition(doc[i - 1].y, doc[i].y);
-		if(_idAllocator.Contains(tr))
+		for(int i = 1; i < (int)(doc->size()); i++)
 		{
-			continue;
+			wstring tr = _MakeTransition((*doc)[i - 1].y, (*doc)[i].y);
+			if(_idAllocator.Contains(tr))
+			{
+				continue;
+			}
+			int id = AllocateID();
+			_idAllocator.Insert(tr, id);
 		}
-		int id = AllocateID();
-		_idAllocator.Insert(tr, id);
 	}
 }
 

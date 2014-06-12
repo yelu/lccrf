@@ -125,10 +125,8 @@ void LCCRF::Learn(list<Document>& traningSet, double learningRate, int batch, in
 	_derivatives.clear();
 	_features.Clear();
 	_pTraningSet = &traningSet;
-	for(auto ite = _pTraningSet->begin(); ite != _pTraningSet->end(); ite++)
-	{
-		_features.Fit(*ite);
-	}
+
+	_features.Fit(traningSet);
 	// reset _weights.
 	vector<double> newWeights(_features.Size(), 0.0);
 	_weights.swap(newWeights);

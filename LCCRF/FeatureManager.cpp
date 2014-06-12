@@ -10,11 +10,16 @@ FeatureManager::~FeatureManager(void)
 {
 }
 
-void FeatureManager::Fit(const Document& doc)
+void FeatureManager::Fit(const list<Document>& docs)
 {
+	_nextIDs.clear();
+	int startID = 0;
 	for(auto ite = _featurizers.begin(); ite != _featurizers.end(); ite++)
 	{
-		(*ite)->Fit(doc);
+		(*ite)->SetStartID(startID);
+		(*ite)->Fit(docs);
+		startID = (*ite)->GetNextID();
+		_nextIDs.push_back(startID);
 	}
 }
 
@@ -30,9 +35,17 @@ bool FeatureManager::IsHit(const Document& doc, const wstring& s1, const wstring
 {
 	for(auto ite = _featurizers.begin(); ite != _featurizers.end(); ite++)
 	{
+		if(featureID >= (*ite)->GetNextID())
+		{
+			continue;
+		}
 		if((*ite)->IsHit(doc, s1, s2, j, featureID))
 		{
 			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	return false;
@@ -58,5 +71,16 @@ void FeatureManager::Clear()
 	{
 		(*ite)->Clear();
 	}
-	Featurizer::StaticClear();
+}
+
+void FeatureManager::Serialize(wstring path)
+{
+	for(auto ite = _featurizers.begin(); ite != _featurizers.end(); ite++)
+	{
+		wstring p = L"";
+		p.append(L"\\");
+		p.append((*ite)->Name());
+		p.append(L"features");
+		(*ite)->Serialize(p);
+	}
 }

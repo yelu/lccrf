@@ -29,9 +29,9 @@ protected:
 		trainingSet.push_back(doc);
 	
 		std::shared_ptr<Featurizer> f(new NGramFeaturizer(1));
-		f->Fit(doc);
-		f->Serialize(L".\\NgramFeatures.txt");
 		featureManager.AddFeaturizer(f);
+		featureManager.Fit(trainingSet);
+		featureManager.Serialize(L".");
 		lccrf = new LCCRF(featureManager, 0.1);
 	}
 

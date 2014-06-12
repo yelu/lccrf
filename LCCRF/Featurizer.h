@@ -2,16 +2,18 @@
 
 #include "Document.h"
 #include <set>
+#include <list>
 using std::set;
+using std::list;
 
 class Featurizer
 {
 public:
-	Featurizer(void)
+	Featurizer()
 	{
 	};
 	virtual ~Featurizer(void){};
-	virtual void Fit(const Document& doc) = 0;
+	virtual void Fit(const list<Document>& doc) = 0;
 	virtual void Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res) = 0;
 	virtual bool IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID) = 0;
 	virtual const wstring& Name() = 0;
@@ -19,28 +21,30 @@ public:
 	virtual void Clear() = 0;
 	virtual wstring FeatureToString(int featureID){return L"";}
 
-	static void StaticClear()
+	void SetStartID(int startID)
 	{
-		_maxID = -1;
+		_minID = startID;
+		_nextID = _minID;
 	}
 
-	static size_t Size()
+	size_t Size()
 	{
-		if(_maxID < 0)
-		{
-			return 0;
-		}
-		return _maxID + 1;
+		return _nextID - _minID;
 	}
 
+	int GetNextID()
+	{
+		return _nextID;
+	}
 protected:
-	static int AllocateID()
+	int AllocateID()
 	{
-		_maxID++;
-		return _maxID;
+		_nextID++;
+		return _nextID - 1;
 	}
 
 private:
 
-	static int _maxID;
+	int _minID;
+	int _nextID;
 };

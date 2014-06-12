@@ -33,17 +33,20 @@ wstring NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int en
 	return gram;
 }
 
-void NGramFeaturizer::Fit(const Document& doc)
+void NGramFeaturizer::Fit(const list<Document>& docs)
 {
-	for(int i = _n - 1; i < (int)(doc.size()); i++)
+	for(auto doc = docs.begin(); doc != docs.end(); doc++)
 	{
-		wstring gram = _MakeGram(doc, doc[i].y, i);
-		if(_idAllocator.Contains(gram))
+		for(int i = _n - 1; i < (int)(doc->size()); i++)
 		{
-			continue;
+			wstring gram = _MakeGram(*doc, (*doc)[i].y, i);
+			if(_idAllocator.Contains(gram))
+			{
+				continue;
+			}
+			int id = AllocateID();
+			_idAllocator.Insert(gram, id);
 		}
-		int id = AllocateID();
-		_idAllocator.Insert(gram, id);
 	}
 }
 
