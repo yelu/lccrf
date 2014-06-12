@@ -76,6 +76,11 @@ size_t NGramFeaturizer::Size()
 	return _idAllocator.Size();
 }
 
+void NGramFeaturizer::Clear()
+{
+	_idAllocator.Clear();
+}
+
 void NGramFeaturizer::Serialize(const wstring& filePath)
 {
 	std::wofstream ofs(filePath);

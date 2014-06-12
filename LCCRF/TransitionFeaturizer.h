@@ -16,6 +16,7 @@ public:
 	const wstring& Name();
 	size_t Size();
 	void Serialize(const wstring& filePath);
+	void Clear();
 
 private:
 

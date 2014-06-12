@@ -68,6 +68,11 @@ size_t TransitionFeaturizer::Size()
 	return _idAllocator.Size();
 }
 
+void TransitionFeaturizer::Clear()
+{
+	_idAllocator.Clear();
+}
+
 void TransitionFeaturizer::Serialize(const wstring& filePath)
 {
 	std::wofstream ofs(filePath);

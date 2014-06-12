@@ -16,6 +16,12 @@ public:
 	virtual bool IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID) = 0;
 	virtual const wstring& Name() = 0;
 	virtual void Serialize(const wstring& filePath) = 0;
+	virtual void Clear() = 0;
+
+	static void StaticClear()
+	{
+		_maxID = -1;
+	}
 
 	static size_t Size()
 	{

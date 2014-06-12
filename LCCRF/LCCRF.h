@@ -35,7 +35,9 @@ public:
 
 	void Learn(list<Document>& traningSet, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 
-	void Predict();
+	void Predict(const Document& doc, vector<wstring>& tags);
+
+	void Debug(const Document&, const vector<wstring>&);
 
 private:
 

@@ -15,6 +15,7 @@ public:
 	bool IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID);
 	const wstring& Name();
 	size_t Size();
+	void Clear();
 	void Serialize(const wstring& filePath);
 
 private:

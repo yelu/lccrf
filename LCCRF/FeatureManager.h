@@ -16,6 +16,7 @@ public:
 	void Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res);
 	bool IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID);
 	size_t Size();
+	void Clear();
 
 private:
 	list<std::shared_ptr<Featurizer>> _featurizers;

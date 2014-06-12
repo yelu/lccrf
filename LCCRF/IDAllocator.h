@@ -71,6 +71,13 @@ public:
 		return _idToTextMapping.end();
 	}
 
+	void Clear()
+	{
+		_currentMaxID = -1;
+		_textToIDMapping.clear();
+		_idToTextMapping.clear();
+	}
+
 private:
 	int _currentMaxID;
 	map<wstring, int> _textToIDMapping;

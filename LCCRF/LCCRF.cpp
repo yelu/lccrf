@@ -1,5 +1,6 @@
 #include "LCCRF.h"
 #include "FWBW.h"
+#include "Viterbi.h"
 
 LCCRF::LCCRF(FeatureManager& featureManager, double lambda = 1):_features(featureManager),_weights(featureManager.Size(), 0.0)
 {
@@ -120,7 +121,18 @@ void LCCRF::AllocateIDForY()
 
 void LCCRF::Learn(list<Document>& traningSet, double learningRate, int batch, int maxIteration)
 {
+	_yIDAllocator.Clear();
+	_derivatives.clear();
+	_features.Clear();
 	_pTraningSet = &traningSet;
+	for(auto ite = _pTraningSet->begin(); ite != _pTraningSet->end(); ite++)
+	{
+		_features.Fit(*ite);
+	}
+	// reset _weights.
+	vector<double> newWeights(_features.Size(), 0.0);
+	_weights.swap(newWeights);
+
 	AllocateIDForY();
 	// 1. make deriveatives
 	MakeDervative();
@@ -129,4 +141,55 @@ void LCCRF::Learn(list<Document>& traningSet, double learningRate, int batch, in
 	// 3. SGD
 	SGD<Document> sgd(traningSet, _weights, _derivatives, _likelihood);
 	sgd.Run(learningRate, batch, maxIteration);
+}
+
+void LCCRF::Predict(const Document& doc, vector<wstring>& tags)
+{
+	boost::multi_array<double, 3> graph(boost::extents[doc.size()][_yIDAllocator.Size()][_yIDAllocator.Size()]);
+	for(int j = 0; j < (int)doc.size(); j++)
+	{
+		for(int s2 = 0; s2 < (int)_yIDAllocator.Size(); s2++)
+		{
+			for(int s1 = 0; s1 < (int)_yIDAllocator.Size(); s1++)
+			{
+				if(0 == j)
+				{
+					if(s1 != 0)
+					{
+						// fill graph[0][1..._sCount-1][0..._sCount] with 0.
+						graph[j][s1][s2] = 0.0;
+					}
+					else
+					{
+						graph[j][s1][s2] = Phi(_yIDAllocator.GetText(-1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
+					}
+				}
+				else
+				{
+					graph[j][s1][s2] = Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
+				}
+			}
+		}
+	}
+	vector<int> path(doc.size(), -1);
+	Viterbi::GetPath(graph, path);
+	tags.clear();
+	for(auto ite = path.begin(); ite != path.end(); ite++)
+	{
+		tags.push_back(_yIDAllocator.GetText(*ite));
+	}
+}
+
+void LCCRF::Debug(const Document& doc, const vector<wstring>& path)
+{
+	int preState = -1;
+	double score = 0.0;
+	printf("Path : ");
+	for(int j = 0; j < (int)_yIDAllocator.Size(); j++)
+	{
+		score += Phi(_yIDAllocator.GetText(preState), path[j], j, doc, _weights, _features);
+		preState = _yIDAllocator.GetOrAllocateID(path[j]);
+		printf("%s -> ", path[j].c_str());
+	}
+	printf(" score : %f\n", score);
 }

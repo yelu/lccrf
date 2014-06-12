@@ -59,7 +59,6 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-
 	lccrf->Learn(trainingSet, 1, 1, 0);
 	double res = 0;
 	vector<double> weights;
@@ -93,7 +92,6 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-
 	lccrf->Learn(trainingSet, 1, 1, 0);
 	double res = 0;
 	vector<double> weights;
@@ -115,6 +113,44 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 	weights.push_back(2.0);
 	res = lccrf->_likelihood(weights, *(trainingSet.begin()));
 	EXPECT_NEAR(0.813505, res, 10e-6);
+}
+
+TEST_F(LCCRFTestSuite, TestPredict)
+{
+	lccrf->Learn(trainingSet, 0.1, 1, 1000);
+
+	Document doc;
+	wstring xs[] = {L"I", L"love"};
+	wstring ys[] = {L"0",L"1"};
+	int n = sizeof(xs) / sizeof(wstring);
+	MakeDocument(doc, xs, ys, n);
+
+	vector<wstring> res;
+	lccrf->Predict(doc, res);
+	EXPECT_STREQ(L"0", res[0].c_str());
+	EXPECT_STREQ(L"1", res[1].c_str());
+
+	vector<wstring> path;
+
+	path.clear();
+	path.push_back(L"0");
+	path.push_back(L"0");
+	lccrf->Debug(doc, path);
+
+	path.clear();
+	path.push_back(L"0");
+	path.push_back(L"1");
+	lccrf->Debug(doc, path);
+
+	path.clear();
+	path.push_back(L"1");
+	path.push_back(L"0");
+	lccrf->Debug(doc, path);
+
+	path.clear();
+	path.push_back(L"1");
+	path.push_back(L"1");
+	lccrf->Debug(doc, path);
 }
 
 int main(int argc, char* argv[])

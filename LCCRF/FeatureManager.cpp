@@ -51,3 +51,12 @@ void FeatureManager::AddFeaturizer(std::shared_ptr<Featurizer>& featurizer)
 {
 	_featurizers.push_back(featurizer);
 }
+
+void FeatureManager::Clear()
+{
+	for(auto ite = _featurizers.begin(); ite != _featurizers.end(); ite++)
+	{
+		(*ite)->Clear();
+	}
+	Featurizer::StaticClear();
+}
