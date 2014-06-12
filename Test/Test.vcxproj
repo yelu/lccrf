@@ -83,6 +83,11 @@
   <ItemGroup>
     <ClCompile Include="TestLCCRF.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LCCRF\LCCRF.vcxproj">
+      <Project>{146717de-ba7f-404f-bd02-ed767f490e4f}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

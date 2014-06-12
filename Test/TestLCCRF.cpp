@@ -23,7 +23,7 @@ protected:
 	{
 		Document doc;
 		wstring xs[] = {L"I", L"love"};
-		wstring ys[] = {L"0",L"1"};
+		wstring ys[] = {L"tag1",L"tag2"};
 		int n = sizeof(xs) / sizeof(wstring);
 		MakeDocument(doc, xs, ys, n);
 		trainingSet.push_back(doc);
@@ -121,35 +121,41 @@ TEST_F(LCCRFTestSuite, TestPredict)
 
 	Document doc;
 	wstring xs[] = {L"I", L"love"};
-	wstring ys[] = {L"0",L"1"};
+	wstring ys[] = {L"tag1",L"tag2"};
 	int n = sizeof(xs) / sizeof(wstring);
 	MakeDocument(doc, xs, ys, n);
 
 	vector<wstring> res;
 	lccrf->Predict(doc, res);
-	EXPECT_STREQ(L"0", res[0].c_str());
-	EXPECT_STREQ(L"1", res[1].c_str());
+	EXPECT_STREQ(L"tag1", res[0].c_str());
+	EXPECT_STREQ(L"tag2", res[1].c_str());
 
 	vector<wstring> path;
 
 	path.clear();
-	path.push_back(L"0");
-	path.push_back(L"0");
+	path.push_back(L"tag1");
+	path.push_back(L"tag1");
 	lccrf->Debug(doc, path);
 
 	path.clear();
-	path.push_back(L"0");
-	path.push_back(L"1");
+	path.push_back(L"tag1");
+	path.push_back(L"tag2");
 	lccrf->Debug(doc, path);
 
 	path.clear();
-	path.push_back(L"1");
-	path.push_back(L"0");
+	path.push_back(L"tag2");
+	path.push_back(L"tag1");
 	lccrf->Debug(doc, path);
 
 	path.clear();
-	path.push_back(L"1");
-	path.push_back(L"1");
+	path.push_back(L"tag2");
+	path.push_back(L"tag2");
+	lccrf->Debug(doc, path);
+
+	// bad path.
+	path.clear();
+	path.push_back(L"tag1");
+	path.push_back(L"tag3");
 	lccrf->Debug(doc, path);
 }
 

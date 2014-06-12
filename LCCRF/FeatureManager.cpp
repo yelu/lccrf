@@ -77,10 +77,10 @@ void FeatureManager::Serialize(wstring path)
 {
 	for(auto ite = _featurizers.begin(); ite != _featurizers.end(); ite++)
 	{
-		wstring p = L"";
+		wstring p = path;
 		p.append(L"\\");
 		p.append((*ite)->Name());
-		p.append(L"features");
+		p.append(L".features");
 		(*ite)->Serialize(p);
 	}
 }

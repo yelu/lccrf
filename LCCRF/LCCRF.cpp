@@ -1,6 +1,7 @@
 #include "LCCRF.h"
 #include "FWBW.h"
 #include "Viterbi.h"
+using std::wcout;
 
 LCCRF::LCCRF(FeatureManager& featureManager, double lambda = 1):_features(featureManager),_weights(featureManager.Size(), 0.0)
 {
@@ -182,12 +183,18 @@ void LCCRF::Debug(const Document& doc, const vector<wstring>& path)
 {
 	int preState = -1;
 	double score = 0.0;
-	printf("Path : ");
+	wcout << "Path : ";
 	for(int j = 0; j < (int)_yIDAllocator.Size(); j++)
 	{
+		wcout << path[j];
+		if(!_yIDAllocator.Contains(path[j]))
+		{
+			wcout << L"(bad path)" << std::endl;
+			return;
+		}
 		score += Phi(_yIDAllocator.GetText(preState), path[j], j, doc, _weights, _features);
 		preState = _yIDAllocator.GetOrAllocateID(path[j]);
-		printf("%s -> ", path[j].c_str());
+		wcout << L" -> ";
 	}
-	printf(" score : %f\n", score);
+	wcout << " score : " << score << std::endl;
 }
