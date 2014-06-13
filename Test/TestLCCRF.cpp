@@ -50,7 +50,7 @@ FeatureManager LCCRFTestSuite::featureManager;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Learn(trainingSet, 0.1, 1, 1000);
+	lccrf->Fit(trainingSet, 0.1, 1, 1000);
 	EXPECT_NEAR(1.63, lccrf->_weights[0], 10e-2);
 	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
 }
@@ -59,7 +59,7 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-	lccrf->Learn(trainingSet, 1, 1, 0);
+	lccrf->Fit(trainingSet, 1, 1, 0);
 	double res = 0;
 	vector<double> weights;
 
@@ -92,7 +92,7 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-	lccrf->Learn(trainingSet, 1, 1, 0);
+	lccrf->Fit(trainingSet, 1, 1, 0);
 	double res = 0;
 	vector<double> weights;
 
@@ -117,7 +117,7 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 
 TEST_F(LCCRFTestSuite, TestPredict)
 {
-	lccrf->Learn(trainingSet, 0.1, 1, 1000);
+	lccrf->Fit(trainingSet, 0.1, 1, 1000);
 
 	Document doc;
 	wstring xs[] = {L"I", L"love"};

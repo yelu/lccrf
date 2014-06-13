@@ -22,22 +22,24 @@ public:
 	LCCRF(FeatureManager&, double);
 	virtual ~LCCRF(void);
 
-	static double Phi(wstring s1, wstring s2, int j,
-		const Document& doc, 
-		vector<double>& weights,
-		FeatureManager& features);
-
-	void MakeDervative();
-
-	void MakeLikelihood();
-
-	void AllocateIDForY();
-
-	void Learn(list<Document>& traningSet, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
+	void Fit(list<Document>& traningSet, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 
 	void Predict(const Document& doc, vector<wstring>& tags);
 
 	void Debug(const Document&, const vector<wstring>&);
+
+private:
+
+	static double _Phi(wstring s1, wstring s2, int j,
+		const Document& doc, 
+		vector<double>& weights,
+		FeatureManager& features);
+
+	void _MakeDervative();
+
+	void _MakeLikelihood();
+
+	void _AllocateIDForY();
 
 private:
 

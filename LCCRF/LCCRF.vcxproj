@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FeatureManager.cpp" />
-    <ClCompile Include="Featurizer.cpp" />
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />

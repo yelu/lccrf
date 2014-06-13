@@ -36,9 +36,6 @@
     <ClCompile Include="FeatureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Featurizer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Viterbi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

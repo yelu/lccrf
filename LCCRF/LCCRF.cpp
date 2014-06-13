@@ -13,7 +13,7 @@ LCCRF::~LCCRF(void)
 {
 }
 
-double LCCRF::Phi(wstring s1, wstring s2, int j,
+double LCCRF::_Phi(wstring s1, wstring s2, int j,
 				  const Document& doc, 
 				  vector<double>& weights,
 				  FeatureManager& features)
@@ -29,7 +29,7 @@ double LCCRF::Phi(wstring s1, wstring s2, int j,
 	return ret;
 }
 
-void LCCRF::MakeDervative()
+void LCCRF::_MakeDervative()
 {
 	function<double (vector<double>&, Document&, int)> derivative = [&](vector<double>& weights, Document& doc, int k)
 	{
@@ -39,7 +39,7 @@ void LCCRF::MakeDervative()
 
 		// forward-backword calculation.
 		function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-		{ return Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, weights, _features); };
+		{ return _Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, weights, _features); };
 		FWBW fwbw(phi, labelCount, doc.size());
 		auto QMatrix = fwbw.GetQMatrix();
 		//fwbw.PrintQMatrix();
@@ -70,7 +70,7 @@ void LCCRF::MakeDervative()
 	}
 }
 
-void LCCRF::MakeLikelihood()
+void LCCRF::_MakeLikelihood()
 {
 	function<double (vector<double>&, Document&)> likelihood= [&](vector<double>& weights, Document& doc)
 	{
@@ -94,7 +94,7 @@ void LCCRF::MakeLikelihood()
 
 		// forward-backword calculation for res2.
 		function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-		{ return Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, weights, _features); };
+		{ return _Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, weights, _features); };
 		FWBW fwbw(phi, labelCount, doc.size());
 		res2 += fwbw.GetZ(); // linear
 
@@ -108,7 +108,7 @@ void LCCRF::MakeLikelihood()
 	_likelihood = likelihood;
 }
 
-void LCCRF::AllocateIDForY()
+void LCCRF::_AllocateIDForY()
 {
 	for(auto ite = _pTraningSet->begin(); ite != _pTraningSet->end(); ite++)
 	{
@@ -119,7 +119,7 @@ void LCCRF::AllocateIDForY()
 	}
 }
 
-void LCCRF::Learn(list<Document>& traningSet, double learningRate, int batch, int maxIteration)
+void LCCRF::Fit(list<Document>& traningSet, double learningRate, int batch, int maxIteration)
 {
 	_yIDAllocator.Clear();
 	_derivatives.clear();
@@ -131,11 +131,11 @@ void LCCRF::Learn(list<Document>& traningSet, double learningRate, int batch, in
 	vector<double> newWeights(_features.Size(), 0.0);
 	_weights.swap(newWeights);
 
-	AllocateIDForY();
+	_AllocateIDForY();
 	// 1. make deriveatives
-	MakeDervative();
+	_MakeDervative();
 	// 2. make likilihood
-	MakeLikelihood();
+	_MakeLikelihood();
 	// 3. SGD
 	SGD<Document> sgd(traningSet, _weights, _derivatives, _likelihood);
 	sgd.Run(learningRate, batch, maxIteration);
@@ -159,12 +159,12 @@ void LCCRF::Predict(const Document& doc, vector<wstring>& tags)
 					}
 					else
 					{
-						graph[j][s1][s2] = Phi(_yIDAllocator.GetText(-1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
+						graph[j][s1][s2] = _Phi(_yIDAllocator.GetText(-1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
 					}
 				}
 				else
 				{
-					graph[j][s1][s2] = Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
+					graph[j][s1][s2] = _Phi(_yIDAllocator.GetText(s1), _yIDAllocator.GetText(s2), j, doc, _weights, _features);
 				}
 			}
 		}
@@ -191,7 +191,7 @@ void LCCRF::Debug(const Document& doc, const vector<wstring>& path)
 			wcout << L"(bad path)" << std::endl;
 			return;
 		}
-		score += Phi(_yIDAllocator.GetText(preState), path[j], j, doc, _weights, _features);
+		score += _Phi(_yIDAllocator.GetText(preState), path[j], j, doc, _weights, _features);
 		preState = _yIDAllocator.GetOrAllocateID(path[j]);
 		wcout << L" -> ";
 	}
