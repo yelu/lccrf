@@ -73,11 +73,6 @@ bool NGramFeaturizer::IsHit(const Document& doc, const wstring& s1, const wstrin
 	return false;
 }
 
-size_t NGramFeaturizer::Size()
-{
-	return _idAllocator.Size();
-}
-
 void NGramFeaturizer::Clear()
 {
 	_idAllocator.Clear();

@@ -66,11 +66,6 @@ bool TransitionFeaturizer::IsHit(const Document& doc, const wstring& s1, const w
 	return false;
 }
 
-size_t TransitionFeaturizer::Size()
-{
-	return _idAllocator.Size();
-}
-
 void TransitionFeaturizer::Clear()
 {
 	_idAllocator.Clear();
