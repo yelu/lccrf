@@ -13,7 +13,6 @@ struct Token
 {
 	Token(X& _x, Y& _y):x(_x),y(_y){}
 	X x;
-	int yID;
 	Y y;
 };
 typedef vector<Token> Document;

@@ -46,10 +46,10 @@ void LCCRF::MakeDervative()
 		for(size_t j = 0; j < doc.size(); j++)
 		{
 			// If j is the first token, then j-1 is not avaliable, use -1 instead.
-			int y1 = -1;
-			if(0 == j){y1 = -1;}
-			else {y1 = doc[j - 1].yID;}
-			res1 += _features.IsHit(doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j, k);
+			wstring y1 = L"";
+			if(0 == j){y1 = L"";}
+			else {y1 = doc[j - 1].y;}
+			res1 += _features.IsHit(doc, y1, doc[j].y, j, k);
 			for(int y1 = 0; y1 < labelCount; y1++)
 			{
 				for(int y2 = 0; y2 < labelCount; y2++)
@@ -81,11 +81,11 @@ void LCCRF::MakeLikelihood()
 		// calculate res1
 		for(size_t j = 0; j < doc.size(); j++)
 		{
-			int y1 = -1;
-			if(0 == j){y1 = -1;}
-			else {y1 = doc[j - 1].yID;};
+			wstring y1 = L"";
+			if(0 == j){y1 = L"";}
+			else {y1 = doc[j - 1].y;};
 			set<int> hitFeatures;
-			_features.Transform(doc, _yIDAllocator.GetText(y1), _yIDAllocator.GetText(doc[j].yID), j, hitFeatures);
+			_features.Transform(doc, y1, doc[j].y, j, hitFeatures);
 			for(auto ite = hitFeatures.begin(); ite != hitFeatures.end(); ite++)
 			{			
 				res1 += (weights[*ite]);
@@ -115,7 +115,6 @@ void LCCRF::AllocateIDForY()
 		for(auto token = ite->begin(); token != ite->end(); token++)
 		{
 			int id = _yIDAllocator.GetOrAllocateID(token->y);
-			token->yID = id;
 		}
 	}
 }
