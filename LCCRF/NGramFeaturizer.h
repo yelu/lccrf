@@ -8,7 +8,7 @@ using std::set;
 class NGramFeaturizer : public Featurizer
 {
 public:
-	NGramFeaturizer(int n);
+	NGramFeaturizer(int n, const vector<int>& fields = vector<int>(1, 0));
 	virtual ~NGramFeaturizer(void);
 	void Fit(const list<Document>& docs);
 	void Transform(const Document& doc, const wstring& s1, const wstring& s2, int j, set<int>& res);
@@ -16,7 +16,6 @@ public:
 	const wstring& Name();
 	void Clear();
 	void Serialize(const wstring& filePath);
-	wstring FeatureToString(int featureID);
 
 private:
 
@@ -25,5 +24,6 @@ private:
 	int _n;
 	IDAllocator _idAllocator;
 	wstring _name;
+	vector<int> _fields;
 };
 

@@ -82,11 +82,3 @@ void TransitionFeaturizer::Serialize(const wstring& filePath)
 	}
 	ofs.close();
 }
-
-wstring TransitionFeaturizer::FeatureToString(int featureID)
-{
-	wstring res = _name;
-	res.append(L".");
-	res.append(_idAllocator.GetText(featureID));
-	return res;
-}

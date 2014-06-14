@@ -1,10 +1,11 @@
 #include "NGramFeaturizer.h"
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include "Utils.h"
 using std::wofstream;
 using std::wifstream;
 
-NGramFeaturizer::NGramFeaturizer(int n):_n(n)
+NGramFeaturizer::NGramFeaturizer(int n, const vector<int>& fields):_n(n), _fields(fields)
 {
 	_name = boost::lexical_cast<wstring>(_n);
 	_name.append(L"gram");
@@ -22,13 +23,22 @@ const wstring& NGramFeaturizer::Name()
 
 wstring NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos)
 {
-	// blank as seperator to seperator words. \t as seperotor to seperate tag.
-	wstring gram = s;
+	// use blank as seperator to seperator words. blank character will be escaped to double blank.
+	// '\r\n' will be replaced to blank to avoid deserilization problem.
+	wstring gram = StringUtils::Escape(s, L' ');
+	StringUtils::Replace(gram, L'\n', L' ');
+	StringUtils::Replace(gram, L'\r', L' ');
 	gram.append(L" ");
 	for(int j = endPos - _n  + 1; j <= endPos; j++)
 	{
-		gram.append(doc[j].x[0]);
-		gram.append(L" ");
+		for(auto ite = doc[j].x.begin(); ite != doc[j].x.end(); ite++)
+		{
+			wstring t = StringUtils::Escape(*ite, L' ');
+			StringUtils::Replace(gram, L'\n', L' ');
+			StringUtils::Replace(gram, L'\r', L' ');
+			gram.append(t);
+			gram.append(L" ");
+		}
 	}
 	return gram;
 }
@@ -83,18 +93,16 @@ void NGramFeaturizer::Serialize(const wstring& filePath)
 	std::wofstream ofs(filePath);
 	ofs << _n;
 	ofs << L"\n";
+	for(auto ite = _fields.begin(); ite != _fields.end(); ite++)
+	{
+		ofs << *ite;
+		ofs << "\t";
+	}
+	ofs << "\n";
 	for(auto ite = _idAllocator.Begin(); ite != _idAllocator.End(); ite++)
 	{
 		ofs << (*ite).first << L"\t" << (*ite).second;
 		ofs << L"\n";
 	}
 	ofs.close();
-}
-
-wstring NGramFeaturizer::FeatureToString(int featureID)
-{
-	wstring res = _name;
-	res.append(L".");
-	res.append(_idAllocator.GetText(featureID));
-	return res;
 }

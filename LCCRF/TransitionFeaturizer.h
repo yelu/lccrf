@@ -16,7 +16,6 @@ public:
 	const wstring& Name();
 	void Serialize(const wstring& filePath);
 	void Clear();
-	wstring FeatureToString(int featureID);
 
 private:
 

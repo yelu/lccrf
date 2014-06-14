@@ -97,6 +97,7 @@
     <ClInclude Include="NGramFeaturizer.h" />
     <ClInclude Include="SGD.h" />
     <ClInclude Include="TransitionFeaturizer.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Viterbi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
