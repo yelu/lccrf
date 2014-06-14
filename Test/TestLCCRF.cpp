@@ -28,7 +28,7 @@ protected:
 		MakeDocument(doc, xs, ys, n);
 		trainingSet.push_back(doc);
 	
-		std::shared_ptr<Featurizer> f(new NGramFeaturizer(2));
+		std::shared_ptr<Featurizer> f(new NGramFeaturizer(1));
 		featureManager.AddFeaturizer(f);
 		featureManager.Fit(trainingSet);
 		featureManager.Serialize(L".");

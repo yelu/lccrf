@@ -75,6 +75,10 @@ void NGramFeaturizer::Transform(const Document& doc, const wstring& s1, const ws
 
 bool NGramFeaturizer::IsHit(const Document& doc, const wstring& s1, const wstring& s2, int j, int featureID)
 {
+	if(j - _n + 1 < 0)
+	{
+		return false;
+	}
 	wstring gram = _MakeGram(doc, s2, j);
 	if(gram == _idAllocator.GetText(featureID))
 	{
