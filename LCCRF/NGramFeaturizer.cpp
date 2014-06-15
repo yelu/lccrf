@@ -21,26 +21,32 @@ const wstring& NGramFeaturizer::Name()
 	return _name;
 }
 
-wstring NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos)
+int NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos, wstring& res)
 {
 	// use blank as seperator to seperator words. blank character will be escaped to double blank.
 	// '\r\n' will be replaced to blank to avoid deserilization problem.
-	wstring gram = StringUtils::Escape(s, L' ');
-	StringUtils::Replace(gram, L'\n', L' ');
-	StringUtils::Replace(gram, L'\r', L' ');
-	gram.append(L" ");
+	res = s;
+	StringUtils::Replace(res, L'\n', L' ');
+	StringUtils::Replace(res, L'\r', L' ');
+	res = StringUtils::Escape(res, L' ');
+	res.append(L" ");
 	for(int j = endPos - _n  + 1; j <= endPos; j++)
 	{
-		for(auto ite = doc[j].x.begin(); ite != doc[j].x.end(); ite++)
+		for(auto ite = _fields.begin(); ite != _fields.end(); ite++)
 		{
-			wstring t = StringUtils::Escape(*ite, L' ');
-			StringUtils::Replace(gram, L'\n', L' ');
-			StringUtils::Replace(gram, L'\r', L' ');
-			gram.append(t);
-			gram.append(L" ");
+			if(*ite < 0 || *ite >= doc.size())
+			{
+				return -1;
+			}
+			wstring t = doc[j].x[*ite];
+			StringUtils::Replace(t, L'\n', L' ');
+			StringUtils::Replace(t, L'\r', L' ');
+			t = StringUtils::Escape(t, L' ');		
+			res.append(t);
+			res.append(L" ");
 		}
 	}
-	return gram;
+	return 0;
 }
 
 void NGramFeaturizer::Fit(const list<Document>& docs)
@@ -49,7 +55,11 @@ void NGramFeaturizer::Fit(const list<Document>& docs)
 	{
 		for(int i = _n - 1; i < (int)(doc->size()); i++)
 		{
-			wstring gram = _MakeGram(*doc, (*doc)[i].y, i);
+			wstring gram;
+			if(0 != _MakeGram(*doc, (*doc)[i].y, i,gram))
+			{
+				continue;
+			}
 			if(_idAllocator.Contains(gram))
 			{
 				continue;
@@ -66,7 +76,11 @@ void NGramFeaturizer::Transform(const Document& doc, const wstring& s1, const ws
 	{
 		return;
 	}
-	wstring gram = _MakeGram(doc, s2, j);
+	wstring gram;
+	if(0 != _MakeGram(doc, s2, j, gram))
+	{
+		return;
+	}
 	if(_idAllocator.Contains(gram))
 	{
 		res.insert(_idAllocator.GetOrAllocateID(gram));
@@ -79,7 +93,11 @@ bool NGramFeaturizer::IsHit(const Document& doc, const wstring& s1, const wstrin
 	{
 		return false;
 	}
-	wstring gram = _MakeGram(doc, s2, j);
+	wstring gram;
+	if(0 != _MakeGram(doc, s2, j, gram))
+	{
+		return false;
+	}
 	if(gram == _idAllocator.GetText(featureID))
 	{
 		return true;
@@ -109,4 +127,28 @@ void NGramFeaturizer::Serialize(const wstring& filePath)
 		ofs << L"\n";
 	}
 	ofs.close();
+}
+
+void NGramFeaturizer::Deserialize(const wstring& filePath)
+{
+	std::wstring line;
+	std::wifstream ifs(filePath);
+
+	std::getline(ifs, line);
+	_n = _wtoi(line.c_str());
+
+	std::getline(ifs, line);
+	std::vector<wstring> tokens = StringUtils::Split(line, L'\t');
+	for(int i = 0; i < tokens.size(); i++)
+	{
+		_fields.push_back(_wtoi(tokens[i].c_str()));
+	}
+
+	while (std::getline(ifs, line))
+	{
+		std::vector<wstring> tokens = StringUtils::Split(line, L'\t');
+		int id = _wtoi(tokens[0].c_str());
+		_idAllocator.Insert(tokens[1], id);
+	}
+	ifs.close();
 }

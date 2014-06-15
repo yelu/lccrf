@@ -81,7 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TestLCCRF.cpp" />
+    <ClCompile Include="TestNGramFeaturizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LCCRF\LCCRF.vcxproj">

@@ -1,5 +1,6 @@
 #include "TransitionFeaturizer.h"
 #include <fstream>
+#include "Utils.h"
 using std::wofstream;
 
 TransitionFeaturizer::TransitionFeaturizer()
@@ -14,10 +15,20 @@ TransitionFeaturizer::~TransitionFeaturizer(void)
 
 wstring TransitionFeaturizer::_MakeTransition(const wstring& s1, const wstring& s2)
 {
+	wstring s11 = s1;
+	StringUtils::Replace(s11, L'\n', L' ');
+	StringUtils::Replace(s11, L'\r', L' ');
+	s11 = StringUtils::Escape(s11, L' ');
+
+	wstring s22 = s2;
+	StringUtils::Replace(s22, L'\n', L' ');
+	StringUtils::Replace(s22, L'\r', L' ');
+	s22 = StringUtils::Escape(s22, L' ');
+
 	wstring tr = L"";
-	tr.append(s1);
+	tr.append(s11);	
 	tr.append(L" ");
-	tr.append(s2);
+	tr.append(s22);
 	return tr;
 }
 
@@ -74,11 +85,24 @@ void TransitionFeaturizer::Clear()
 void TransitionFeaturizer::Serialize(const wstring& filePath)
 {
 	std::wofstream ofs(filePath);
-	ofs << L"\n";
 	for(auto ite = _idAllocator.Begin(); ite != _idAllocator.End(); ite++)
 	{
 		ofs << (*ite).first << L"\t" << (*ite).second;
 		ofs << L"\n";
 	}
 	ofs.close();
+}
+
+void TransitionFeaturizer::Deserialize(const wstring& filePath)
+{
+	std::wifstream ifs(filePath);
+	wstring line;
+	while(std::getline(ifs, line))
+	{
+		std::vector<wstring> tokens = StringUtils::Split(line, L'\t');
+		int id = _wtoi(tokens[0].c_str());
+		_idAllocator.Insert(tokens[1], id);
+	}
+
+	ifs.close();
 }

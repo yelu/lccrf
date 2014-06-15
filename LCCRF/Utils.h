@@ -2,6 +2,7 @@
 
 #include<string>
 #include<vector>
+#include<sstream>
 using std::wstring;
 using std::vector;
 
@@ -24,7 +25,7 @@ public:
 		return out;
 	}
 
-	static void Replace(wstring in, wchar_t src, wchar_t dst)
+	static void Replace(wstring& in, wchar_t src, wchar_t dst)
 	{
 		for(size_t i = 0; i < in.size(); i++)
 		{
@@ -46,30 +47,16 @@ public:
 		return out;
 	}
 
-	static void Split(const wstring& in, vector<wstring>& res, wchar_t ch = L' ')
+	static std::vector<std::wstring> Split(const std::wstring& s, wchar_t delim) 
 	{
-		size_t s = 0;
-		size_t e = -1;
-		wstring cur;
-		for(size_t i = 0; i < in.size(); i++)
+		std::vector<std::wstring> elems;
+		std::wstringstream ss(s);
+		std::wstring item;
+		while (std::getline(ss, item, delim)) 
 		{
-			if(in[i]  == ch)
-			{
-				if(i + 1 < in.size() && in[i + 1] == ch)
-				{
-					cur.push_back(ch);
-					i++;
-				}
-				else
-				{
-					res.push_back(cur);
-					cur = L"";
-				}
-				continue;
-			}
-			cur.push_back(in[i]);
+			elems.push_back(item);
 		}
-		res.push_back(cur);
+		return elems;
 	}
 
 private:
