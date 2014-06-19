@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestNGramFeaturizer.cpp">
+    <ClCompile Include="TestLCCRF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

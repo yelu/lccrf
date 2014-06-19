@@ -2,7 +2,9 @@
 
 #include <boost/multi_array.hpp>
 #include <functional>
+#include <memory>
 using std::function;
+using std::shared_ptr;
 
 class FWBW
 {
