@@ -75,10 +75,10 @@ public:
 		return _features.at(key);
 	}
 
-	double GetFeatureValue(int j, int s1, int s2, int featureID)
+	double GetFeatureValue(int j, int s1, int s2, int featureID) const 
 	{
 		Key key(j, s1, s2);
-		if(_features.count(key) == 0 || (_features[key])->count(featureID) == 0)
+		if(_features.count(key) == 0 || (_features.at(key))->count(featureID) == 0)
 		{
 			return 0;
 		}
@@ -113,7 +113,7 @@ private:
 
 struct Y
 {
-	size_t Length()
+	size_t Length() const 
 	{
 		return _tags.size();
 	}
@@ -136,4 +136,36 @@ struct Y
 
 private:
 	std::vector<int> _tags;
+};
+
+struct ListX
+{
+	void Append(const X& x)
+	{
+		_xs.push_back(x);
+	}
+
+	const list<X>& GetX() const
+	{
+		return _xs;
+	}
+
+private:
+	list<X> _xs;
+};
+
+struct ListY
+{
+	void Append(const Y& y)
+	{
+		_ys.push_back(y);
+	}
+
+	const list<Y>& GetY() const
+	{
+		return _ys;
+	}
+
+private:
+	list<Y> _ys;
 };

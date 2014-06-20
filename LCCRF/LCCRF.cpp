@@ -30,7 +30,7 @@ double LCCRF::_Phi(int s1, int s2, int j,
 
 void LCCRF::_MakeDervative()
 {
-	function<double (vector<double>&, X&, Y&, int)> derivative = [&](vector<double>& weights, X& x, Y& y, int k)
+	function<double (vector<double>&, const X&, const Y&, int)> derivative = [&](vector<double>& weights, const X& x, const Y& y, int k)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -69,14 +69,14 @@ void LCCRF::_MakeDervative()
 	};
 	for(int k = 0; k < _featureCount; k++)
 	{
-		function<double (vector<double>&, X&, Y&)> derivativeK = [=](vector<double>& weights, X& x, Y& y) {return derivative(weights, x, y, k);};
+		function<double (vector<double>&, const X&, const Y&)> derivativeK = [=](vector<double>& weights, const X& x, const Y& y) {return derivative(weights, x, y, k);};
 		_derivatives.push_back(derivativeK);
 	}
 }
 
 void LCCRF::_MakeLikelihood()
 {
-	function<double (vector<double>&, X&, Y&)> likelihood= [&](vector<double>& weights, X& x, Y& y)
+	function<double (vector<double>&, const X&, const Y&)> likelihood= [&](vector<double>& weights, const X& x, const Y& y)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -111,7 +111,7 @@ void LCCRF::_MakeLikelihood()
 	_likelihood = likelihood;
 }
 
-void LCCRF::Fit(list<X>& xs, list<Y> ys, double learningRate, int batch, int maxIteration)
+void LCCRF::Fit(const ListX& xs, const ListY& ys, double learningRate, int batch, int maxIteration)
 {
 	_derivatives.clear();
 	_xs = &xs;
@@ -126,7 +126,7 @@ void LCCRF::Fit(list<X>& xs, list<Y> ys, double learningRate, int batch, int max
 	// 2. make likilihood
 	_MakeLikelihood();
 	// 3. SGD
-	SGD<X, Y> sgd(xs, ys, _weights, _derivatives, _likelihood);
+	SGD<X, Y> sgd(_xs->GetX(), _ys->GetY(), _weights, _derivatives, _likelihood);
 	sgd.Run(learningRate, batch, maxIteration);
 }
 

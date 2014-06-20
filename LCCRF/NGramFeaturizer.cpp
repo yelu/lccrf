@@ -34,7 +34,7 @@ int NGramFeaturizer::_MakeGram(const Document& doc, const wstring& s, int endPos
 	{
 		for(auto ite = _fields.begin(); ite != _fields.end(); ite++)
 		{
-			if(*ite < 0 || *ite >= doc.size())
+			if(*ite < 0 || *ite >= (int)doc.size())
 			{
 				return -1;
 			}

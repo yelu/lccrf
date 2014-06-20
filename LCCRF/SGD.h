@@ -12,11 +12,11 @@ template<typename XType, typename YType>
 class SGD
 {
 public:
-	typedef function<double (vector<double>&, XType&, YType&)> DerivativeFunction;
-	typedef function<double (vector<double>&, XType&, YType&)> ObjectFunction;
+	typedef function<double (vector<double>&, const XType&, const YType&)> DerivativeFunction;
+	typedef function<double (vector<double>&, const XType&, const YType&)> ObjectFunction;
 
-	SGD(list<XType>& xs,
-		list<YType>& ys,
+	SGD(const list<XType>& xs,
+		const list<YType>& ys,
 		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives,
 		ObjectFunction& object):
@@ -41,8 +41,8 @@ public:
 		{
 			printf("Iteration %d \n", i);
 			int count = 0;
-			typename list<XType>::iterator xBegin = _xs.begin();
-			typename list<YType>::iterator yBegin = _ys.begin();
+			typename list<XType>::const_iterator xBegin = _xs.begin();
+			typename list<YType>::const_iterator yBegin = _ys.begin();
 			auto xIte = _xs.begin();
 			auto yIte = _ys.begin();
 			for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
@@ -69,10 +69,10 @@ public:
 	}
 
 	void TrainABatch(double learningRate, 
-					 typename list<XType>::iterator xBegin, 
-					 typename list<XType>::iterator xEnd, 
-					 typename list<YType>::iterator yBegin, 
-					 typename list<YType>::iterator yEnd)
+					 typename list<XType>::const_iterator xBegin, 
+					 typename list<XType>::const_iterator xEnd, 
+					 typename list<YType>::const_iterator yBegin, 
+					 typename list<YType>::const_iterator yEnd)
 	{
 		vector<double> oldWeights(_weights.size());
 		oldWeights.swap(_weights);
@@ -115,8 +115,8 @@ public:
 	virtual ~SGD(void){}
 	
 private:
-	list<XType>& _xs;
-	list<YType>& _ys;
+	const list<XType>& _xs;
+	const list<YType>& _ys;
 	vector<DerivativeFunction> _derivatives;
 	ObjectFunction _object;
 	vector<double>& _weights;

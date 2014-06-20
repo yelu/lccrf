@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\local\boost_1_55_0;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Python27\include;C:\local\boost_1_55_0;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -83,6 +83,7 @@
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />
+    <ClCompile Include="LCCRFPy.cpp" />
     <ClCompile Include="NGramFeaturizer.cpp" />
     <ClCompile Include="TransitionFeaturizer.cpp" />
     <ClCompile Include="Viterbi.cpp" />
