@@ -47,8 +47,8 @@ void LCCRF::_MakeDervative()
 			// If j is the first token, then j-1 is not avaliable, use -1 instead.
 			int y1 = -1;
 			if(0 == j){y1 = -1;}
-			else {y1 = y.tags[j - 1];}
-			res1 += x.GetFeatureValue(j, y1, y.tags[j], k);
+			else {y1 = y.Tags()[j - 1];}
+			res1 += x.GetFeatureValue(j, y1, y.Tags()[j], k);
 			for(int y1 = 0; y1 < labelCount; y1++)
 			{
 				for(int y2 = 0; y2 < labelCount; y2++)
@@ -87,8 +87,8 @@ void LCCRF::_MakeLikelihood()
 		{
 			int y1 = -1;
 			if(0 == j){y1 = -1;}
-			else {y1 = y.tags[j - 1];};
-			shared_ptr<std::set<int>> pFeatures = x.GetFeatures(j, y1, y.tags[j]);
+			else {y1 = y.Tags()[j - 1];};
+			shared_ptr<std::set<int>> pFeatures = x.GetFeatures(j, y1, y.Tags()[j]);
 			for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 			{
 				res1 += (weights[*ite]);
@@ -160,10 +160,10 @@ void LCCRF::Predict(const X& doc, Y& tags)
 	}
 	vector<int> path(doc.Length(), -1);
 	Viterbi::GetPath(graph, path);
-	tags.tags.clear();
+	tags.Clear();
 	for(auto ite = path.begin(); ite != path.end(); ite++)
 	{
-		tags.tags.push_back(*ite);
+		tags.AppendTag(*ite);
 	}
 }
 
@@ -174,14 +174,14 @@ void LCCRF::Debug(const X& doc, const Y& y)
 	wcout << "Path : ";
 	for(int j = 0; j < _labelCount; j++)
 	{
-		wcout << y.tags[j];
-		if(y.tags[j] >= _labelCount)
+		wcout << y.Tags()[j];
+		if(y.Tags()[j] >= _labelCount)
 		{
 			wcout << L"(bad path)" << std::endl;
 			return;
 		}
-		score += _Phi(preState, y.tags[j], j, doc, _weights);
-		preState = y.tags[j];
+		score += _Phi(preState, y.Tags()[j], j, doc, _weights);
+		preState = y.Tags()[j];
 		wcout << L" -> ";
 	}
 	wcout << " score : " << score << std::endl;

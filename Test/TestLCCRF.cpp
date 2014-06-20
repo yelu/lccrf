@@ -6,25 +6,18 @@
 void MakeDocument(list<X>& xs, list<Y>& ys)
 {
 	X x;
-	x.length = 2;
+	x.SetLength(2);
 	X::Key key1(0, -1, 0);
 	
-	x.features[key1] = shared_ptr<std::set<int>>(new std::set<int>());
-	(x.features[key1])->insert(0);
-
-	X::Key key2(1, 0, 1);
-	x.features[key2] = shared_ptr<std::set<int>>(new std::set<int>());
-	(x.features[key2])->insert(1);
-
-	X::Key key3(1, 1, 1);
-	x.features[key3] = shared_ptr<std::set<int>>(new std::set<int>());
-	(x.features[key3])->insert(1);
+	x.SetFeature(0, -1, 0, 0);
+	x.SetFeature(1, 0, 1, 1);
+	x.SetFeature(1, 1, 1, 1);
 
 	xs.push_back(x);
 
 	Y y;
-	y.tags.push_back(0);
-	y.tags.push_back(1);
+	y.AppendTag(0);
+	y.AppendTag(1);
 
 	ys.push_back(y);
 }
