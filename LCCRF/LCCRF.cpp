@@ -111,7 +111,7 @@ void LCCRF::_MakeLikelihood()
 	_likelihood = likelihood;
 }
 
-void LCCRF::Fit(const ListX& xs, const ListY& ys, double learningRate, int batch, int maxIteration)
+void LCCRF::Fit(const list<X>& xs, const list<Y>& ys, double learningRate, int batch, int maxIteration)
 {
 	_derivatives.clear();
 	_xs = &xs;
@@ -126,7 +126,7 @@ void LCCRF::Fit(const ListX& xs, const ListY& ys, double learningRate, int batch
 	// 2. make likilihood
 	_MakeLikelihood();
 	// 3. SGD
-	SGD<X, Y> sgd(_xs->GetX(), _ys->GetY(), _weights, _derivatives, _likelihood);
+	SGD<X, Y> sgd(*_xs, *_ys, _weights, _derivatives, _likelihood);
 	sgd.Run(learningRate, batch, maxIteration);
 }
 

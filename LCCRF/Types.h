@@ -137,35 +137,3 @@ struct Y
 private:
 	std::vector<int> _tags;
 };
-
-struct ListX
-{
-	void Append(const X& x)
-	{
-		_xs.push_back(x);
-	}
-
-	const list<X>& GetX() const
-	{
-		return _xs;
-	}
-
-private:
-	list<X> _xs;
-};
-
-struct ListY
-{
-	void Append(const Y& y)
-	{
-		_ys.push_back(y);
-	}
-
-	const list<Y>& GetY() const
-	{
-		return _ys;
-	}
-
-private:
-	list<Y> _ys;
-};

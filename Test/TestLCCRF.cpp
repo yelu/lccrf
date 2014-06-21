@@ -3,7 +3,7 @@
 #include "../LCCRF/LCCRF.h"
 #include <memory>
 
-void MakeDocument(ListX& xs, ListY& ys)
+void MakeDocument(list<X>& xs, list<Y>& ys)
 {
 	X x;
 	x.SetLength(2);
@@ -13,13 +13,13 @@ void MakeDocument(ListX& xs, ListY& ys)
 	x.SetFeature(1, 0, 1, 1);
 	x.SetFeature(1, 1, 1, 1);
 
-	xs.Append(x);
+	xs.push_back(x);
 
 	Y y;
 	y.AppendTag(0);
 	y.AppendTag(1);
 
-	ys.Append(y);
+	ys.push_back(y);
 }
 
 class LCCRFTestSuite : public ::testing::Test
@@ -36,13 +36,13 @@ protected:
 	}
 
 	static LCCRF* lccrf;
-	static ListX xs;
-	static ListY ys;
+	static list<X> xs;
+	static list<Y> ys;
 };
 
 LCCRF* LCCRFTestSuite::lccrf;
-ListX LCCRFTestSuite::xs;
-ListY LCCRFTestSuite::ys;
+list<X> LCCRFTestSuite::xs;
+list<Y> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
@@ -63,25 +63,25 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	weights.clear();
 	weights.push_back(0);
 	weights.push_back(0);
-	res = lccrf->_derivatives[0](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(-0.5, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(-0.5, res, 10e-6);
 	
 	weights.clear();
 	weights.push_back(1.0);
 	weights.push_back(1.0);
-	res = lccrf->_derivatives[0](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(-0.168941, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(-0.168941, res, 10e-6);
 
 	weights.clear();
 	weights.push_back(0.5);
 	weights.push_back(2.0);
-	res = lccrf->_derivatives[0](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(-0.327541, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(0.0807971, res, 10e-6);
 }
 
@@ -96,19 +96,19 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 	weights.clear();
 	weights.push_back(0);
 	weights.push_back(0);
-	res = lccrf->_likelihood(weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_likelihood(weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(1.38629, res, 10e-6);
 	
 	weights.clear();
 	weights.push_back(1.0);
 	weights.push_back(1.0);
-	res = lccrf->_likelihood(weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_likelihood(weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(0.726523, res, 10e-6);
 
 	weights.clear();
 	weights.push_back(0.5);
 	weights.push_back(2.0);
-	res = lccrf->_likelihood(weights, *(xs.GetX().begin()), *(ys.GetY().begin()));
+	res = lccrf->_likelihood(weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(0.813505, res, 10e-6);
 }
 

@@ -9,7 +9,7 @@ public:
 	LCCRF(int, int, double);
 	virtual ~LCCRF(void);
 
-	void Fit(const ListX& xs, const ListY& ys, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
+	void Fit(const list<X>& xs, const list<Y>& ys, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 
 	void Predict(const X& doc, Y& tags);
 
@@ -29,8 +29,8 @@ private:
 
 	function<double (vector<double>&, const X&, const Y&)> _likelihood;
 	vector<function<double (vector<double>&, const X&, const Y&)>> _derivatives;
-	const ListX* _xs;
-	const ListY* _ys;
+	const list<X>* _xs;
+	const list<Y>* _ys;
 	double _lambda;
 	vector<double> _weights;
 	int _featureCount;

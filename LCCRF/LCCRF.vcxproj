@@ -83,7 +83,6 @@
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />
-    <ClCompile Include="LCCRFPy.cpp" />
     <ClCompile Include="NGramFeaturizer.cpp" />
     <ClCompile Include="TransitionFeaturizer.cpp" />
     <ClCompile Include="Viterbi.cpp" />
