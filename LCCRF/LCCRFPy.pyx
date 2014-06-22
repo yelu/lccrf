@@ -43,7 +43,8 @@ cdef class PyLCCRF:
 		self.thisptr = new LCCRF(featureCount, labelCount, l)
 	def __dealloc__(self):
 		del self.thisptr
-	cdef Fit(self, list[X]& xs, list[Y]& ys, learningRate = 0.01, batch = 1, maxIteration = 1):
-		self.thisptr.Fit(xs, ys, learningRate, batch, maxIteration)
-	cdef Predict(self, X& doc, Y& tags):
-		self.thisptr.Predict(doc, tags)
+	#def Fit(self, list[PyX] xs, list[PyY] ys, learningRate = 0.01, batch = 1, maxIteration = 1):
+	#	self.thisptr.Fit(xs, ys, learningRate, batch, maxIteration)
+	def Predict(self, PyX a, PyY b):
+		pass
+		self.thisptr.Predict((a.thisptr)[0], (b.thisptr)[0])
