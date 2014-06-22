@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Types.h"
+#include <list>
+#include <functional>
+using std::list;
+using std::function;
 
 class LCCRF
 {

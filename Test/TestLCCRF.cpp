@@ -5,8 +5,7 @@
 
 void MakeDocument(list<X>& xs, list<Y>& ys)
 {
-	X x;
-	x.SetLength(2);
+	X x(2);
 	X::Key key1(0, -1, 0);
 	
 	x.SetFeature(0, -1, 0, 0);

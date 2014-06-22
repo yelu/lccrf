@@ -85,6 +85,7 @@
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="NGramFeaturizer.cpp" />
     <ClCompile Include="TransitionFeaturizer.cpp" />
+    <ClCompile Include="Types.cpp" />
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>
   <ItemGroup>

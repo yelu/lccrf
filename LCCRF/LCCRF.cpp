@@ -1,6 +1,7 @@
 #include "LCCRF.h"
 #include "FWBW.h"
 #include "Viterbi.h"
+#include "SGD.h"
 using std::wcout;
 
 LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featureCount, 0.0)
@@ -18,7 +19,6 @@ double LCCRF::_Phi(int s1, int s2, int j,
 				  const X& doc, 
 				  vector<double>& weights)
 {
-	size_t n = weights.size();
 	double ret = 0.0;
 	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
 	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)

@@ -3,7 +3,8 @@
 #include <functional>
 #include <vector>
 #include <list>
-#include <cmath>
+#include <limits>
+#include <stdlib.h>
 using std::function;
 using std::vector;
 using std::list;
@@ -29,7 +30,7 @@ public:
 		list<YType>& ys,
 		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives):
-		_xs(xs), _ys(ys),, _derivatives(derivatives), _weights(weights)
+		_xs(xs), _ys(ys), _derivatives(derivatives), _weights(weights)
 	{
 		_isObjectProvided = false;
 	}
@@ -102,7 +103,7 @@ public:
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
 		printf("delta : %f\tobject : %f\n", 0 - delta, newObjectValue);
-		if(abs(delta) < 10e-8) 
+		if(::abs(delta) < 10e-8) 
 		{
 			return true;
 		}

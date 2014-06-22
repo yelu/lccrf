@@ -1,22 +1,17 @@
 #pragma once
 
-#include <functional>
-#include <list>
 #include <string>
 #include <vector>
 #include <memory>
 #include <map>
 #include <set>
-#include "SGD.h"
-using std::function;
-using std::list;
 using std::wstring;
 using std::vector;
 using std::set;
 using std::map;
 using std::shared_ptr;
 
-struct X
+class X
 {
 public:
 	struct Key
@@ -35,7 +30,7 @@ public:
 	class KeyCompare 
 	{ // simple comparison function
 	   public:
-		  bool operator()(const X::Key x1,const X::Key x2) 
+		  bool operator()(const X::Key& x1,const X::Key& x2) const
 		  { 
 			  if(x1.j < x2.j)
 			  {
@@ -59,80 +54,38 @@ public:
 		  }
 	};
 
-	X()
-	{
-		_length = 0;
-	}
 
-	shared_ptr<std::set<int>> GetFeatures(int j, int s1, int s2) const
-	{
-		Key key(j, s1, s2);
-		if(_features.count(key) == 0)
-		{
-			shared_ptr<std::set<int>> ret(new std::set<int>());
-			return ret;
-		}
-		return _features.at(key);
-	}
+	// export to cython.
+	X(int length);
 
-	double GetFeatureValue(int j, int s1, int s2, int featureID) const 
-	{
-		Key key(j, s1, s2);
-		if(_features.count(key) == 0 || (_features.at(key))->count(featureID) == 0)
-		{
-			return 0;
-		}
-		return 1;
-	}
+	shared_ptr<std::set<int>> GetFeatures(int j, int s1, int s2) const;
 
-	size_t Length() const
-	{
-		return _length;
-	}
+	double GetFeatureValue(int j, int s1, int s2, int featureID) const ;
 
-	void SetLength(int length)
-	{
-		_length = length;
-	}
+	size_t Length() const;
 
-	//export to python.
-	void SetFeature(int j, int s1, int s2, int featureID)
-	{
-		Key key(j, s1, s2);
-		if(_features.count(key) == 0)
-		{
-			_features[key] = shared_ptr<std::set<int>>(new std::set<int>());
-		}
-		_features[key]->insert(featureID);
-	}
+	//export to cython.
+	void SetFeature(int j, int s1, int s2, int featureID);
 
 private:
 	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
 	size_t _length;
 };
 
-struct Y
+class Y
 {
-	size_t Length() const 
-	{
-		return _tags.size();
-	}
+public:
 
-	const std::vector<int>& Tags() const
-	{
-		return _tags;
-	}
+	Y(){}
 
-	void Clear()
-	{
-		_tags.clear();
-	}
+	size_t Length() const;
+
+	const std::vector<int>& Tags() const;
+
+	void Clear();
 
 	// export to python.
-	void AppendTag(int j)
-	{
-		_tags.push_back(j);
-	}
+	void AppendTag(int j);
 
 private:
 	std::vector<int> _tags;
