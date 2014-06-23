@@ -4,7 +4,6 @@
 #include <vector>
 #include <list>
 #include <limits>
-#include <stdlib.h>
 using std::function;
 using std::vector;
 using std::list;
@@ -61,7 +60,7 @@ public:
 			{
 				TrainABatch(learningRate, xBegin, _xs.end(), yBegin, _ys.end());
 			}
-			if(_isObjectProvided && IsConveraged(lastObjectValue))
+			if(_isObjectProvided && i != 0 && IsConveraged(lastObjectValue))
 			{
 				break;
 			}
@@ -103,8 +102,13 @@ public:
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
 		printf("delta : %f\tobject : %f\n", 0 - delta, newObjectValue);
-		if(::abs(delta) < 10e-8) 
+		if(delta <= 0)
 		{
+			delta = 0 - delta;
+		}
+		if(delta < 10e-8) 
+		{
+			printf("Converged. delta : %f\n", delta);
 			return true;
 		}
 		else

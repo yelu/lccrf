@@ -59,6 +59,9 @@ cdef class LinearChainCRF:
 	def __dealloc__(self):
 		del self.thisptr
 	def Fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
+		print learningRate
+		print batch
+		print maxIteration
 		self.thisptr.Fit(x.thisptr[0], y.thisptr[0], learningRate, batch, maxIteration)
 	def Predict(self, X x, Y y):
 		self.thisptr.Predict(x.thisptr[0], y.thisptr[0])

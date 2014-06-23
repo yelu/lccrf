@@ -78,7 +78,10 @@ class YType
 {
 public:
 
-	YType(){}
+	YType()
+	{
+		printf("Y constructed.\n");
+	}
 
 	size_t Length() const;
 
@@ -117,6 +120,7 @@ class YListType
 public:
 	YListType()
 	{
+		printf("YList constructed.\n");
 	}
 
 	// export to python.

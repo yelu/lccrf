@@ -6,14 +6,14 @@ FWBW::FWBW(void)
 {
 }
 
-FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount):
-	_phi(phi), 
+FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount): 
 	_sCount(sCount),
 	_jCount(jCount),
 	_alphaMatrix(boost::extents[_jCount][_sCount]),
 	_betaMatrix(boost::extents[_jCount][_sCount]),
 	_muMatrix(boost::extents[_jCount][_sCount][_sCount]),
-	_qMatrix(boost::extents[_jCount][_sCount][_sCount])
+	_qMatrix(boost::extents[_jCount][_sCount][_sCount]),
+	_phi(phi)
 {
 	_z = std::numeric_limits<double>::lowest();
 	_CalculateAlphaMatrix();
