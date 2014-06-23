@@ -19,6 +19,8 @@ public:
 
 	void Predict(const XType& x, YType& y);
 
+	void Predict(XListType& x, YListType& y);
+
 	void Debug(const XType&, const YType&);
 
 private:

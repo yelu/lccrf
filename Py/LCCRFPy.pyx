@@ -5,46 +5,60 @@ from libcpp.list cimport list
 from libcpp.vector cimport vector
 
 cdef extern from "Types.h":
-	cdef cppclass X:
-		X(int) except +
-		void SetFeature(int, int, int, int)
-		
-	cdef cppclass Y:
-		Y() except +
-		void AppendTag(int)
+	cdef cppclass XListType:
+		XListType() except +
+		void PushBack(int)
+		void AddFeature(int, int, int, int)
+
+	cdef cppclass YListType:
+		YListType() except +
+		void PushBack()
+		void AddTag(int)
+		int LengthOf(int)
+		int TagOf(int, int)
+		int Size()
 
 cdef extern from "LCCRF.h":
 	cdef cppclass LCCRF:
 		LCCRF(int, int, double) except +
-		void Fit(const list[X]&, const list[Y]&, double, int, int)
-		void Predict(const X&, Y&)
+		void Fit(XListType&, YListType&, double, int, int)
+		void Predict(XListType&, YListType&)
 		
-cdef class PyX:
-	cdef X* thisptr
-	def __cinit__(self, int length):
-		self.thisptr = new X(length)
-	def __dealloc__(self):
-		del self.thisptr
-	def set_feature(self, j, s1, s2, f):
-		self.thisptr.SetFeature(j, s1, s2, f)
-		
-cdef class PyY:
-	cdef Y* thisptr
+cdef class X:
+	cdef XListType* thisptr
 	def __cinit__(self):
-		self.thisptr = new Y()
+		self.thisptr = new XListType()
 	def __dealloc__(self):
 		del self.thisptr
-	def append_tag(self, j):
-		self.thisptr.AppendTag(j)
-
+	def add_feature(self, j, s1, s2, f):
+		self.thisptr.AddFeature(j, s1, s2, f)
+	def push_back(self, i):
+		self.thisptr.PushBack(i)
+		
+cdef class Y:
+	cdef YListType* thisptr
+	def __cinit__(self):
+		self.thisptr = new YListType()
+	def __dealloc__(self):
+		del self.thisptr
+	def push_back(self):
+		self.thisptr.PushBack()
+	def add_tag(self, j):
+		self.thisptr.AddTag(j)
+	def size(self):
+		return self.thisptr.Size()
+	def length_of(self, i):
+		return self.thisptr.LengthOf(i)
+	def tag_of(self, i, j):
+		return self.thisptr.TagOf(i, j)
+		
 cdef class PyLCCRF:
 	cdef LCCRF* thisptr
 	def __cinit__(self, int featureCount, int labelCount, float l = 1):
 		self.thisptr = new LCCRF(featureCount, labelCount, l)
 	def __dealloc__(self):
 		del self.thisptr
-	def Fit(self, list[PyX] xs, list[PyY] ys, learningRate = 0.01, batch = 1, maxIteration = 1):
-		self.thisptr.Fit(xs, ys, learningRate, batch, maxIteration)
-	def Predict(self, PyX a, PyY b):
-		pass
-		self.thisptr.Predict((a.thisptr)[0], (b.thisptr)[0])
+	def Fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
+		self.thisptr.Fit(x.thisptr[0], y.thisptr[0], learningRate, batch, maxIteration)
+	def Predict(self, X x, Y y):
+		self.thisptr.Predict(x.thisptr[0], y.thisptr[0])

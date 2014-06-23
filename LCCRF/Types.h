@@ -100,8 +100,10 @@ public:
 	{
 	}
 
+	// export to python.
 	void AddFeature(int j, int s1, int s2, int featureID);
 
+	// export to python.
 	void PushBack(int length);
 
 	const list<XType>& Raw();
@@ -117,14 +119,19 @@ public:
 	{
 	}
 
+	// export to python.
 	void PushBack();
 
+	// export to python.
 	void AddTag(int tag);
 
+	// export to python.
 	int Size();
 
+	// export to python.
 	int LengthOf(int i);
 
+	// export to python.
 	int TagOf(int i, int j);
 
 	const list<YType>& Raw();

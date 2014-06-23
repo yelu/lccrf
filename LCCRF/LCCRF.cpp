@@ -172,6 +172,22 @@ void LCCRF::Predict(const XType& x, YType& y)
 	}
 }
 
+void LCCRF::Predict(XListType& xs, YListType& ys)
+{
+	const list<XType>& rawXs = xs.Raw();
+	for(auto ite = rawXs.begin(); ite != rawXs.end(); ite++)
+	{
+		YType y;
+		Predict(*ite, y);
+		ys.PushBack();
+		for(auto tag = y.Tags().begin(); tag != y.Tags().end(); tag++)
+		{
+			ys.PushBack();
+			ys.AddTag(*tag);
+		}
+	}
+}
+
 void LCCRF::Debug(const XType& doc, const YType& y)
 {
 	int preState = -1;
