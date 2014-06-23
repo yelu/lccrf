@@ -52,7 +52,7 @@ cdef class Y:
 	def tag_of(self, i, j):
 		return self.thisptr.TagOf(i, j)
 		
-cdef class PyLCCRF:
+cdef class LinearChainCRF:
 	cdef LCCRF* thisptr
 	def __cinit__(self, int featureCount, int labelCount, float l = 1):
 		self.thisptr = new LCCRF(featureCount, labelCount, l)
