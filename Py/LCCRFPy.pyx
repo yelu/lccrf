@@ -1,5 +1,5 @@
 ﻿# distutils: language = c++
-# distutils: sources = Types.cpp FWBW.cpp Viterbi.cpp LCCRF.cpp 
+# distutils: sources = ../LCCRF/Types.cpp ../LCCRF/FWBW.cpp ../LCCRF/Viterbi.cpp ../LCCRF/LCCRF.cpp 
 
 from libcpp.list cimport list
 from libcpp.vector cimport vector
@@ -43,8 +43,8 @@ cdef class PyLCCRF:
 		self.thisptr = new LCCRF(featureCount, labelCount, l)
 	def __dealloc__(self):
 		del self.thisptr
-	#def Fit(self, list[PyX] xs, list[PyY] ys, learningRate = 0.01, batch = 1, maxIteration = 1):
-	#	self.thisptr.Fit(xs, ys, learningRate, batch, maxIteration)
+	def Fit(self, list[PyX] xs, list[PyY] ys, learningRate = 0.01, batch = 1, maxIteration = 1):
+		self.thisptr.Fit(xs, ys, learningRate, batch, maxIteration)
 	def Predict(self, PyX a, PyY b):
 		pass
 		self.thisptr.Predict((a.thisptr)[0], (b.thisptr)[0])

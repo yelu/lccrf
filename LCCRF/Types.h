@@ -5,13 +5,15 @@
 #include <memory>
 #include <map>
 #include <set>
+#include <list>
 using std::wstring;
 using std::vector;
 using std::set;
 using std::map;
+using std::list;
 using std::shared_ptr;
 
-class X
+class XType
 {
 public:
 	struct Key
@@ -30,7 +32,7 @@ public:
 	class KeyCompare 
 	{ // simple comparison function
 	   public:
-		  bool operator()(const X::Key& x1,const X::Key& x2) const
+		  bool operator()(const XType::Key& x1,const XType::Key& x2) const
 		  { 
 			  if(x1.j < x2.j)
 			  {
@@ -56,7 +58,7 @@ public:
 
 
 	// export to cython.
-	X(int length);
+	XType(int length);
 
 	shared_ptr<std::set<int>> GetFeatures(int j, int s1, int s2) const;
 
@@ -65,18 +67,18 @@ public:
 	size_t Length() const;
 
 	//export to cython.
-	void SetFeature(int j, int s1, int s2, int featureID);
+	void AddFeature(int j, int s1, int s2, int featureID);
 
 private:
 	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
 	size_t _length;
 };
 
-class Y
+class YType
 {
 public:
 
-	Y(){}
+	YType(){}
 
 	size_t Length() const;
 
@@ -85,8 +87,49 @@ public:
 	void Clear();
 
 	// export to python.
-	void AppendTag(int j);
+	void AddTag(int j);
 
 private:
 	std::vector<int> _tags;
+};
+
+class XListType
+{
+public:
+	XListType()
+	{
+	}
+
+	void AddFeature(int j, int s1, int s2, int featureID);
+
+	void PushBack(int length);
+
+	const list<XType>& Raw();
+
+private:
+	list<XType> _xs;
+};
+
+class YListType
+{
+public:
+	YListType()
+	{
+	}
+
+	void PushBack();
+
+	void AddTag(int tag);
+
+	int Size();
+
+	int LengthOf(int i);
+
+	int TagOf(int i, int j);
+
+	const list<YType>& Raw();
+
+private:
+	list<YType> _ys;
+	map<int, const YType*> _index;
 };

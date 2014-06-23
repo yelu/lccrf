@@ -13,16 +13,18 @@ public:
 	LCCRF(int, int, double);
 	virtual ~LCCRF(void);
 
-	void Fit(const list<X>& xs, const list<Y>& ys, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
+	void Fit(const list<XType>& xs, const list<YType>& ys, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 
-	void Predict(const X& doc, Y& tags);
+	void Fit(XListType& xs, YListType& ys, double learningRate = 0.01, int batch = 1, int maxIteration = 1);
 
-	void Debug(const X&, const Y&);
+	void Predict(const XType& x, YType& y);
+
+	void Debug(const XType&, const YType&);
 
 private:
 
 	static double _Phi(int s1, int s2, int j,
-		const X& doc, 
+		const XType& doc, 
 		vector<double>& weights);
 
 	void _MakeDervative();
@@ -31,10 +33,10 @@ private:
 
 private:
 
-	function<double (vector<double>&, const X&, const Y&)> _likelihood;
-	vector<function<double (vector<double>&, const X&, const Y&)>> _derivatives;
-	const list<X>* _xs;
-	const list<Y>* _ys;
+	function<double (vector<double>&, const XType&, const YType&)> _likelihood;
+	vector<function<double (vector<double>&, const XType&, const YType&)>> _derivatives;
+	const list<XType>* _xs;
+	const list<YType>* _ys;
 	double _lambda;
 	vector<double> _weights;
 	int _featureCount;
