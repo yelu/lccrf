@@ -45,7 +45,7 @@ list<YType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Fit(xs, ys, 0.1, 1, 1000);
+	lccrf->Fit(xs, ys, 0.1, 1, 2);
 	EXPECT_NEAR(1.63, lccrf->_weights[0], 10e-2);
 	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
 }

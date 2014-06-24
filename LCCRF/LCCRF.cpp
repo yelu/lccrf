@@ -9,7 +9,7 @@ LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featu
 	_lambda = lambda;
 	_featureCount = featureCount;
 	_labelCount = labelCount;
-	_cacheX = NULL;
+	_lastK = 0;
 	_cachedQMatrix = NULL;
 }
 
@@ -40,15 +40,16 @@ void LCCRF::_MakeDervative()
 
 		// forward-backword calculation.
 		// use a cache to avoid unnecessary calculation.
-		if(&x != _cacheX)
+		if(k != (_lastK + 1))
 		{
 			function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
 			{ return _Phi(s1, s2, j, x, weights); };
 			FWBW fwbw(phi, labelCount, x.Length());
 			_cachedQMatrix = fwbw.GetQMatrix();
+			fwbw.PrintQMatrix();
 		}
+		_lastK = k;
 		
-		//fwbw.PrintQMatrix();
 		for(size_t j = 0; j < y.Length(); j++)
 		{
 			// If j is the first token, then j-1 is not avaliable, use -1 instead.

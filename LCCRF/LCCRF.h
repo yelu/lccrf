@@ -46,6 +46,6 @@ private:
 	int _labelCount;
 	// for accelarating derivitive calculation.
 	shared_ptr<const boost::multi_array<double, 3>> _cachedQMatrix;
-	XType* _cacheX;
+	int _lastK;	// remember last derivative we are calculation. if k is increasing, we can use cached QMatrix.
 };
 
