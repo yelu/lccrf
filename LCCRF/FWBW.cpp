@@ -1,7 +1,6 @@
 #include "FWBW.h"
 #include <iostream>
 
-
 FWBW::FWBW(void)
 {
 }

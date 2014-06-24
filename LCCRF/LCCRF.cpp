@@ -1,7 +1,7 @@
 #include "LCCRF.h"
-#include "FWBW.h"
 #include "Viterbi.h"
 #include "SGD.h"
+#include "FWBW.h"
 using std::wcout;
 
 LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featureCount, 0.0)

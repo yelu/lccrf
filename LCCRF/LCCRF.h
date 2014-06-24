@@ -1,11 +1,18 @@
 #pragma once
 
+//#include <boost/multi_array.hpp>
 #include "Types.h"
 #include <list>
 #include <functional>
-#include <boost/multi_array.hpp>
 using std::list;
 using std::function;
+
+namespace boost
+{
+template<typename T, std::size_t NumDims,
+  typename Allocator>
+class multi_array;
+}
 
 class LCCRF
 {
@@ -45,7 +52,7 @@ private:
 	int _featureCount;
 	int _labelCount;
 	// for accelarating derivitive calculation.
-	shared_ptr<const boost::multi_array<double, 3>> _cachedQMatrix;
+	shared_ptr<const boost::multi_array<double, 3, std::allocator<double>>> _cachedQMatrix;
 	int _lastK;	// remember last derivative we are calculation. if k is increasing, we can use cached QMatrix.
 };
 
