@@ -13,7 +13,7 @@ public:
 	FWBW(function<double (int, int, int)>&, int, int);
 	virtual ~FWBW(void);
 
-	const boost::multi_array<double, 3>& GetQMatrix();
+	shared_ptr<const boost::multi_array<double, 3>> GetQMatrix();
 	double GetZ();
 
 	static double ExpPlus(double, double);
@@ -32,7 +32,7 @@ private:
 	boost::multi_array<double, 2> _alphaMatrix;	// log
 	boost::multi_array<double, 2> _betaMatrix;	// log
 	boost::multi_array<double, 3> _muMatrix;	// log
-	boost::multi_array<double, 3> _qMatrix;	//linear, probability [0,1]
+	shared_ptr<boost::multi_array<double, 3>> _pQMatrix;	//linear, probability [0,1]
 	function<double (int, int, int)> _phi;
 	double _z; // log
 };

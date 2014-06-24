@@ -12,7 +12,7 @@ FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount):
 	_alphaMatrix(boost::extents[_jCount][_sCount]),
 	_betaMatrix(boost::extents[_jCount][_sCount]),
 	_muMatrix(boost::extents[_jCount][_sCount][_sCount]),
-	_qMatrix(boost::extents[_jCount][_sCount][_sCount]),
+	_pQMatrix(new boost::multi_array<double, 3>(boost::extents[_jCount][_sCount][_sCount])),
 	_phi(phi)
 {
 	_z = std::numeric_limits<double>::lowest();
@@ -108,7 +108,7 @@ void FWBW::_CalculateZ()
 	}
 }
 
-const boost::multi_array<double, 3>& FWBW::GetQMatrix()
+shared_ptr<const boost::multi_array<double, 3>> FWBW::GetQMatrix()
 {
 	_CalculateMuMatrix();
 	_CalculateZ();
@@ -121,14 +121,14 @@ const boost::multi_array<double, 3>& FWBW::GetQMatrix()
 				// fill _qMatrix[0][1..._sCount-1][0..._sCount] with 0.
 				if(0 == j && s1 != 0)
 				{
-					_qMatrix[j][s1][s2] = 0.0;
+					(*_pQMatrix)[j][s1][s2] = 0.0;
 					continue;
 				}
-				_qMatrix[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
+				(*_pQMatrix)[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
 			}
 		}
 	}
-	return _qMatrix;
+	return _pQMatrix;
 }
 
 double FWBW::GetZ()
@@ -162,7 +162,7 @@ void FWBW::PrintQMatrix()
 		{
 			for(int s2 =0; s2 < _sCount; s2++)
 			{
-				std::cout << _qMatrix[j][s1][s2] << "\t";
+				std::cout << (*_pQMatrix)[j][s1][s2] << "\t";
 			}
 			std::cout << std::endl;
 		}

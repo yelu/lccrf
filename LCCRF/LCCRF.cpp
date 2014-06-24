@@ -9,6 +9,8 @@ LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featu
 	_lambda = lambda;
 	_featureCount = featureCount;
 	_labelCount = labelCount;
+	_cacheX = NULL;
+	_cachedQMatrix = NULL;
 }
 
 LCCRF::~LCCRF(void)
@@ -37,10 +39,15 @@ void LCCRF::_MakeDervative()
 		double res2 = 0.0; // linear
 
 		// forward-backword calculation.
-		function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-		{ return _Phi(s1, s2, j, x, weights); };
-		FWBW fwbw(phi, labelCount, x.Length());
-		auto QMatrix = fwbw.GetQMatrix();
+		// use a cache to avoid unnecessary calculation.
+		if(&x != _cacheX)
+		{
+			function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
+			{ return _Phi(s1, s2, j, x, weights); };
+			FWBW fwbw(phi, labelCount, x.Length());
+			_cachedQMatrix = fwbw.GetQMatrix();
+		}
+		
 		//fwbw.PrintQMatrix();
 		for(size_t j = 0; j < y.Length(); j++)
 		{
@@ -53,7 +60,7 @@ void LCCRF::_MakeDervative()
 			{
 				for(int y2 = 0; y2 < labelCount; y2++)
 				{
-					double q = QMatrix[j][y1][y2];
+					double q = (*_cachedQMatrix)[j][y1][y2];
 					int y = y1;
 					if(0 == j)
 					{

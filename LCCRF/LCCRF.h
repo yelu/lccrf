@@ -3,6 +3,7 @@
 #include "Types.h"
 #include <list>
 #include <functional>
+#include <boost/multi_array.hpp>
 using std::list;
 using std::function;
 
@@ -43,5 +44,8 @@ private:
 	vector<double> _weights;
 	int _featureCount;
 	int _labelCount;
+	// for accelarating derivitive calculation.
+	shared_ptr<const boost::multi_array<double, 3>> _cachedQMatrix;
+	XType* _cacheX;
 };
 
