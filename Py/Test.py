@@ -1,8 +1,10 @@
 ﻿#!/usr/bin/env python
 
+import os
 from LCCRFPy import *
 
 if __name__ == "__main__":
+
 	x = X()
 	x.push_back(2)
 	x.add_feature(0, -1, 0, 0)

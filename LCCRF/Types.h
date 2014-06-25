@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <list>
+#include "Log.h"
 using std::wstring;
 using std::vector;
 using std::set;
@@ -80,7 +81,7 @@ public:
 
 	YType()
 	{
-		printf("Y constructed.\n");
+		LOG_DEBUG("Y constructed.");
 	}
 
 	size_t Length() const;
@@ -120,7 +121,7 @@ class YListType
 public:
 	YListType()
 	{
-		printf("YList constructed.\n");
+		LOG_DEBUG("YList constructed.");
 	}
 
 	// export to python.

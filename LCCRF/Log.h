@@ -19,6 +19,6 @@
 #ifdef NOLOG
 #undef LOG
 #undef LOG_DEBUG
-#define LOG(_fmt_, args...) do{}while(false)
-#define LOG_DEBUG(_fmt_, args...) do{}while(false)
+#define LOG(_fmt_, ...) do{}while(false)
+#define LOG_DEBUG(_fmt_, ...) do{}while(false)
 #endif
