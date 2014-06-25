@@ -23,6 +23,7 @@ cdef extern from "LCCRF.h":
 		LCCRF(int, int, double) except +
 		void Fit(XListType&, YListType&, double, int, int)
 		void Predict(XListType&, YListType&)
+		vector[double]& GetWeights()
 		
 cdef class X:
 	cdef XListType* thisptr
@@ -58,10 +59,12 @@ cdef class LinearChainCRF:
 		self.thisptr = new LCCRF(featureCount, labelCount, l)
 	def __dealloc__(self):
 		del self.thisptr
-	def Fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
+	def fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
 		print learningRate
 		print batch
 		print maxIteration
 		self.thisptr.Fit(x.thisptr[0], y.thisptr[0], learningRate, batch, maxIteration)
-	def Predict(self, X x, Y y):
+	def predict(self, X x, Y y):
 		self.thisptr.Predict(x.thisptr[0], y.thisptr[0])
+	def get_weights(self):
+		return self.thisptr.GetWeights()

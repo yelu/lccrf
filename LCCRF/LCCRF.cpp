@@ -46,7 +46,7 @@ void LCCRF::_MakeDervative()
 			{ return _Phi(s1, s2, j, x, weights); };
 			FWBW fwbw(phi, labelCount, x.Length());
 			_cachedQMatrix = fwbw.GetQMatrix();
-			fwbw.PrintQMatrix();
+			//fwbw.PrintQMatrix();
 		}
 		_lastK = k;
 		
@@ -194,6 +194,11 @@ void LCCRF::Predict(XListType& xs, YListType& ys)
 			ys.AddTag(*tag);
 		}
 	}
+}
+
+vector<double>& LCCRF::GetWeights()
+{
+	return _weights;
 }
 
 void LCCRF::Debug(const XType& doc, const YType& y)

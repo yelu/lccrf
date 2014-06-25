@@ -31,6 +31,8 @@ public:
 
 	void Debug(const XType&, const YType&);
 
+	vector<double>& GetWeights();
+
 private:
 
 	static double _Phi(int s1, int s2, int j,

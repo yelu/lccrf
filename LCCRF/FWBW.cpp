@@ -161,7 +161,8 @@ void FWBW::PrintQMatrix()
 		{
 			for(int s2 =0; s2 < _sCount; s2++)
 			{
-				std::cout << (*_pQMatrix)[j][s1][s2] << "\t";
+				double v = (*_pQMatrix)[j][s1][s2];
+				std::cout << v << "\t";
 			}
 			std::cout << std::endl;
 		}

@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <limits>
+#include "Log.h"
 using std::function;
 using std::vector;
 using std::list;
@@ -39,7 +40,7 @@ public:
 		double lastObjectValue = std::numeric_limits<double>::infinity();
 		for(int i = 0; i < maxIteration; i++)
 		{
-			printf("Iteration %d \n", i);
+			LOG_DEBUG("Iteration %d", i);
 			int count = 0;
 			typename list<XType>::const_iterator xBegin = _xs.begin();
 			typename list<YType>::const_iterator yBegin = _ys.begin();
@@ -101,14 +102,14 @@ public:
 		}
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
-		printf("delta : %f\tobject : %f\n", 0 - delta, newObjectValue);
+		LOG_DEBUG("delta : %f\tobject : %f", 0 - delta, newObjectValue);
 		if(delta <= 0)
 		{
 			delta = 0 - delta;
 		}
 		if(delta < 10e-8) 
 		{
-			printf("Converged. delta : %f\n", delta);
+			LOG_DEBUG("Converged. delta : %f", delta);
 			return true;
 		}
 		else

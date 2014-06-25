@@ -10,8 +10,8 @@ setup(
 			"LCCRFPy", 
 			['LCCRFPy.pyx'], 
 			language="c++", 
-            include_dirs=['../LCCRF', './'],
-			extra_compile_args=["-std=c++11", "-IC:\\local\\boost_1_55_0"]
+            include_dirs=['../LCCRF'],
+			extra_compile_args=["-std=c++11", "-IC:\\local\\boost_1_55_0"],
 			)
 	]),
 )

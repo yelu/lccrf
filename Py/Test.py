@@ -15,4 +15,6 @@ if __name__ == "__main__":
 	y.add_tag(1)
 	
 	crf = LinearChainCRF(2, 2, 0.1)
-	crf.Fit(x, y, 0.1, 1, 1000)
+	crf.fit(x, y, 0.1, 1, 1000)
+	weights = crf.get_weights()
+	print weights
