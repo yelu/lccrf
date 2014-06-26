@@ -70,6 +70,11 @@ public:
 	//export to cython.
 	void AddFeature(int j, int s1, int s2, int featureID);
 
+    const std::map<Key, shared_ptr<std::set<int>>, KeyCompare>& Raw()
+    {
+        return _features;
+    }
+
 private:
 	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
 	size_t _length;
@@ -93,6 +98,11 @@ public:
 	// export to python.
 	void AddTag(int j);
 
+    const std::vector<int>& Raw()
+    {
+        return _tags;
+    }
+
 private:
 	std::vector<int> _tags;
 };
@@ -111,6 +121,29 @@ public:
 	void PushBack(int length);
 
 	const list<XType>& Raw();
+
+    void GetAllFeatures(list<list<std::pair<list<int>, list<int>>>>& res)
+    {
+        for(auto i = _xs.begin(); i != _xs.end(); i++)
+        {
+            auto x = i->Raw();
+            list<std::pair<list<int>, list<int>>> xOut;
+            for(auto j = x.begin(); j != x.end(); j++)
+            {
+                std::pair<list<int>, list<int>> fs;
+                XType::Key k = j->first;
+                fs.first.push_back(k.j);
+                fs.first.push_back(k.s1);
+                fs.first.push_back(k.s2);
+                for(auto f = j->second->begin(); f != j->second->end(); f++)
+                {
+                    fs.second.push_back(*f);
+                }
+                xOut.push_back(fs);
+            }
+            res.push_back(xOut);
+        } 
+    }
 
 private:
 	list<XType> _xs;
@@ -138,6 +171,20 @@ public:
 
 	// export to python.
 	int TagOf(int i, int j);
+
+    void GetAllTags(list<list<int>>& res)
+    {
+        for(auto i = _ys.begin(); i != _ys.end(); i++)
+        {
+            std::list<int> tags;
+            auto y = i->Raw();
+            for(auto tag = y.begin(); tag != y.end(); tag++)
+            {
+                tags.push_back(*tag);
+            }
+            res.push_back(tags);
+        }
+    }
 
 	const list<YType>& Raw();
 

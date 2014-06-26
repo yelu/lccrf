@@ -79,28 +79,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FeatureManager.cpp" />
     <ClCompile Include="FWBW.cpp" />
-    <ClCompile Include="IDAllocator.cpp" />
     <ClCompile Include="LCCRF.cpp" />
-    <ClCompile Include="NGramFeaturizer.cpp" />
-    <ClCompile Include="TransitionFeaturizer.cpp" />
     <ClCompile Include="Types.cpp" />
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Document.h" />
-    <ClInclude Include="FeatureManager.h" />
-    <ClInclude Include="Featurizer.h" />
     <ClInclude Include="FWBW.h" />
-    <ClInclude Include="IDAllocator.h" />
     <ClInclude Include="LCCRF.h" />
     <ClInclude Include="Log.h" />
-    <ClInclude Include="NGramFeaturizer.h" />
     <ClInclude Include="SGD.h" />
-    <ClInclude Include="TransitionFeaturizer.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="Utils.h" />
     <ClInclude Include="Viterbi.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
