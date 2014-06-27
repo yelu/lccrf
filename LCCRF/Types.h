@@ -57,18 +57,25 @@ public:
 		  }
 	};
 
-
 	// export to cython.
-	XType(int length);
+	XType(void);
+
+    XType(int length)
+    {
+        _length = length;
+    }
 
 	shared_ptr<std::set<int>> GetFeatures(int j, int s1, int s2) const;
 
-	double GetFeatureValue(int j, int s1, int s2, int featureID) const ;
-
-	size_t Length() const;
+	double GetFeatureValue(int j, int s1, int s2, int featureID) const;
 
 	//export to cython.
 	void AddFeature(int j, int s1, int s2, int featureID);
+
+    size_t Length() const
+    {
+        return _length;
+    }
 
     const std::map<Key, shared_ptr<std::set<int>>, KeyCompare>& Raw()
     {
@@ -77,7 +84,8 @@ public:
 
 private:
 	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
-	size_t _length;
+
+    int _length;
 };
 
 class YType
@@ -96,7 +104,12 @@ public:
 	void Clear();
 
 	// export to python.
-	void AddTag(int j);
+	void AddTag(int i, int j);
+
+	void AppendTag(int tag)
+    {
+        _tags.push_back(tag);
+    }
 
     const std::vector<int>& Raw()
     {
@@ -114,14 +127,12 @@ public:
 	{
 	}
 
-	// export to python.
-	void AddFeature(int j, int s1, int s2, int featureID);
-
-	// export to python.
-	void PushBack(int length);
+	// export to cython.
+	void AddFeature(int i, int j, int s1, int s2, int featureID);
 
 	const list<XType>& Raw();
 
+    // export to cython.
     void GetAllFeatures(list<list<std::pair<list<int>, list<int>>>>& res)
     {
         for(auto i = _xs.begin(); i != _xs.end(); i++)
@@ -145,8 +156,15 @@ public:
         } 
     }
 
+    // export to cython.
+    XType& At(int i);
+
+    // export to cython.
+    void Append(XType& x);
+
 private:
 	list<XType> _xs;
+    map<int, XType*> _index;
 };
 
 class YListType
@@ -157,21 +175,10 @@ public:
 		LOG_DEBUG("YList constructed.");
 	}
 
-	// export to python.
-	void PushBack();
+	// export to cython.
+	void AddTag(int i, int j, int tag);
 
-	// export to python.
-	void AddTag(int tag);
-
-	// export to python.
-	int Size();
-
-	// export to python.
-	int LengthOf(int i);
-
-	// export to python.
-	int TagOf(int i, int j);
-
+    // export to cython.
     void GetAllTags(list<list<int>>& res)
     {
         for(auto i = _ys.begin(); i != _ys.end(); i++)
@@ -186,9 +193,15 @@ public:
         }
     }
 
+    // export to cython.
+    void Append(YType& y);
+
+    // export to cython.
+    YType& At(int i);
+
 	const list<YType>& Raw();
 
 private:
 	list<YType> _ys;
-	map<int, const YType*> _index;
+	map<int, YType*> _index;
 };

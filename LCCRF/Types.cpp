@@ -1,8 +1,7 @@
 #include "Types.h"
 
-XType::XType(int length)
+XType::XType(void)
 {
-	_length = length;
 }
 
 shared_ptr<std::set<int>> XType::GetFeatures(int j, int s1, int s2) const
@@ -24,11 +23,6 @@ double XType::GetFeatureValue(int j, int s1, int s2, int featureID) const
 		return 0;
 	}
 	return 1;
-}
-
-size_t XType::Length() const
-{
-	return _length;
 }
 
 void XType::AddFeature(int j, int s1, int s2, int featureID)
@@ -56,20 +50,24 @@ void YType::Clear()
 	_tags.clear();
 }
 
-void YType::AddTag(int j)
+void YType::AddTag(int i, int tag)
 {
-	_tags.push_back(j);
+    if(i >= (int)_tags.size())
+    {
+        _tags.resize(i + 1);
+    }
+	_tags[i] = tag;
 }
 
-void XListType::AddFeature(int j, int s1, int s2, int featureID)
+void XListType::AddFeature(int i, int j, int s1, int s2, int featureID)
 {
-	_xs.back().AddFeature(j, s1, s2, featureID);
-}
-
-void XListType::PushBack(int length)
-{
-	XType x(length);
-	_xs.push_back(x);
+    for(int ite = _xs.size(); ite < i + 1; ite++)
+    {
+        XType x;
+        _xs.push_back(x);
+        _index[ite] = &(_xs.back());
+    }
+    _index[i]->AddFeature(j, s1, s2, featureID);
 }
 
 const list<XType>& XListType::Raw()
@@ -77,31 +75,47 @@ const list<XType>& XListType::Raw()
 	return _xs;
 }
 
-void YListType::AddTag(int tag)
+void XListType::Append(XType& x)
 {
-	_ys.back().AddTag(tag);
+    _xs.push_back(x);
+    _index[_xs.size() - 1] = &(_xs.back());
 }
 
-void YListType::PushBack()
+XType& XListType::At(int i)
 {
-	YType y;
-	_ys.push_back(y);
-	_index[_ys.size() - 1] = &(_ys.back());
+    if(-1 == i)
+    {
+        i = _xs.size() - 1;
+    }
+    return *(_index[i]);
 }
 
-int YListType::Size()
+void YListType::AddTag(int i, int j, int tag)
 {
-	return _ys.size();
+    for(int ite = _ys.size(); ite < i + 1; ite++)
+    {
+        YType y;
+        _ys.push_back(y);
+        _index[ite] = &(_ys.back());
+    }
+    // -1 is the last.
+    if(-1 == i) {i = _ys.size() - 1;}
+	_index[i]->AddTag(j, tag);
 }
 
-int YListType::LengthOf(int i)
+void YListType::Append(YType& y)
 {
-	return _index[i]->Length();
+    _ys.push_back(y);
+    _index[_ys.size() - 1] = &(_ys.back());
 }
 
-int YListType::TagOf(int i, int j)
+YType& YListType::At(int i)
 {
-	return (_index[i]->Tags())[j];
+    if(-1 == i)
+    {
+        i = _ys.size() - 1;
+    }
+    return *(_index[i]);
 }
 
 const list<YType>& YListType::Raw()
