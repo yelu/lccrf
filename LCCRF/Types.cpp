@@ -2,6 +2,7 @@
 
 XType::XType(void)
 {
+	_length = 0;
 }
 
 shared_ptr<std::set<int>> XType::GetFeatures(int j, int s1, int s2) const
@@ -83,6 +84,12 @@ void XListType::Append(XType& x)
 
 XType& XListType::At(int i)
 {
+	for(int ite = _xs.size(); ite < i + 1; ite++)
+    {
+        XType x;
+        _xs.push_back(x);
+        _index[ite] = &(_xs.back());
+    }
     if(-1 == i)
     {
         i = _xs.size() - 1;
@@ -111,6 +118,12 @@ void YListType::Append(YType& y)
 
 YType& YListType::At(int i)
 {
+	for(int ite = _ys.size(); ite < i + 1; ite++)
+    {
+        YType y;
+        _ys.push_back(y);
+        _index[ite] = &(_ys.back());
+    }
     if(-1 == i)
     {
         i = _ys.size() - 1;

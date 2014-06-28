@@ -10,13 +10,13 @@ class VectorizerManager:
     def add_vectorizer(self, v):
         self.__vectorizer.append(v)
     
-    def get_all_tags(self, docs):
+    def allocate_tagid(self, docs):
         for doc in docs:
             for _, tag in doc:
                 Vectorizer.get_or_allocate_tagid(tag)
         
     def fit(self, docs):
-        self.get_all_tags(docs)
+        self.allocate_tagid(docs)
         for doc in docs:
             for v in self.__vectorizer:
                 v.fit(doc)

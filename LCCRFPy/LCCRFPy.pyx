@@ -10,6 +10,8 @@ cdef extern from "Types.h":
         XType() except +
         XType(int) except +
         void AddFeature(int, int, int, int)
+        void SetLength(int)
+        int Length()
     
     cdef cppclass YType:
         YType() except +
@@ -48,7 +50,13 @@ cdef class XItem:
         if self.ownership == 1:
             del self.thisptr
     def __setitem__(self, idx, value):
-        self.thisptr.AddFeature(idx[0], idx[1], idx[2], idx[3])
+        self.thisptr.AddFeature(idx[0], idx[1], idx[2], idx[3]) 
+    
+    property length:
+        def __get__(self):
+            return self.thisptr.Length()
+        def __set__(self, value):
+            self.thisptr.SetLength(value)
         
 cdef class YItem:
     cdef YType* thisptr

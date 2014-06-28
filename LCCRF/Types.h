@@ -72,10 +72,15 @@ public:
 	//export to cython.
 	void AddFeature(int j, int s1, int s2, int featureID);
 
-    size_t Length() const
+    int Length() const
     {
         return _length;
     }
+
+	void SetLength(int length)
+	{
+		_length = length;
+	}
 
     const std::map<Key, shared_ptr<std::set<int>>, KeyCompare>& Raw()
     {

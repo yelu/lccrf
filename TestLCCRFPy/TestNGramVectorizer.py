@@ -26,8 +26,7 @@ class TestCaseNGramVectorizer(unittest.TestCase):
         
         x = X()
         y = Y()
-        x.append(XItem(2))
-        v.transform(doc, x[-1])
+        v.transform(doc, x[0])
         x = x.get_all_features()
         
         self.assertEqual(len(x), 1)

@@ -10,8 +10,8 @@ class TestCaseLinearChainCRF(unittest.TestCase):
     
     def setUp(self):
         self.x = X()
-        item = XItem(2)
-        self.x.append(item)
+        self.x[0].length = 2
+        print self.x[0].length
         self.x[0, 0, -1, 0, 0] = 1
         self.x[0, 1, 0, 1, 1] = 1
         self.x[0, 1, 1, 1, 1] = 1
