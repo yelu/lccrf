@@ -38,6 +38,7 @@ cdef extern from "LCCRF.h":
         void Fit(XListType&, YListType&, double, int, int)
         void Predict(XListType&, YListType&)
         vector[double]& GetWeights()
+        pair[list[list[pair[int, double]]], double] Debug(XType&, YType&)
 
 cdef class XItem:
     cdef XType* thisptr
@@ -121,3 +122,5 @@ cdef class LinearChainCRF:
         self.thisptr.Predict(x.thisptr[0], y.thisptr[0])
     def get_weights(self):
         return self.thisptr.GetWeights()
+    def debug(self, XItem x, YItem y):
+        return self.thisptr.Debug(x.thisptr[0], y.thisptr[0])

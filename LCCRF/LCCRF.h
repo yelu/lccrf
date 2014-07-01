@@ -6,6 +6,7 @@
 #include <functional>
 using std::list;
 using std::function;
+using std::pair;
 
 namespace boost
 {
@@ -29,7 +30,7 @@ public:
 
 	void Predict(XListType& x, YListType& y);
 
-	void Debug(const XType&, const YType&);
+    pair<list<list<pair<int, double>>>, double> Debug(const XType&, const YType&);
 
 	vector<double>& GetWeights();
 
@@ -37,7 +38,8 @@ private:
 
 	static double _Phi(int s1, int s2, int j,
 		const XType& doc, 
-		vector<double>& weights);
+		vector<double>& weights,
+        list<pair<int, double>>* hitFeatures = NULL);
 
 	void _MakeDervative();
 

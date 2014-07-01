@@ -20,7 +20,7 @@ class VectorizerManager:
         for doc in docs:
             for v in self.__vectorizer:
                 v.fit(doc)
-        
+               
     def transform(self, docs):
         x = X()
         y = Y()
@@ -33,3 +33,21 @@ class VectorizerManager:
                 y[-1, idx] = Vectorizer.get_or_allocate_tagid(v[1])
                 
         return (x, y)
+        
+    @property
+    def feature_count(self):
+        count = 0
+        for v in self.__vectorizer:
+            count += v.feature_count
+        return count
+        
+    @property
+    def tag_count(self):
+        return len(Vectorizer.tagid_to_tagname)
+        
+    def readable_features(self):
+        all_features = {}
+        with open(filePath, 'w') as f:
+            for v in self.__vectorizer:
+                all_features.update(v.readable_features())
+        return all_features

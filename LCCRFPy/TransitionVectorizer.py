@@ -32,4 +32,13 @@ class TransitionVectorizer(Vectorizer):
                         x[j, s1, s2, self.features[tr]] = 1
         
         return x
+    
+    @property
+    def feature_count(self):
+        return len(self.features)
+        
+    
+    def readable_features(self):
+        new_dict = dict(zip(self.features.values(), self.features.keys()))
+        return new_dict
         

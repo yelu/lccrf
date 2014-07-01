@@ -24,15 +24,17 @@ public:
 		_xs(xs), _ys(ys), _derivatives(derivatives), _object(object), _weights(weights)
 	{
 		_isObjectProvided = true;
+        _iterationCount = 0;
 	}
 
-	SGD(list<XType>& xs,
-		list<YType>& ys,
+	SGD(const list<XType>& xs,
+		const list<YType>& ys,
 		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives):
 		_xs(xs), _ys(ys), _derivatives(derivatives), _weights(weights)
 	{
 		_isObjectProvided = false;
+        _iterationCount = 0;
 	}
 
 	const vector<double>& Run(double learningRate, int batch = 1, int maxIteration = 1)
@@ -41,6 +43,7 @@ public:
 		for(int i = 0; i < maxIteration; i++)
 		{
 			LOG_DEBUG("Iteration %d", i);
+            _iterationCount++;
 			int count = 0;
 			typename list<XType>::const_iterator xBegin = _xs.begin();
 			typename list<YType>::const_iterator yBegin = _ys.begin();
@@ -66,6 +69,7 @@ public:
 				break;
 			}
 		}
+        printf("iterations = %d\n", _iterationCount);
 		return _weights;
 	}
 
@@ -127,5 +131,6 @@ private:
 	ObjectFunction _object;
 	vector<double>& _weights;
 	bool _isObjectProvided;
+    int _iterationCount;
 };
 

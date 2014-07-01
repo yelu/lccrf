@@ -2,6 +2,7 @@
 #include "Viterbi.h"
 #include "SGD.h"
 #include "FWBW.h"
+#include <iostream>
 using std::wcout;
 
 LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featureCount, 0.0)
@@ -19,13 +20,18 @@ LCCRF::~LCCRF(void)
 
 double LCCRF::_Phi(int s1, int s2, int j,
 				  const XType& doc, 
-				  vector<double>& weights)
+				  vector<double>& weights,
+                  list<pair<int, double>>* hitFeatures)
 {
 	double ret = 0.0;
 	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
 	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 	{
 		ret += (weights[*ite]);
+        if(NULL != hitFeatures)
+        {
+            hitFeatures->push_back(pair<int, double>(*ite, weights[*ite]));
+        }
 	}
 	return ret;
 }
@@ -46,7 +52,7 @@ void LCCRF::_MakeDervative()
 			{ return _Phi(s1, s2, j, x, weights); };
 			FWBW fwbw(phi, labelCount, y.Length());
 			_cachedQMatrix = fwbw.GetQMatrix();
-			//fwbw.PrintQMatrix();
+            //fwbw.PrintQMatrix();
 		}
 		_lastK = k;
 		
@@ -196,22 +202,22 @@ vector<double>& LCCRF::GetWeights()
 	return _weights;
 }
 
-void LCCRF::Debug(const XType& doc, const YType& y)
+pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XType& doc, const YType& y)
 {
 	int preState = -1;
 	double score = 0.0;
-	wcout << "Path : ";
+	pair<list<list<pair<int, double>>>, double> res;
 	for(int j = 0; j < _labelCount; j++)
 	{
 		wcout << y.Tags()[j];
 		if(y.Tags()[j] >= _labelCount)
 		{
-			wcout << L"(bad path)" << std::endl;
-			return;
+			return res;
 		}
-		score += _Phi(preState, y.Tags()[j], j, doc, _weights);
+        res.first.push_back(list<pair<int, double>>());
+        score += _Phi(preState, y.Tags()[j], j, doc, _weights, &(res.first.back()));
 		preState = y.Tags()[j];
-		wcout << L" -> ";
 	}
-	wcout << " score : " << score << std::endl;
+    res.second = score;
+    return res;
 }
