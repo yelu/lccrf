@@ -1,4 +1,5 @@
 #include "FWBW.h"
+#include "Log.h"
 #include <iostream>
 
 FWBW::FWBW(void)
@@ -32,13 +33,13 @@ void FWBW::_CalculateAlphaMatrix()
 	}
 	for(int j = 1; j < _jCount; j++)
 	{
-		for(int s1 = 0; s1 < _sCount; s1++)
+		for(int s2 = 0; s2 < _sCount; s2++)
 		{
-			_alphaMatrix[j][s1] = std::numeric_limits<double>::lowest();
-			for(int s2 = 0; s2 < _sCount; s2++)
+			_alphaMatrix[j][s2] = std::numeric_limits<double>::lowest();
+			for(int s1 = 0; s1 < _sCount; s1++)
 			{
-				double phi = ExpPlus(_alphaMatrix[j][s1], _alphaMatrix[j-1][s2] + _phi(s2, s1, j));
-				_alphaMatrix[j][s1] = phi;
+				double phi = ExpPlus(_alphaMatrix[j][s2], _alphaMatrix[j-1][s1] + _phi(s1, s2, j));
+				_alphaMatrix[j][s2] = phi;
 			}
 		}
 	}
@@ -52,13 +53,13 @@ void FWBW::_CalculateBetaMatrix()
 	}
 	for(int j = _jCount - 2; j >= 0; j--)
 	{
-		for(int s = 0; s < _sCount; s++)
+		for(int s1 = 0; s1 < _sCount; s1++)
 		{
-			_betaMatrix[j][s] = std::numeric_limits<double>::lowest();
-			for(int k = 0; k < _sCount; k++)
+			_betaMatrix[j][s1] = std::numeric_limits<double>::lowest();
+			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				double phi = ExpPlus(_betaMatrix[j][s], _betaMatrix[j+1][k] + _phi(s, k, j+1));
-				_betaMatrix[j][s] = phi;
+				double phi = ExpPlus(_betaMatrix[j][s1], _betaMatrix[j+1][s2] + _phi(s1, s2, j+1));
+				_betaMatrix[j][s1] = phi;
 			}
 		}
 	}
@@ -101,10 +102,17 @@ void FWBW::_CalculateMuMatrix()
 void FWBW::_CalculateZ()
 {
 	_z = std::numeric_limits<double>::lowest();
+    double _z1 = std::numeric_limits<double>::lowest();
 	for(int s = 0; s < _sCount; s++)
 	{
 		_z = ExpPlus(_z, _alphaMatrix[_jCount - 1][s]);
 	}
+    for(int k = 0; k < _sCount; k++)
+	{
+		_z1 = ExpPlus(_z1, _betaMatrix[0][k] + _phi(-1, k, 0));
+	}
+    LOG_DEBUG("fb : %f\t%f", _z, _z1);
+    //assert(abs(_z1 - _z) < 10e-4);
 }
 
 shared_ptr<const boost::multi_array<double, 3>> FWBW::GetQMatrix()

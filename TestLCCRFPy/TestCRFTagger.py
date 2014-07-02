@@ -6,6 +6,7 @@ sys.path.append(lib_path)
 from CRFTagger import *
 import unittest
 import re
+import json
 
 class TestCRFTagger(unittest.TestCase):
 
@@ -38,17 +39,26 @@ class TestCRFTagger(unittest.TestCase):
     
     def setUp(self):
         filePath = './data/train.tsv'
-        docs = self.ParseInput(filePath)
+        train_doc = self.ParseInput(filePath)
         
         tagger = CRFTagger()
-        tagger.fit(docs)
+        tagger.fit(train_doc)
         
-        testX = self.ParseInput('./data/test.tsv')
-        testY = tagger.transform(testX[0:1])
-        print testY
+        for feature in tagger.readable_features_and_weights():
+            print "%d\t%s\t%f" % (feature[0], feature[1], feature[2])
+        
+        test_doc = self.ParseInput('./data/test.tsv')
+        test_y = tagger.transform(test_doc[0:1])
+        print test_y
 
-        debugRes1 = tagger.debug(testX[0])
-        print debugRes1
+        debugRes1 = tagger.debug(test_doc[0])
+        print json.dumps(debugRes1, sort_keys = True, indent = 4)
+        
+        # change tag and get another path result.
+        for idx, i in enumerate(test_doc[0]):
+            i[1] = test_y[0][idx]
+        debugRes2 = tagger.debug(test_doc[0])
+        print json.dumps(debugRes2, sort_keys = True, indent = 4)
         
     def tearDown(self):
         pass

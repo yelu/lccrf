@@ -17,7 +17,9 @@ LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featu
 LCCRF::~LCCRF(void)
 {
 }
-
+/*
+   S2, j current position, s1 is previous state
+*/
 double LCCRF::_Phi(int s1, int s2, int j,
 				  const XSampleType& doc, 
 				  vector<double>& weights,
