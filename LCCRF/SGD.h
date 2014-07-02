@@ -69,7 +69,7 @@ public:
 				break;
 			}
 		}
-        printf("iterations = %d\n", _iterationCount);
+        LOG_DEBUG("iterations = %d\n", _iterationCount);
 		return _weights;
 	}
 
