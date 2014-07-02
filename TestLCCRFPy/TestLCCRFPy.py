@@ -15,12 +15,12 @@ class TestCaseLinearChainCRF(unittest.TestCase):
         self.x[0, 0, -1, 0, 0] = 1
         self.x[0, 1, 0, 1, 1] = 1
         self.x[0, 1, 1, 1, 1] = 1
-        print self.x.get_all_features()
+        print self.x.to_array()
         
         self.y = Y()
         self.y[0, 0] = 0
         self.y[0, 1] = 1
-        print self.y.get_all_tags()
+        print self.y.to_array()
         
         self.crf = LinearChainCRF(2, 2, 0.1)
         

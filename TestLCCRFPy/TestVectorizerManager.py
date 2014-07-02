@@ -21,12 +21,12 @@ class TestCaseVectorizerManager(unittest.TestCase):
         doc = [[['a'], 'tag1'], [['b'], 'tag2']]
     
         vm = VectorizerManager()
-        vm.add_vectorizer(NGramVectorizer(1))
-        vm.add_vectorizer(TransitionVectorizer())
+        vm.add_vectorizer(NGramVectorizer(vm, 1))
+        vm.add_vectorizer(TransitionVectorizer(vm))
         
         vm.fit([doc])
         x, y = vm.transform([doc])
-        x, y = x.get_all_features(), y.get_all_tags()
+        x, y = x.to_array(), y.to_array()
         
         self.assertEqual(len(x), 1)
         self.assertEqual(x[0][0][0], [0,-1,0])

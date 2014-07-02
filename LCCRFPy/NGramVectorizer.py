@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
-from Vectorizer import Vectorizer
-from LCCRFPy import X,Y,XItem
-
-class NGramVectorizer(Vectorizer):
-    def __init__(self, ngram = 2):
+class NGramVectorizer:
+    def __init__(self, vm, ngram = 2):
         self.__ngram = ngram
-        self.tags = Vectorizer.tagid_to_tagname
+        self.tags = vm.tagid_to_tagname
+        self.vm = vm
         self.features = {}
     
     def get_features(self):
@@ -23,7 +21,7 @@ class NGramVectorizer(Vectorizer):
         for i in range(self.__ngram - 1, len(doc)):
             gram = self.__make_gram(doc, i, doc[i][1])
             if gram not in self.features:
-                new_featureid = Vectorizer.allocate_featureid()
+                new_featureid = self.vm.allocate_featureid()
                 self.features[gram] = new_featureid
 
     def transform(self, doc, x):
@@ -44,5 +42,7 @@ class NGramVectorizer(Vectorizer):
         return len(self.features)
         
     def readable_features(self):
-        new_dict = dict(zip(self.features.values(), self.features.keys()))
-        return new_dict
+        readable_features = {}
+        for key, value in self.features.items():
+            readable_features[value] = "ngram%d#%s"%(self.__ngram, key.strip())
+        return readable_features

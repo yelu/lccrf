@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
-from Vectorizer import Vectorizer
-from LCCRFPy import X,Y
-
-class TransitionVectorizer(Vectorizer):
-    def __init__(self, ngram = 2):
-        self.__ngram = ngram
+class TransitionVectorizer():
+    def __init__(self, vm):
         self.features = {}
-        self.tags = Vectorizer.tagid_to_tagname
+        self.tags = vm.tagid_to_tagname
+        self.vm = vm
     
     def get_features(self):
         return self.features
@@ -20,7 +17,7 @@ class TransitionVectorizer(Vectorizer):
         for i in range(1, len(doc)):
             tr = self.__make_transition(doc[i-1][1], doc[i][1])
             if tr not in self.features:
-                new_featureid = Vectorizer.allocate_featureid()
+                new_featureid = self.vm.allocate_featureid()
                 self.features[tr] = new_featureid
 
     def transform(self, doc, x):
@@ -39,6 +36,8 @@ class TransitionVectorizer(Vectorizer):
         
     
     def readable_features(self):
-        new_dict = dict(zip(self.features.values(), self.features.keys()))
-        return new_dict
+        readable_features = {}
+        for key, value in self.features.items():
+            readable_features[value] = "transition#%s"%(key.strip(),)
+        return readable_features
         

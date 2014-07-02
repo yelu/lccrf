@@ -9,15 +9,15 @@ using std::function;
 using std::vector;
 using std::list;
 
-template<typename XType, typename YType>
+template<typename XSampleType, typename YSampleType>
 class SGD
 {
 public:
-	typedef function<double (vector<double>&, const XType&, const YType&)> DerivativeFunction;
-	typedef function<double (vector<double>&, const XType&, const YType&)> ObjectFunction;
+	typedef function<double (vector<double>&, const XSampleType&, const YSampleType&)> DerivativeFunction;
+	typedef function<double (vector<double>&, const XSampleType&, const YSampleType&)> ObjectFunction;
 
-	SGD(const list<XType>& xs,
-		const list<YType>& ys,
+	SGD(const list<XSampleType>& xs,
+		const list<YSampleType>& ys,
 		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives,
 		ObjectFunction& object):
@@ -27,8 +27,8 @@ public:
         _iterationCount = 0;
 	}
 
-	SGD(const list<XType>& xs,
-		const list<YType>& ys,
+	SGD(const list<XSampleType>& xs,
+		const list<YSampleType>& ys,
 		vector<double>& weights,
 		vector<DerivativeFunction>& derivatives):
 		_xs(xs), _ys(ys), _derivatives(derivatives), _weights(weights)
@@ -45,8 +45,8 @@ public:
 			LOG_DEBUG("Iteration %d", i);
             _iterationCount++;
 			int count = 0;
-			typename list<XType>::const_iterator xBegin = _xs.begin();
-			typename list<YType>::const_iterator yBegin = _ys.begin();
+			typename list<XSampleType>::const_iterator xBegin = _xs.begin();
+			typename list<YSampleType>::const_iterator yBegin = _ys.begin();
 			auto xIte = _xs.begin();
 			auto yIte = _ys.begin();
 			for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
@@ -74,10 +74,10 @@ public:
 	}
 
 	void TrainABatch(double learningRate, 
-					 typename list<XType>::const_iterator xBegin, 
-					 typename list<XType>::const_iterator xEnd, 
-					 typename list<YType>::const_iterator yBegin, 
-					 typename list<YType>::const_iterator yEnd)
+					 typename list<XSampleType>::const_iterator xBegin, 
+					 typename list<XSampleType>::const_iterator xEnd, 
+					 typename list<YSampleType>::const_iterator yBegin, 
+					 typename list<YSampleType>::const_iterator yEnd)
 	{
 		vector<double> oldWeights(_weights.size());
 		oldWeights.swap(_weights);
@@ -125,8 +125,8 @@ public:
 	virtual ~SGD(void){}
 	
 private:
-	const list<XType>& _xs;
-	const list<YType>& _ys;
+	const list<XSampleType>& _xs;
+	const list<YSampleType>& _ys;
 	vector<DerivativeFunction> _derivatives;
 	ObjectFunction _object;
 	vector<double>& _weights;

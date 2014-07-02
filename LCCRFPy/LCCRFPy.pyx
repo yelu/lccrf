@@ -6,52 +6,52 @@ from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 
 cdef extern from "Types.h":
-    cdef cppclass XType:
-        XType() except +
-        XType(int) except +
-        void AddFeature(int, int, int, int)
+    cdef cppclass XSampleType:
+        XSampleType() except +
+        XSampleType(int) except +
+        void SetFeature(int, int, int, int)
         void SetLength(int)
         int Length()
     
+    cdef cppclass YSampleType:
+        YSampleType() except +
+        void SetTag(int, int)
+
+    cdef cppclass XType:
+        XType() except +
+        void SetFeature(int, int, int, int, int)
+        void ToArray(list[list[pair[list[int], list[int]]]]& res)
+        XSampleType& At(int)
+        void Append(XSampleType&)
+
     cdef cppclass YType:
         YType() except +
-        void AddTag(int, int)
-
-    cdef cppclass XListType:
-        XListType() except +
-        void AddFeature(int, int, int, int, int)
-        void GetAllFeatures(list[list[pair[list[int], list[int]]]]& res)
-        XType& At(int)
-        void Append(XType&)
-
-    cdef cppclass YListType:
-        YListType() except +
-        void AddTag(int, int, int)
-        void GetAllTags(list[list[int]]& res)
-        YType& At(int)
-        void Append(YType&)
+        void SetTag(int, int, int)
+        void ToArray(list[list[int]]& res)
+        YSampleType& At(int)
+        void Append(YSampleType&)
         
 
 cdef extern from "LCCRF.h":
     cdef cppclass LCCRF:
         LCCRF(int, int, double) except +
-        void Fit(XListType&, YListType&, double, int, int)
-        void Predict(XListType&, YListType&)
+        void Fit(XType&, YType&, double, int, int)
+        void Predict(XType&, YType&)
         vector[double]& GetWeights()
-        pair[list[list[pair[int, double]]], double] Debug(XType&, YType&)
+        pair[list[list[pair[int, double]]], double] Debug(XSampleType&, YSampleType&)
 
-cdef class XItem:
-    cdef XType* thisptr
+cdef class XSample:
+    cdef XSampleType* thisptr
     cdef int ownership
     def __cinit__(self, int length, ownership = 1):
         self.ownership = ownership
         if self.ownership == 1:
-            self.thisptr = new XType(length)
+            self.thisptr = new XSampleType(length)
     def __dealloc__(self):
         if self.ownership == 1:
             del self.thisptr
     def __setitem__(self, idx, value):
-        self.thisptr.AddFeature(idx[0], idx[1], idx[2], idx[3]) 
+        self.thisptr.SetFeature(idx[0], idx[1], idx[2], idx[3]) 
     
     property length:
         def __get__(self):
@@ -59,55 +59,55 @@ cdef class XItem:
         def __set__(self, value):
             self.thisptr.SetLength(value)
         
-cdef class YItem:
-    cdef YType* thisptr
+cdef class YSample:
+    cdef YSampleType* thisptr
     cdef int ownership
     def __cinit__(self, ownership = 1):     
         self.ownership = ownership
         if self.ownership == 1:
-            self.thisptr = new YType()
+            self.thisptr = new YSampleType()
     def __dealloc__(self):
         if self.ownership == 1:
             del self.thisptr
     def __setitem__(self, idx, value):
-        self.thisptr.AddTag(idx, value)
+        self.thisptr.SetTag(idx, value)
 
 cdef class X:
-    cdef XListType* thisptr
+    cdef XType* thisptr
     def __cinit__(self):
-        self.thisptr = new XListType()
+        self.thisptr = new XType()
     def __dealloc__(self):
         del self.thisptr
     def __getitem__(self, idx):
-        res = XItem(0, 0)
+        res = XSample(0, 0)
         res.thisptr = &(self.thisptr.At(idx))
         return res
     def __setitem__(self, idx, value):
-        self.thisptr.AddFeature(idx[0], idx[1], idx[2], idx[3], idx[4])
-    def append(self, XItem x):
+        self.thisptr.SetFeature(idx[0], idx[1], idx[2], idx[3], idx[4])
+    def append(self, XSample x):
         self.thisptr.Append(x.thisptr[0])
-    def get_all_features(self):
+    def to_array(self):
         cdef list[list[pair[list[int], list[int]]]] res
-        self.thisptr.GetAllFeatures(res)
+        self.thisptr.ToArray(res)
         return res
         
 cdef class Y:
-    cdef YListType* thisptr
+    cdef YType* thisptr
     def __cinit__(self):
-        self.thisptr = new YListType()
+        self.thisptr = new YType()
     def __dealloc__(self):
         del self.thisptr
-    def append(self, YItem y):
+    def append(self, YSample y):
         self.thisptr.Append(y.thisptr[0])
     def __getitem__(self, idx):
-        res = YItem(0)
+        res = YSample(0)
         res.thisptr = &(self.thisptr.At(idx))
         return res
     def __setitem__(self, idx, value):
-        self.thisptr.AddTag(idx[0], idx[1], value)
-    def get_all_tags(self):
+        self.thisptr.SetTag(idx[0], idx[1], value)
+    def to_array(self):
         cdef list[list[int]] res
-        self.thisptr.GetAllTags(res)
+        self.thisptr.ToArray(res)
         return res
         
 cdef class LinearChainCRF:
@@ -118,9 +118,11 @@ cdef class LinearChainCRF:
         del self.thisptr
     def fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
         self.thisptr.Fit(x.thisptr[0], y.thisptr[0], learningRate, batch, maxIteration)
-    def predict(self, X x, Y y):
+    def predict(self, X x):
+        y = Y()
         self.thisptr.Predict(x.thisptr[0], y.thisptr[0])
+        return y
     def get_weights(self):
         return self.thisptr.GetWeights()
-    def debug(self, XItem x, YItem y):
+    def debug(self, XSample x, YSample y):
         return self.thisptr.Debug(x.thisptr[0], y.thisptr[0])

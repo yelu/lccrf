@@ -14,7 +14,7 @@ using std::map;
 using std::list;
 using std::shared_ptr;
 
-class XType
+class XSampleType
 {
 public:
 	struct Key
@@ -33,7 +33,7 @@ public:
 	class KeyCompare 
 	{ // simple comparison function
 	   public:
-		  bool operator()(const XType::Key& x1,const XType::Key& x2) const
+		  bool operator()(const XSampleType::Key& x1,const XSampleType::Key& x2) const
 		  { 
 			  if(x1.j < x2.j)
 			  {
@@ -58,9 +58,9 @@ public:
 	};
 
 	// export to cython.
-	XType(void);
+	XSampleType(void);
 
-    XType(int length)
+    XSampleType(int length)
     {
         _length = length;
     }
@@ -70,7 +70,7 @@ public:
 	double GetFeatureValue(int j, int s1, int s2, int featureID) const;
 
 	//export to cython.
-	void AddFeature(int j, int s1, int s2, int featureID);
+	void SetFeature(int j, int s1, int s2, int featureID);
 
     int Length() const
     {
@@ -93,11 +93,11 @@ private:
     int _length;
 };
 
-class YType
+class YSampleType
 {
 public:
 
-	YType()
+	YSampleType()
 	{
 		LOG_DEBUG("Y constructed.");
 	}
@@ -109,7 +109,8 @@ public:
 	void Clear();
 
 	// export to python.
-	void AddTag(int i, int j);
+    // set ith tag to be j
+	void SetTag(int i, int j);
 
 	void AppendTag(int tag)
     {
@@ -125,20 +126,20 @@ private:
 	std::vector<int> _tags;
 };
 
-class XListType
+class XType
 {
 public:
-	XListType()
+	XType()
 	{
 	}
 
 	// export to cython.
-	void AddFeature(int i, int j, int s1, int s2, int featureID);
+	void SetFeature(int i, int j, int s1, int s2, int featureID);
 
-	const list<XType>& Raw();
+	const list<XSampleType>& Raw();
 
     // export to cython.
-    void GetAllFeatures(list<list<std::pair<list<int>, list<int>>>>& res)
+    void ToArray(list<list<std::pair<list<int>, list<int>>>>& res)
     {
         for(auto i = _xs.begin(); i != _xs.end(); i++)
         {
@@ -147,7 +148,7 @@ public:
             for(auto j = x.begin(); j != x.end(); j++)
             {
                 std::pair<list<int>, list<int>> fs;
-                XType::Key k = j->first;
+                XSampleType::Key k = j->first;
                 fs.first.push_back(k.j);
                 fs.first.push_back(k.s1);
                 fs.first.push_back(k.s2);
@@ -162,29 +163,29 @@ public:
     }
 
     // export to cython.
-    XType& At(int i);
+    XSampleType& At(int i);
 
     // export to cython.
-    void Append(XType& x);
+    void Append(XSampleType& x);
 
 private:
-	list<XType> _xs;
-    map<int, XType*> _index;
+	list<XSampleType> _xs;
+    map<int, XSampleType*> _index;
 };
 
-class YListType
+class YType
 {
 public:
-	YListType()
+	YType()
 	{
 		LOG_DEBUG("YList constructed.");
 	}
 
 	// export to cython.
-	void AddTag(int i, int j, int tag);
+	void SetTag(int i, int j, int tag);
 
     // export to cython.
-    void GetAllTags(list<list<int>>& res)
+    void ToArray(list<list<int>>& res)
     {
         for(auto i = _ys.begin(); i != _ys.end(); i++)
         {
@@ -199,14 +200,14 @@ public:
     }
 
     // export to cython.
-    void Append(YType& y);
+    void Append(YSampleType& y);
 
     // export to cython.
-    YType& At(int i);
+    YSampleType& At(int i);
 
-	const list<YType>& Raw();
+	const list<YSampleType>& Raw();
 
 private:
-	list<YType> _ys;
-	map<int, YType*> _index;
+	list<YSampleType> _ys;
+	map<int, YSampleType*> _index;
 };

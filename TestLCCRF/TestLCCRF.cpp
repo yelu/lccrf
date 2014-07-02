@@ -3,20 +3,20 @@
 #include "../LCCRF/LCCRF.h"
 #include <memory>
 
-void MakeDocument(list<XType>& xs, list<YType>& ys)
+void MakeDocument(list<XSampleType>& xs, list<YSampleType>& ys)
 {
-	XType x(2);
-	XType::Key key1(0, -1, 0);
+	XSampleType x(2);
+	XSampleType::Key key1(0, -1, 0);
 	
-	x.AddFeature(0, -1, 0, 0);
-	x.AddFeature(1, 0, 1, 1);
-	x.AddFeature(1, 1, 1, 1);
+	x.SetFeature(0, -1, 0, 0);
+	x.SetFeature(1, 0, 1, 1);
+	x.SetFeature(1, 1, 1, 1);
 
 	xs.push_back(x);
 
-	YType y;
-	y.AddTag(0, 0);
-	y.AddTag(1, 1);
+	YSampleType y;
+	y.SetTag(0, 0);
+	y.SetTag(1, 1);
 
 	ys.push_back(y);
 }
@@ -35,13 +35,13 @@ protected:
 	}
 
 	static LCCRF* lccrf;
-	static list<XType> xs;
-	static list<YType> ys;
+	static list<XSampleType> xs;
+	static list<YSampleType> ys;
 };
 
 LCCRF* LCCRFTestSuite::lccrf;
-list<XType> LCCRFTestSuite::xs;
-list<YType> LCCRFTestSuite::ys;
+list<XSampleType> LCCRFTestSuite::xs;
+list<YSampleType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {

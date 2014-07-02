@@ -4,7 +4,7 @@ import os,sys
 lib_path = os.path.abspath('../LCCRFPy')
 sys.path.append(lib_path)
 from NGramVectorizer import NGramVectorizer
-from Vectorizer import Vectorizer
+from VectorizerManager import VectorizerManager
 from LCCRFPy import *
 import unittest
 
@@ -18,16 +18,14 @@ class TestCaseNGramVectorizer(unittest.TestCase):
     
     def test_(self):
         doc = [[['a'], 'tag1'], [['b'], 'tag2']]
-        Vectorizer.get_or_allocate_tagid('tag1')
-        Vectorizer.get_or_allocate_tagid('tag2')
-        v = NGramVectorizer(1)
-        v.fit(doc)
-        print v.get_features()
+        vm = VectorizerManager()
+        v = NGramVectorizer(vm, 1)
+        vm.add_vectorizer(v)
+        vm.fit([doc])
+        print v.readable_features()
         
-        x = X()
-        y = Y()
-        v.transform(doc, x[0])
-        x = x.get_all_features()
+        x, y = vm.transform([doc])
+        x = x.to_array()
         
         self.assertEqual(len(x), 1)
         self.assertEqual(x[0][0][0], [0,-1,0])

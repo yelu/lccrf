@@ -3,14 +3,11 @@
 import os,sys
 lib_path = os.path.abspath('../LCCRFPy')
 sys.path.append(lib_path)
-from LCCRFPy import *
-from VectorizerManager import VectorizerManager
-from NGramVectorizer import NGramVectorizer
-from TransitionVectorizer import TransitionVectorizer
+from CRFTagger import *
 import unittest
 import re
 
-class TestAccurancy(unittest.TestCase):
+class TestCRFTagger(unittest.TestCase):
 
     def ParseInput(self, filePath):
         docs = []
@@ -43,28 +40,15 @@ class TestAccurancy(unittest.TestCase):
         filePath = './data/train.tsv'
         docs = self.ParseInput(filePath)
         
-        vm = VectorizerManager()
-        vm.add_vectorizer(NGramVectorizer(1))
-        vm.add_vectorizer(TransitionVectorizer())
+        tagger = CRFTagger()
+        tagger.fit(docs)
         
-        vm.fit(docs)
-        x, y = vm.transform(docs)
-        #x, y = x.get_all_features(), y.get_all_tags()
-        print "feature extraction completed."
-        #print x.get_all_features()
-        print y.get_all_tags()
-        crf = LinearChainCRF(vm.feature_count, vm.tag_count, 0.1)
-        crf.fit(x, y, 0.1, 1, 20)
-        weights = crf.get_weights()
-        #input_A = input("Input: ")
-        #print input_A
-        testX, refY = vm.transform(self.ParseInput('./data/test.tsv'))
-        print testX.get_all_features()
-        testY = Y()
-        crf.predict(testX, testY)
-        print testY.get_all_tags()
-        print "features:%d, tags:%d, weights:%d" % (vm.feature_count, vm.tag_count, len(weights))
-        vm.visual_features(weights, './features')
+        testX = self.ParseInput('./data/test.tsv')
+        testY = tagger.transform(testX[0:1])
+        print testY
+
+        debugRes1 = tagger.debug(testX[0])
+        print debugRes1
         
     def tearDown(self):
         pass
