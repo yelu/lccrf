@@ -19,7 +19,7 @@ class CRFTagger:
         self.vm.fit(docs)
         x, y = self.vm.transform(docs)
         self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count, 0.1)
-        self.crf.fit(x, y, 0.1, 1, 20)
+        self.crf.fit(x, y, 0.1, 1, 100)
         self.weights = self.crf.get_weights()
         self.readable_features = self.vm.readable_features()
         self.tags = self.vm.tagid_to_tagname
@@ -27,14 +27,15 @@ class CRFTagger:
         #print json.dumps(self.vm.readable_features(), sort_keys = True, indent = 4)
     
     def transform(self, docs):
-        refX, refY = self.vm.transform(docs)
-        testY = Y()
-        self.crf.predict(refX, testY)
-        testY = testY.to_array()
-        for case in testY:
+        x, _ = self.vm.transform(docs)
+        
+        y = Y()
+        y = self.crf.predict(x)
+        y_array = y.to_array()
+        for case in y_array:
             for i in range(0, len(case)):
                 case[i] = self.tags[case[i]]
-        return testY
+        return y_array
         
     def readable_features_and_weights(self):
         res = []

@@ -7,6 +7,7 @@ from CRFTagger import *
 import unittest
 import re
 import json
+from random import shuffle
 
 class TestCRFTagger(unittest.TestCase):
 
@@ -35,6 +36,7 @@ class TestCRFTagger(unittest.TestCase):
                 #print doc
                 if has_tag:
                     docs.append(doc)
+        shuffle(docs)
         return docs
     
     def setUp(self):
@@ -48,17 +50,27 @@ class TestCRFTagger(unittest.TestCase):
             print "%d\t%s\t%f" % (feature[0], feature[1], feature[2])
         
         test_doc = self.ParseInput('./data/test.tsv')
-        test_y = tagger.transform(test_doc[0:1])
-        print test_y
+        test_y = tagger.transform(test_doc)
+        for i, doc in enumerate(test_doc):
+            mismatch = False
+            for j, token in enumerate(doc):
+                if token[1] != test_y[i][j]:
+                    mismatch = True
+                    break
+            if mismatch:
+                print doc
+                print test_y[i]
+                print ""
+        #print test_y
 
-        debugRes1 = tagger.debug(test_doc[0])
-        print json.dumps(debugRes1, sort_keys = True, indent = 4)
+        #debugRes1 = tagger.debug(test_doc[0])
+        #print json.dumps(debugRes1, sort_keys = True, indent = 4)
         
         # change tag and get another path result.
-        for idx, i in enumerate(test_doc[0]):
-            i[1] = test_y[0][idx]
-        debugRes2 = tagger.debug(test_doc[0])
-        print json.dumps(debugRes2, sort_keys = True, indent = 4)
+        #for idx, i in enumerate(test_doc[0]):
+        #    i[1] = test_y[0][idx]
+        #debugRes2 = tagger.debug(test_doc[0])
+        #print json.dumps(debugRes2, sort_keys = True, indent = 4)
         
     def tearDown(self):
         pass

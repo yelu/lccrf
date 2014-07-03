@@ -111,8 +111,11 @@ void FWBW::_CalculateZ()
 	{
 		_z1 = ExpPlus(_z1, _betaMatrix[0][k] + _phi(-1, k, 0));
 	}
-    LOG_DEBUG("fb : %f\t%f", _z, _z1);
-    //assert(abs(_z1 - _z) < 10e-4);
+    assert(abs(_z1 - _z) < 10e-4);
+    if(abs(_z1 - _z) > 10e-4)
+    {
+        LOG_DEBUG("fb : %f\t%f", _z, _z1);
+    }
 }
 
 shared_ptr<const boost::multi_array<double, 3>> FWBW::GetQMatrix()

@@ -81,6 +81,7 @@ void LCCRF::_MakeDervative()
 			}
 
 		}
+        //LOG_DEBUG("emperical:%f model:%f", res1, res2);
 		return 0 - (res1 - res2 - _lambda * weights[k]);
 	};
 	for(int k = 0; k < _featureCount; k++)
@@ -142,7 +143,7 @@ void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, double
 	// 2. make likilihood
 	_MakeLikelihood();
 	// 3. SGD
-	SGD<XSampleType, YSampleType> sgd(*_xs, *_ys, _weights, _derivatives, _likelihood);
+	SGD<XSampleType, YSampleType> sgd(*_xs, *_ys, _weights, _derivatives/*, _likelihood*/);
 	sgd.Run(learningRate, batch, maxIteration);
 }
 

@@ -114,6 +114,22 @@ public:
 		if(delta < 10e-8) 
 		{
 			LOG_DEBUG("Converged. delta : %f", delta);
+            // check if all derivatives equal to zero.
+            /*
+            for(int i = 0; i < _weights.size(); i++)
+            {
+                auto xIte = _xs.begin();
+			    auto yIte = _ys.begin();
+                double res = 0;
+			    for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
+			    {
+                    res += _derivatives[i](_weights, *xIte, *yIte);
+                }
+                if(abs(res) > 10e-4)
+                {
+                    LOG_DEBUG("not converged. i = %d, di=%f", i, res);
+                }
+            }*/
 			return true;
 		}
 		else

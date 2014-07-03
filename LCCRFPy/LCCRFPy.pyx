@@ -35,7 +35,7 @@ cdef extern from "Types.h":
 cdef extern from "LCCRF.h":
     cdef cppclass LCCRF:
         LCCRF(int, int, double) except +
-        void Fit(XType&, YType&, double, int, int)
+        void Fit(XType&, YType&, double, int, int) except +
         void Predict(XType&, YType&)
         vector[double]& GetWeights()
         pair[list[list[pair[int, double]]], double] Debug(XSampleType&, YSampleType&)
