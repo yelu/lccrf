@@ -51,6 +51,7 @@ class TestCRFTagger(unittest.TestCase):
         
         test_doc = self.ParseInput('./data/test.tsv')
         test_y = tagger.transform(test_doc)
+        #print test_y
         for i, doc in enumerate(test_doc):
             mismatch = False
             for j, token in enumerate(doc):

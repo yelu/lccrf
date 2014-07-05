@@ -22,13 +22,13 @@ class TestCaseLinearChainCRF(unittest.TestCase):
         self.y[0, 1] = 1
         print self.y.to_array()
         
-        self.crf = LinearChainCRF(2, 2, 0.1)
+        self.crf = LinearChainCRF(2, 2)
         
     def tearDown(self):
         pass
     
     def test_fit(self):
-        self.crf.fit(self.x, self.y, 0.1, 1, 1000)
+        self.crf.fit(self.x, self.y, 1000, 0.1, 0.1)
         weights = self.crf.get_weights()
         self.assertAlmostEqual(weights[0], 1.6306, 4)
         self.assertAlmostEqual(weights[1], 1.6306, 4)

@@ -34,8 +34,8 @@ cdef extern from "Types.h":
 
 cdef extern from "LCCRF.h":
     cdef cppclass LCCRF:
-        LCCRF(int, int, double) except +
-        void Fit(XType&, YType&, double, int, int) except +
+        LCCRF(int, int) except +
+        void Fit(XType&, YType&, int, double, double) except +
         void Predict(XType&, YType&)
         vector[double]& GetWeights()
         pair[list[list[pair[int, double]]], double] Debug(XSampleType&, YSampleType&)
@@ -112,12 +112,12 @@ cdef class Y:
         
 cdef class LinearChainCRF:
     cdef LCCRF* thisptr
-    def __cinit__(self, int featureCount, int labelCount, float l = 1):
-        self.thisptr = new LCCRF(featureCount, labelCount, l)
+    def __cinit__(self, int featureCount, int labelCount):
+        self.thisptr = new LCCRF(featureCount, labelCount)
     def __dealloc__(self):
         del self.thisptr
-    def fit(self, X x, Y y, learningRate = 0.01, batch = 1, maxIteration = 1):
-        self.thisptr.Fit(x.thisptr[0], y.thisptr[0], learningRate, batch, maxIteration)
+    def fit(self, X x, Y y, maxIteration = 1, learningRate = 0.001, l2 = 0.001):
+        self.thisptr.Fit(x.thisptr[0], y.thisptr[0], maxIteration, learningRate, l2)
     def predict(self, X x):
         y = Y()
         self.thisptr.Predict(x.thisptr[0], y.thisptr[0])
