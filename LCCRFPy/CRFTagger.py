@@ -18,8 +18,10 @@ class CRFTagger:
     def fit(self, docs):
         self.vm.fit(docs)
         x, y = self.vm.transform(docs)
-        self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count, 0.1)
-        self.crf.fit(x, y, 0.1, 1, 100)
+        print x.to_array()
+        print y.to_array()
+        self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count, 0)
+        self.crf.fit(x, y, 0.0005, 1, 400)
         self.weights = self.crf.get_weights()
         self.readable_features = self.vm.readable_features()
         self.tags = self.vm.tagid_to_tagname

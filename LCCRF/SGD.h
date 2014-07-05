@@ -37,60 +37,36 @@ public:
         _iterationCount = 0;
 	}
 
-	const vector<double>& Run(double learningRate, int batch = 1, int maxIteration = 1)
+	const vector<double>& Run(double learningRate, int maxIteration = 1)
 	{
 		double lastObjectValue = std::numeric_limits<double>::infinity();
 		for(int i = 0; i < maxIteration; i++)
 		{
 			LOG_DEBUG("Iteration %d", i);
             _iterationCount++;
-			int count = 0;
-			typename list<XSampleType>::const_iterator xBegin = _xs.begin();
-			typename list<YSampleType>::const_iterator yBegin = _ys.begin();
 			auto xIte = _xs.begin();
 			auto yIte = _ys.begin();
 			for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
 			{
-				count++;
-				if(count > batch)
-				{
-					TrainABatch(learningRate, xBegin, xIte, yBegin, yIte);
-					xBegin = xIte;
-					yBegin = yIte;
-					count = 1;
-				}
+				UpdateWeights(learningRate, *xIte, *yIte);
 			}
-			if(xBegin != _xs.end())
-			{
-				TrainABatch(learningRate, xBegin, _xs.end(), yBegin, _ys.end());
-			}
+			// one iteration(epoch) finished, check it converged.
 			if(_isObjectProvided && i != 0 && IsConveraged(lastObjectValue))
 			{
 				break;
 			}
 		}
-        LOG_DEBUG("iterations = %d\n", _iterationCount);
+        LOG_DEBUG("total iterations = %d\n", _iterationCount);
 		return _weights;
 	}
 
-	void TrainABatch(double learningRate, 
-					 typename list<XSampleType>::const_iterator xBegin, 
-					 typename list<XSampleType>::const_iterator xEnd, 
-					 typename list<YSampleType>::const_iterator yBegin, 
-					 typename list<YSampleType>::const_iterator yEnd)
+	void UpdateWeights(double learningRate, const XSampleType& xSample, const YSampleType& ySample)
 	{
 		vector<double> oldWeights(_weights.size());
 		oldWeights.swap(_weights);
 		for(size_t i = 0; i < _weights.size(); i++)
 		{
-			double delta = 0.0;
-			auto xIte = xBegin;
-			auto yIte = yBegin;
-			for(; xIte != xEnd && yIte != yEnd; xIte++, yIte++)
-			{
-				double d = _derivatives[i](oldWeights, *xIte, *yIte);
-				delta += d;
-			}
+			double delta = _derivatives[i](oldWeights, xSample, ySample);
 			_weights[i] = oldWeights[i] -  (learningRate * delta);
 		}
 	}

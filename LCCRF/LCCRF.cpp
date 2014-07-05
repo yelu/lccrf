@@ -5,9 +5,8 @@
 #include <iostream>
 using std::wcout;
 
-LCCRF::LCCRF(int featureCount, int labelCount, double lambda = 1):_weights(featureCount, 0.0)
+LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
-	_lambda = lambda;
 	_featureCount = featureCount;
 	_labelCount = labelCount;
 	_lastK = 0;
@@ -38,9 +37,10 @@ double LCCRF::_Phi(int s1, int s2, int j,
 	return ret;
 }
 
-void LCCRF::_MakeDervative()
+void LCCRF::_MakeDervative(double l2)
 {
-	function<double (vector<double>&, const XSampleType&, const YSampleType&, int)> derivative = [&](vector<double>& weights, const XSampleType& x, const YSampleType& y, int k)
+	function<double (vector<double>&, const XSampleType&, const YSampleType&, int)> derivative = 
+		[&, l2](vector<double>& weights, const XSampleType& x, const YSampleType& y, int k)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -81,19 +81,22 @@ void LCCRF::_MakeDervative()
 			}
 
 		}
-        //LOG_DEBUG("emperical:%f model:%f", res1, res2);
-		return 0 - (res1 - res2 - _lambda * weights[k]);
+        //LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
+		return 0 - (res1 - res2 - l2 * weights[k]);
 	};
 	for(int k = 0; k < _featureCount; k++)
 	{
-		function<double (vector<double>&, const XSampleType&, const YSampleType&)> derivativeK = [=](vector<double>& weights, const XSampleType& x, const YSampleType& y) {return derivative(weights, x, y, k);};
+		function<double (vector<double>&, const XSampleType&, const YSampleType&)> derivativeK = 
+			[=](vector<double>& weights, const XSampleType& x, const YSampleType& y) 
+			{return derivative(weights, x, y, k);};
 		_derivatives.push_back(derivativeK);
 	}
 }
 
-void LCCRF::_MakeLikelihood()
+void LCCRF::_MakeLikelihood(double l2)
 {
-	function<double (vector<double>&, const XSampleType&, const YSampleType&)> likelihood= [&](vector<double>& weights, const XSampleType& x, const YSampleType& y)
+	function<double (vector<double>&, const XSampleType&, const YSampleType&)> likelihood= 
+		[&, l2](vector<double>& weights, const XSampleType& x, const YSampleType& y)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -123,12 +126,12 @@ void LCCRF::_MakeLikelihood()
 		{
 			res3 += (weights[w] * weights[w]);
 		}
-		return 0 - (res1 - res2 - res3 * _lambda / 2.0);
+		return 0 - (res1 - res2 - res3 * l2 / 2.0);
 	};
 	_likelihood = likelihood;
 }
 
-void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, double learningRate, int batch, int maxIteration)
+void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, int maxIteration, double learningRate, double l2)
 {
 	_derivatives.clear();
 	_xs = &xs;
@@ -139,17 +142,17 @@ void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, double
 	_weights.swap(newWeights);
 
 	// 1. make deriveatives
-	_MakeDervative();
+	_MakeDervative(l2);
 	// 2. make likilihood
-	_MakeLikelihood();
+	_MakeLikelihood(l2);
 	// 3. SGD
-	SGD<XSampleType, YSampleType> sgd(*_xs, *_ys, _weights, _derivatives/*, _likelihood*/);
-	sgd.Run(learningRate, batch, maxIteration);
+	SGD<XSampleType, YSampleType> sgd(*_xs, *_ys, _weights, _derivatives, _likelihood);
+	sgd.Run(learningRate, maxIteration);
 }
 
-void LCCRF::Fit(XType& xs, YType& ys, double learningRate, int batch, int maxIteration)
+void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l2)
 {
-	Fit(xs.Raw(), ys.Raw(), learningRate, batch, maxIteration);
+	Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l2);
 }
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)

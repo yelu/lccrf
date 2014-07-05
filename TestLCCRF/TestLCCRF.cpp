@@ -27,7 +27,7 @@ protected:
 	static void SetUpTestCase() 
 	{
 		MakeDocument(xs, ys);
-		lccrf = new LCCRF(2, 2, 0.1);
+		lccrf = new LCCRF(2, 2);
 	}
 
 	static void TearDownTestCase() 
@@ -45,7 +45,7 @@ list<YSampleType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Fit(xs, ys, 0.1, 1, 1000);
+	lccrf->Fit(xs, ys, 1000, 0.1, 0.1);
 	EXPECT_NEAR(1.63, lccrf->_weights[0], 10e-2);
 	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
 }
@@ -55,7 +55,7 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-	lccrf->Fit(xs, ys, 1, 1, 0);
+	lccrf->Fit(xs, ys, 0, 1, 0.1);
 	double res = 0;
 	vector<double> weights;
 
@@ -88,7 +88,7 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
 	// -d/dy = 1-(e^(x+y)+e^y)/(e^(x+y)+e^x+e^y+1)-0.1y
-	lccrf->Fit(xs, ys, 1, 1, 0);
+	lccrf->Fit(xs, ys, 0, 1, 0.1);
 	double res = 0;
 	vector<double> weights;
 
