@@ -10,12 +10,12 @@ Viterbi::~Viterbi(void)
 {
 }
 
-void Viterbi::GetPath(const boost::multi_array<double, 3>& graph, vector<int>& res)
+void Viterbi::GetPath(const Matrix3& graph, vector<int>& res)
 {
-	int nStep = graph.shape()[0];
-	int nState = graph.shape()[1];
+	int nStep = graph.size();
+	int nState = graph[0].size();
 	vector<double> pi(nState, 0);
-	boost::multi_array<int, 2> backTraceMatrix(boost::extents[nStep][nState]);
+	vector<vector<int>> backTraceMatrix(nStep, vector<int>(nState, -1));
 
 	for(int s = 0; s < nState; s++)
 	{

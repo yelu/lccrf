@@ -102,7 +102,7 @@ public:
 		LOG_DEBUG("Y constructed.");
 	}
 
-	size_t Length() const;
+	int Length() const;
 
 	const std::vector<int>& Tags() const;
 

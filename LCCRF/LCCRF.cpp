@@ -2,8 +2,6 @@
 #include "Viterbi.h"
 #include "SGD.h"
 #include "FWBW.h"
-#include <iostream>
-using std::wcout;
 
 LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
@@ -58,7 +56,7 @@ void LCCRF::_MakeDervative(double l2)
 		}
 		_lastK = k;
 		
-		for(size_t j = 0; j < y.Length(); j++)
+		for(int j = 0; j < y.Length(); j++)
 		{
 			// If j is the first token, then j-1 is not avaliable, use -1 instead.
 			int y1 = -1;
@@ -103,7 +101,7 @@ void LCCRF::_MakeLikelihood(double l2)
 		double res2 = 0.0; // linear
 
 		// calculate res1
-		for(size_t j = 0; j < y.Length(); j++)
+		for(int j = 0; j < y.Length(); j++)
 		{
 			int y1 = -1;
 			if(0 == j){y1 = -1;}
@@ -157,7 +155,7 @@ void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, dou
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
-    boost::multi_array<double, 3> graph(boost::extents[x.Length()][_labelCount][_labelCount]);
+	Viterbi::Matrix3 graph(x.Length(), vector<vector<double>>(_labelCount, vector<double>(_labelCount, 0.0)));
     for(int j = 0; j < (int)x.Length(); j++)
 	{
 		for(int s2 = 0; s2 < (int)_labelCount; s2++)

@@ -36,9 +36,9 @@ void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
 	_features[key]->insert(featureID);
 }
 
-size_t YSampleType::Length() const 
+int YSampleType::Length() const 
 {
-	return _tags.size();
+	return (int)_tags.size();
 }
 
 const std::vector<int>& YSampleType::Tags() const
@@ -62,7 +62,7 @@ void YSampleType::SetTag(int i, int tag)
 
 void XType::SetFeature(int i, int j, int s1, int s2, int featureID)
 {
-    for(int ite = _xs.size(); ite < i + 1; ite++)
+    for(int ite = (int)_xs.size(); ite < i + 1; ite++)
     {
         XSampleType x;
         _xs.push_back(x);
@@ -79,12 +79,12 @@ const list<XSampleType>& XType::Raw()
 void XType::Append(XSampleType& x)
 {
     _xs.push_back(x);
-    _index[_xs.size() - 1] = &(_xs.back());
+    _index[(int)_xs.size() - 1] = &(_xs.back());
 }
 
 XSampleType& XType::At(int i)
 {
-	for(int ite = _xs.size(); ite < i + 1; ite++)
+	for(int ite = (int)_xs.size(); ite < i + 1; ite++)
     {
         XSampleType x;
         _xs.push_back(x);
@@ -92,33 +92,33 @@ XSampleType& XType::At(int i)
     }
     if(-1 == i)
     {
-        i = _xs.size() - 1;
+        i = (int)_xs.size() - 1;
     }
     return *(_index[i]);
 }
 
 void YType::SetTag(int i, int j, int tag)
 {
-    for(int ite = _ys.size(); ite < i + 1; ite++)
+    for(int ite = (int)_ys.size(); ite < i + 1; ite++)
     {
         YSampleType y;
         _ys.push_back(y);
         _index[ite] = &(_ys.back());
     }
     // -1 is the last.
-    if(-1 == i) {i = _ys.size() - 1;}
+    if(-1 == i) {i = (int)_ys.size() - 1;}
 	_index[i]->SetTag(j, tag);
 }
 
 void YType::Append(YSampleType& y)
 {
     _ys.push_back(y);
-    _index[_ys.size() - 1] = &(_ys.back());
+    _index[(int)_ys.size() - 1] = &(_ys.back());
 }
 
 YSampleType& YType::At(int i)
 {
-	for(int ite = _ys.size(); ite < i + 1; ite++)
+	for(int ite = (int)_ys.size(); ite < i + 1; ite++)
     {
         YSampleType y;
         _ys.push_back(y);
@@ -126,7 +126,7 @@ YSampleType& YType::At(int i)
     }
     if(-1 == i)
     {
-        i = _ys.size() - 1;
+        i = (int)_ys.size() - 1;
     }
     return *(_index[i]);
 }

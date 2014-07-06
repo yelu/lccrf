@@ -3,16 +3,10 @@
 #include "Types.h"
 #include <list>
 #include <functional>
+#include "FWBW.h"
 using std::list;
 using std::function;
 using std::pair;
-
-namespace boost
-{
-template<typename T, std::size_t NumDims,
-  typename Allocator>
-class multi_array;
-}
 
 class LCCRF
 {
@@ -54,7 +48,7 @@ private:
 	int _featureCount;
 	int _labelCount;
 	// for accelarating derivitive calculation.
-	shared_ptr<const boost::multi_array<double, 3, std::allocator<double>>> _cachedQMatrix;
+	shared_ptr<const FWBW::Matrix3> _cachedQMatrix;
 	int _lastK;	// remember last derivative we are calculation. if k is increasing, we can use cached QMatrix.
 };
 

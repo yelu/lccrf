@@ -1,6 +1,6 @@
 #include "FWBW.h"
 #include "Log.h"
-#include <iostream>
+#include <cassert>
 
 FWBW::FWBW(void)
 {
@@ -9,10 +9,10 @@ FWBW::FWBW(void)
 FWBW::FWBW(function<double (int, int, int)>& phi, int sCount, int jCount): 
 	_sCount(sCount),
 	_jCount(jCount),
-	_alphaMatrix(boost::extents[_jCount][_sCount]),
-	_betaMatrix(boost::extents[_jCount][_sCount]),
-	_muMatrix(boost::extents[_jCount][_sCount][_sCount]),
-	_pQMatrix(new boost::multi_array<double, 3>(boost::extents[_jCount][_sCount][_sCount])),
+	_alphaMatrix(_jCount, vector<double>(_sCount, 0.0)),
+	_betaMatrix(_jCount, vector<double>(_sCount, 0.0)),
+	_muMatrix(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0))),
+	_pQMatrix(new Matrix3(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0)))),
 	_phi(phi)
 {
 	_z = std::numeric_limits<double>::lowest();
@@ -118,7 +118,7 @@ void FWBW::_CalculateZ()
     }
 }
 
-shared_ptr<const boost::multi_array<double, 3>> FWBW::GetQMatrix()
+shared_ptr<const FWBW::Matrix3> FWBW::GetQMatrix()
 {
 	_CalculateMuMatrix();
 	_CalculateZ();
@@ -167,15 +167,14 @@ void FWBW::PrintQMatrix()
 {
 	for(int j = 0; j < _jCount; j++)
 	{
-		printf("\nj = %d\n", j);
+		LOG_DEBUG("\nj = %d", j);
 		for(int s1 = 0; s1 < _sCount; s1++)
 		{
 			for(int s2 =0; s2 < _sCount; s2++)
 			{
 				double v = (*_pQMatrix)[j][s1][s2];
-				std::cout << v << "\t";
+				LOG_DEBUG("%d,%d\t%f", s1, s2, v);
 			}
-			std::cout << std::endl;
 		}
 	}
 }
