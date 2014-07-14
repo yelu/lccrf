@@ -20,13 +20,13 @@ LCCRF::~LCCRF(void)
 double LCCRF::_Phi(int s1, int s2, int j,
 				  const XSampleType& doc, 
 				  vector<double>& weights,
-                  list<pair<int, double>>* hitFeatures)
+                  list<pair<int, double>>* hitFeatures, double c)
 {
 	double ret = 0.0;
 	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
 	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 	{
-		ret += (weights[*ite]);
+		ret += (c * weights[*ite]);
         if(NULL != hitFeatures)
         {
             hitFeatures->push_back(pair<int, double>(*ite, weights[*ite]));
@@ -35,10 +35,10 @@ double LCCRF::_Phi(int s1, int s2, int j,
 	return ret;
 }
 
-void LCCRF::_MakeDervative(double l2)
+void LCCRF::_MakeDervative()
 {
-	function<double (vector<double>&, const XSampleType&, const YSampleType&, int)> derivative = 
-		[&, l2](vector<double>& weights, const XSampleType& x, const YSampleType& y, int k)
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> derivative = 
+		[&](const XSampleType& x, const YSampleType& y, vector<double>& weights, double c, int k)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -49,7 +49,7 @@ void LCCRF::_MakeDervative(double l2)
 		if(k != (_lastK + 1))
 		{
 			function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-			{ return _Phi(s1, s2, j, x, weights); };
+            { return _Phi(s1, s2, j, x, weights, NULL, c); };
 			FWBW fwbw(phi, labelCount, y.Length());
 			_cachedQMatrix = fwbw.GetQMatrix();
             //fwbw.PrintQMatrix();
@@ -80,21 +80,15 @@ void LCCRF::_MakeDervative(double l2)
 
 		}
         //LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
-		return 0 - (res1 - res2 - l2 * weights[k]);
+		return 0 - (res1 - res2);
 	};
-	for(int k = 0; k < _featureCount; k++)
-	{
-		function<double (vector<double>&, const XSampleType&, const YSampleType&)> derivativeK = 
-			[=](vector<double>& weights, const XSampleType& x, const YSampleType& y) 
-			{return derivative(weights, x, y, k);};
-		_derivatives.push_back(derivativeK);
-	}
+    _derivative = derivative;
 }
 
-void LCCRF::_MakeLikelihood(double l2)
+void LCCRF::_MakeLikelihood()
 {
 	function<double (vector<double>&, const XSampleType&, const YSampleType&)> likelihood= 
-		[&, l2](vector<double>& weights, const XSampleType& x, const YSampleType& y)
+		[&](vector<double>& weights, const XSampleType& x, const YSampleType& y)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -119,19 +113,13 @@ void LCCRF::_MakeLikelihood(double l2)
 		FWBW fwbw(phi, labelCount, y.Length());
 		res2 += fwbw.GetZ(); // linear
 
-		double res3 = 0.0;
-		for(size_t w = 0; w < weights.size(); w++)
-		{
-			res3 += (weights[w] * weights[w]);
-		}
-		return 0 - (res1 - res2 - res3 * l2 / 2.0);
+		return 0 - (res1 - res2);
 	};
 	_likelihood = likelihood;
 }
 
-void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, int maxIteration, double learningRate, double l2)
+void LCCRF::Fit(const vector<XSampleType>& xs, const vector<YSampleType>& ys, int maxIteration, double learningRate, double l2)
 {
-	_derivatives.clear();
 	_xs = &xs;
 	_ys = &ys;
 
@@ -140,12 +128,12 @@ void LCCRF::Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, int ma
 	_weights.swap(newWeights);
 
 	// 1. make deriveatives
-	_MakeDervative(l2);
+	_MakeDervative();
 	// 2. make likilihood
-	_MakeLikelihood(l2);
+	_MakeLikelihood();
 	// 3. SGD
-	SGD<XSampleType, YSampleType> sgd(*_xs, *_ys, _weights, _derivatives, _likelihood);
-	sgd.Run(learningRate, maxIteration);
+	SGD sgd(*_xs, *_ys, _weights, _derivative, _likelihood);
+	sgd.Run(learningRate, l2, maxIteration);
 }
 
 void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l2)
@@ -192,7 +180,7 @@ void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 
 void LCCRF::Predict(XType& xs, YType& ys)
 {
-	const list<XSampleType>& rawXs = xs.Raw();
+	const vector<XSampleType>& rawXs = xs.Raw();
 	for(auto ite = rawXs.begin(); ite != rawXs.end(); ite++)
 	{
 		YSampleType y;

@@ -5,42 +5,46 @@
 #include <list>
 #include <limits>
 #include "Log.h"
+#include "Types.h"
 using std::function;
 using std::vector;
 using std::list;
 
-template<typename XSampleType, typename YSampleType>
+
 class SGD
 {
 public:
-	typedef function<double (vector<double>&, const XSampleType&, const YSampleType&)> DerivativeFunction;
-	typedef function<double (vector<double>&, const XSampleType&, const YSampleType&)> ObjectFunction;
+	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> DerivativeFunction;
+	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&)> ObjectFunction;
 
-	SGD(const list<XSampleType>& xs,
-		const list<YSampleType>& ys,
+	SGD(const vector<XSampleType>& xs,
+		const vector<YSampleType>& ys,
 		vector<double>& weights,
-		vector<DerivativeFunction>& derivatives,
+		DerivativeFunction& derivative,
 		ObjectFunction& object):
-		_xs(xs), _ys(ys), _derivatives(derivatives), _object(object), _weights(weights)
+		_xs(xs), _ys(ys), _derivative(derivative), _object(object), _weights(weights)
 	{
 		_isObjectProvided = true;
         _iterationCount = 0;
 	}
 
-	SGD(const list<XSampleType>& xs,
-		const list<YSampleType>& ys,
+	SGD(const vector<XSampleType>& xs,
+		const vector<YSampleType>& ys,
 		vector<double>& weights,
-		vector<DerivativeFunction>& derivatives):
-		_xs(xs), _ys(ys), _derivatives(derivatives), _weights(weights)
+		DerivativeFunction& derivative):
+		_xs(xs), _ys(ys), _derivative(derivative), _weights(weights)
 	{
 		_isObjectProvided = false;
         _iterationCount = 0;
 	}
 
-	const vector<double>& Run(double learningRate, int maxIteration = 1)
+	const vector<double>& Run(double learningRate, double l2, int maxIteration = 1)
 	{
 		double lastObjectValue = std::numeric_limits<double>::infinity();
-		for(int i = 0; i < maxIteration; i++)
+        _c = 1;  // scalar update factor.
+        _learningRate = learningRate;
+        _l2 = l2;
+        for(int i = 0; i < maxIteration; i++)
 		{
 			LOG_DEBUG("Iteration %d", i);
             _iterationCount++;
@@ -48,8 +52,8 @@ public:
 			auto yIte = _ys.begin();
 			for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
 			{
-				UpdateWeights(learningRate, *xIte, *yIte);
-			}
+				UpdateWeights(*xIte, *yIte);
+			}         
 			// one iteration(epoch) finished, check it converged.
 			if(_isObjectProvided && i != 0 && IsConveraged(lastObjectValue))
 			{
@@ -60,15 +64,27 @@ public:
 		return _weights;
 	}
 
-	void UpdateWeights(double learningRate, const XSampleType& xSample, const YSampleType& ySample)
+	void UpdateWeights(const XSampleType& xSample, const YSampleType& ySample)
 	{
 		vector<double> oldWeights(_weights.size());
 		oldWeights.swap(_weights);
-		for(size_t i = 0; i < _weights.size(); i++)
-		{
-			double delta = _derivatives[i](oldWeights, xSample, ySample);
-			_weights[i] = oldWeights[i] -  (learningRate * delta);
-		}
+        // rescale to void dense update of weights resulted by l2 regularition.
+        if(_c <  0 - 10e6 || _c > 10e6)
+        {
+            for(int i = 0; i < _weights.size(); i++)
+            {
+                _weights[i] = _weights[i] * _c;
+            }
+            _c = 1.0;
+        }
+        _c = (1 - _learningRate * _l2) * _c;
+        // skip updating the i-th feature if the feature is not triggered in xSample. Since the derivative will be zero.
+        auto featureSet = xSample.GetFeatureSet();
+        for(auto f = featureSet.begin(); f != featureSet.end(); f++)
+        {
+            double delta = _derivative(xSample, ySample, oldWeights, _c / (1 - _learningRate * _l2), *f);
+            _weights[*f] = oldWeights[*f] -  _learningRate * delta / _c;
+        }
 	}
 
 	bool IsConveraged(double& lastObjectValue)
@@ -117,11 +133,14 @@ public:
 	virtual ~SGD(void){}
 	
 private:
-	const list<XSampleType>& _xs;
-	const list<YSampleType>& _ys;
-	vector<DerivativeFunction> _derivatives;
+	const vector<XSampleType>& _xs;
+	const vector<YSampleType>& _ys;
+	DerivativeFunction _derivative;
 	ObjectFunction _object;
 	vector<double>& _weights;
+    double _c;
+    double _l2;
+    double _learningRate;
 	bool _isObjectProvided;
     int _iterationCount;
 };

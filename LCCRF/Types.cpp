@@ -34,6 +34,7 @@ void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
 		_features[key] = shared_ptr<std::set<int>>(new std::set<int>());
 	}
 	_features[key]->insert(featureID);
+    _featureSet.insert(featureID);
 }
 
 int YSampleType::Length() const 
@@ -66,12 +67,11 @@ void XType::SetFeature(int i, int j, int s1, int s2, int featureID)
     {
         XSampleType x;
         _xs.push_back(x);
-        _index[ite] = &(_xs.back());
     }
-    _index[i]->SetFeature(j, s1, s2, featureID);
+    _xs.back().SetFeature(j, s1, s2, featureID);
 }
 
-const list<XSampleType>& XType::Raw()
+const vector<XSampleType>& XType::Raw()
 {
 	return _xs;
 }
@@ -79,7 +79,6 @@ const list<XSampleType>& XType::Raw()
 void XType::Append(XSampleType& x)
 {
     _xs.push_back(x);
-    _index[(int)_xs.size() - 1] = &(_xs.back());
 }
 
 XSampleType& XType::At(int i)
@@ -88,13 +87,12 @@ XSampleType& XType::At(int i)
     {
         XSampleType x;
         _xs.push_back(x);
-        _index[ite] = &(_xs.back());
     }
     if(-1 == i)
     {
         i = (int)_xs.size() - 1;
     }
-    return *(_index[i]);
+    return _xs[i];
 }
 
 void YType::SetTag(int i, int j, int tag)
@@ -103,17 +101,15 @@ void YType::SetTag(int i, int j, int tag)
     {
         YSampleType y;
         _ys.push_back(y);
-        _index[ite] = &(_ys.back());
     }
     // -1 is the last.
     if(-1 == i) {i = (int)_ys.size() - 1;}
-	_index[i]->SetTag(j, tag);
+	_ys[i].SetTag(j, tag);
 }
 
 void YType::Append(YSampleType& y)
 {
     _ys.push_back(y);
-    _index[(int)_ys.size() - 1] = &(_ys.back());
 }
 
 YSampleType& YType::At(int i)
@@ -122,16 +118,15 @@ YSampleType& YType::At(int i)
     {
         YSampleType y;
         _ys.push_back(y);
-        _index[ite] = &(_ys.back());
     }
     if(-1 == i)
     {
         i = (int)_ys.size() - 1;
     }
-    return *(_index[i]);
+    return _ys[i];
 }
 
-const list<YSampleType>& YType::Raw()
+const vector<YSampleType>& YType::Raw()
 {
 	return _ys;
 }

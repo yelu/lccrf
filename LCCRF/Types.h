@@ -87,8 +87,14 @@ public:
         return _features;
     }
 
+    const std::set<int>& GetFeatureSet() const
+    {
+        return _featureSet;
+    }
+
 private:
 	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
+    std::set<int> _featureSet;
 
     int _length;
 };
@@ -136,7 +142,7 @@ public:
 	// export to cython.
 	void SetFeature(int i, int j, int s1, int s2, int featureID);
 
-	const list<XSampleType>& Raw();
+	const vector<XSampleType>& Raw();
 
     // export to cython.
     void ToArray(list<list<std::pair<list<int>, list<int>>>>& res)
@@ -169,8 +175,7 @@ public:
     void Append(XSampleType& x);
 
 private:
-	list<XSampleType> _xs;
-    map<int, XSampleType*> _index;
+	vector<XSampleType> _xs;
 };
 
 class YType
@@ -205,9 +210,8 @@ public:
     // export to cython.
     YSampleType& At(int i);
 
-	const list<YSampleType>& Raw();
+    const vector<YSampleType>& Raw();
 
 private:
-	list<YSampleType> _ys;
-	map<int, YSampleType*> _index;
+	vector<YSampleType> _ys;
 };

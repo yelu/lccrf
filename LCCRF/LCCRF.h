@@ -15,7 +15,7 @@ public:
 	LCCRF(int, int);
 	virtual ~LCCRF(void);
 
-	void Fit(const list<XSampleType>& xs, const list<YSampleType>& ys, int maxIteration = 1, double learningRate = 0.001, double l2 = 0.001);
+	void Fit(const vector<XSampleType>& xs, const vector<YSampleType>& ys, int maxIteration = 1, double learningRate = 0.001, double l2 = 0.001);
 
 	void Fit(XType& xs, YType& ys, int maxIteration = 1, double learningRate = 0.001, double l2 = 0.001);
 
@@ -32,18 +32,19 @@ private:
 	static double _Phi(int s1, int s2, int j,
 		const XSampleType& doc, 
 		vector<double>& weights,
-        list<pair<int, double>>* hitFeatures = NULL);
+        list<pair<int, double>>* hitFeatures = NULL,
+        double c = 1.0);
 
-	void _MakeDervative(double l2);
+	void _MakeDervative();
 
-	void _MakeLikelihood(double l2);
+	void _MakeLikelihood();
 
 private:
 
-	function<double (vector<double>&, const XSampleType&, const YSampleType&)> _likelihood;
-	vector<function<double (vector<double>&, const XSampleType&, const YSampleType&)>> _derivatives;
-	const list<XSampleType>* _xs;
-	const list<YSampleType>* _ys;
+	function<double (const XSampleType&, const YSampleType&, vector<double>&)> _likelihood;
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> _derivative;
+	const vector<XSampleType>* _xs;
+	const vector<YSampleType>* _ys;
 	vector<double> _weights;
 	int _featureCount;
 	int _labelCount;

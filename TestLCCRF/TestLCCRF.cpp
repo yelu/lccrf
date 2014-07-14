@@ -3,7 +3,7 @@
 #include "../LCCRF/LCCRF.h"
 #include <memory>
 
-void MakeDocument(list<XSampleType>& xs, list<YSampleType>& ys)
+void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
 {
 	XSampleType x(2);
 	XSampleType::Key key1(0, -1, 0);
@@ -35,13 +35,13 @@ protected:
 	}
 
 	static LCCRF* lccrf;
-	static list<XSampleType> xs;
-	static list<YSampleType> ys;
+	static vector<XSampleType> xs;
+	static vector<YSampleType> ys;
 };
 
 LCCRF* LCCRFTestSuite::lccrf;
-list<XSampleType> LCCRFTestSuite::xs;
-list<YSampleType> LCCRFTestSuite::ys;
+vector<XSampleType> LCCRFTestSuite::xs;
+vector<YSampleType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
