@@ -107,8 +107,9 @@ public:
 		}
 		for(auto i = _weights.begin(); i != _weights.end(); i++)
 		{
-			newObjectValue += (0.5 * _l2 * (*i) * (*i));
+			newObjectValue += (0.5 * _l2 * (*i) * (*i) * _scale * _scale);
 		}
+
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
 		LOG_DEBUG("delta : %f\tobject : %f", 0 - delta, newObjectValue);
@@ -116,7 +117,7 @@ public:
 		{
 			delta = 0 - delta;
 		}
-		if(delta < 10e-8) 
+		if(delta < 10e-6) 
 		{
 			LOG_DEBUG("Converged. delta : %f", delta);
             // check if all derivatives equal to zero.
