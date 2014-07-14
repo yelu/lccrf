@@ -20,16 +20,16 @@ LCCRF::~LCCRF(void)
 double LCCRF::_Phi(int s1, int s2, int j,
 				  const XSampleType& doc, 
 				  vector<double>& weights,
-                  list<pair<int, double>>* hitFeatures, double c)
+                  list<pair<int, double>>* hitFeatures, double scale)
 {
 	double ret = 0.0;
 	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
 	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 	{
-		ret += (c * weights[*ite]);
+		ret += (scale * weights[*ite]);
         if(NULL != hitFeatures)
         {
-            hitFeatures->push_back(pair<int, double>(*ite, weights[*ite]));
+            hitFeatures->push_back(pair<int, double>(*ite, scale * weights[*ite]));
         }
 	}
 	return ret;
@@ -38,7 +38,7 @@ double LCCRF::_Phi(int s1, int s2, int j,
 void LCCRF::_MakeDervative()
 {
 	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> derivative = 
-		[&](const XSampleType& x, const YSampleType& y, vector<double>& weights, double c, int k)
+		[&](const XSampleType& x, const YSampleType& y, vector<double>& weights, double scale, int k)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -49,7 +49,7 @@ void LCCRF::_MakeDervative()
 		if(k != (_lastK + 1))
 		{
 			function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-            { return _Phi(s1, s2, j, x, weights, NULL, c); };
+            { return _Phi(s1, s2, j, x, weights, NULL, scale); };
 			FWBW fwbw(phi, labelCount, y.Length());
 			_cachedQMatrix = fwbw.GetQMatrix();
             //fwbw.PrintQMatrix();
@@ -87,8 +87,8 @@ void LCCRF::_MakeDervative()
 
 void LCCRF::_MakeLikelihood()
 {
-	function<double (vector<double>&, const XSampleType&, const YSampleType&)> likelihood= 
-		[&](vector<double>& weights, const XSampleType& x, const YSampleType& y)
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> likelihood= 
+		[&]( const XSampleType& x, const YSampleType& y, vector<double>& weights, double scale)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -103,13 +103,13 @@ void LCCRF::_MakeLikelihood()
 			shared_ptr<std::set<int>> pFeatures = x.GetFeatures(j, y1, y.Tags()[j]);
 			for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 			{
-				res1 += (weights[*ite]);
+				res1 += (scale * weights[*ite]);
 			}
 		}
 
 		// forward-backword calculation for res2.
 		function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-		{ return _Phi(s1, s2, j, x, weights); };
+		{ return _Phi(s1, s2, j, x, weights, NULL, scale); };
 		FWBW fwbw(phi, labelCount, y.Length());
 		res2 += fwbw.GetZ(); // linear
 

@@ -50,7 +50,7 @@ TEST_F(LCCRFTestSuite, TestLearn)
 	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
 }
 
-
+/*
 TEST_F(LCCRFTestSuite, TestDerivative)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
@@ -110,6 +110,7 @@ TEST_F(LCCRFTestSuite, TestLikelihood)
 	res = lccrf->_likelihood(weights, *(xs.begin()), *(ys.begin()));
 	EXPECT_NEAR(0.813505, res, 10e-6);
 }
+*/
 
 /*
 TEST_F(LCCRFTestSuite, TestPredict)

@@ -15,7 +15,7 @@ class SGD
 {
 public:
 	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> DerivativeFunction;
-	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&)> ObjectFunction;
+	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> ObjectFunction;
 
 	SGD(const vector<XSampleType>& xs,
 		const vector<YSampleType>& ys,
@@ -41,7 +41,7 @@ public:
 	const vector<double>& Run(double learningRate, double l2, int maxIteration = 1)
 	{
 		double lastObjectValue = std::numeric_limits<double>::infinity();
-        _c = 1;  // scalar update factor.
+		_scale = 1.0;  // scalar update factor.
         _learningRate = learningRate;
         _l2 = l2;
         for(int i = 0; i < maxIteration; i++)
@@ -60,8 +60,19 @@ public:
 				break;
 			}
 		}
+		// final rescale to get final weights.
+		Rescale();
         LOG_DEBUG("total iterations = %d\n", _iterationCount);
 		return _weights;
+	}
+
+	void Rescale()
+	{
+		for(auto i = _weights.begin(); i != _weights.end(); i++)
+        {
+			(*i) = (*i) * _scale;
+        }
+		_scale = 1.0;
 	}
 
 	void UpdateWeights(const XSampleType& xSample, const YSampleType& ySample)
@@ -69,21 +80,19 @@ public:
 		vector<double> oldWeights(_weights.size());
 		oldWeights.swap(_weights);
         // rescale to void dense update of weights resulted by l2 regularition.
-        if(_c <  0 - 10e6 || _c > 10e6)
+		if(_scale <  0 - 10e6 || _scale > 10e6)
         {
-            for(int i = 0; i < _weights.size(); i++)
-            {
-                _weights[i] = _weights[i] * _c;
-            }
-            _c = 1.0;
+            Rescale();
         }
-        _c = (1 - _learningRate * _l2) * _c;
+		double oldScale = _scale;
+		_scale *= (1 - _learningRate * _l2);
+		double gain = _learningRate / _scale;
         // skip updating the i-th feature if the feature is not triggered in xSample. Since the derivative will be zero.
         auto featureSet = xSample.GetFeatureSet();
         for(auto f = featureSet.begin(); f != featureSet.end(); f++)
         {
-            double delta = _derivative(xSample, ySample, oldWeights, _c / (1 - _learningRate * _l2), *f);
-            _weights[*f] = oldWeights[*f] -  _learningRate * delta / _c;
+			double delta = _derivative(xSample, ySample, oldWeights, oldScale, *f);
+            _weights[*f] = oldWeights[*f] -  gain * delta;
         }
 	}
 
@@ -94,7 +103,11 @@ public:
 		auto yIte = _ys.begin();
 		for(; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
 		{
-			newObjectValue += _object(_weights, *xIte, *yIte);
+			newObjectValue += _object(*xIte, *yIte, _weights, _scale);
+		}
+		for(auto i = _weights.begin(); i != _weights.end(); i++)
+		{
+			newObjectValue += (0.5 * _l2 * (*i) * (*i));
 		}
 		double delta = newObjectValue - lastObjectValue;
 		lastObjectValue = newObjectValue;
@@ -138,7 +151,7 @@ private:
 	DerivativeFunction _derivative;
 	ObjectFunction _object;
 	vector<double>& _weights;
-    double _c;
+    double _scale;
     double _l2;
     double _learningRate;
 	bool _isObjectProvided;

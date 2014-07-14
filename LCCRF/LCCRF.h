@@ -41,7 +41,7 @@ private:
 
 private:
 
-	function<double (const XSampleType&, const YSampleType&, vector<double>&)> _likelihood;
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> _likelihood;
 	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> _derivative;
 	const vector<XSampleType>* _xs;
 	const vector<YSampleType>* _ys;
