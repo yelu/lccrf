@@ -23,7 +23,7 @@ DEP_INCPATH=
 
 .PHONY:all
 all:
-	$(MAKE) -C ../LCCRFPy
+	$(MAKE) -C ../../LCCRFPy
 
 .PHONY:test
 test:
@@ -35,7 +35,7 @@ test:
 .PHONY:clean
 clean:
 	rm -f ./*.pyc
-	$(MAKE) -C ../LCCRFPy clean
+	$(MAKE) -C ../../LCCRFPy clean
 
 .PHONY:dist
 dist:
