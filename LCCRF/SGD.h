@@ -77,8 +77,6 @@ public:
 
 	void UpdateWeights(const XSampleType& xSample, const YSampleType& ySample)
 	{
-		vector<double> oldWeights(_weights.size());
-		oldWeights.swap(_weights);
         // rescale to void dense update of weights resulted by l2 regularition.
 		if(_scale <  0 - 10e6 || _scale > 10e6)
         {
@@ -87,12 +85,20 @@ public:
 		double oldScale = _scale;
 		_scale *= (1 - _learningRate * _l2);
 		double gain = _learningRate / _scale;
+        
+        // to save weights which has been changed.
+        std::list<std::pair<int, double>> changedWeights;
         // skip updating the i-th feature if the feature is not triggered in xSample. Since the derivative will be zero.
         auto featureSet = xSample.GetFeatureSet();
         for(auto f = featureSet.begin(); f != featureSet.end(); f++)
         {
-			double delta = _derivative(xSample, ySample, oldWeights, oldScale, *f);
-            _weights[*f] = oldWeights[*f] -  gain * delta;
+            double delta = _derivative(xSample, ySample, _weights, oldScale, *f);
+            changedWeights.push_back(std::pair<int, double>(*f, _weights[*f] -  gain * delta));
+        }
+        // update changed weights to _weights.
+        for(auto ite = changedWeights.begin(); ite != changedWeights.end(); ite++)
+        {
+            _weights[ite->first] = ite->second;
         }
 	}
 

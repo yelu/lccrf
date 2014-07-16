@@ -105,7 +105,6 @@ public:
 
 	YSampleType()
 	{
-		LOG_DEBUG("Y constructed.");
 	}
 
 	int Length() const;
@@ -183,7 +182,6 @@ class YType
 public:
 	YType()
 	{
-		LOG_DEBUG("YList constructed.");
 	}
 
 	// export to cython.
