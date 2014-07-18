@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCCRF", "LCCRF.vcxproj", "{146717DE-BA7F-404F-BD02-ED767F490E4F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLCCRF", "..\Tests\TestLCCRF\Test.vcxproj", "{8576921C-FEAC-4AA5-918F-0D298FD86F66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{146717DE-BA7F-404F-BD02-ED767F490E4F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{146717DE-BA7F-404F-BD02-ED767F490E4F}.Debug|Win32.Build.0 = Debug|Win32
+		{146717DE-BA7F-404F-BD02-ED767F490E4F}.Release|Win32.ActiveCfg = Release|Win32
+		{146717DE-BA7F-404F-BD02-ED767F490E4F}.Release|Win32.Build.0 = Release|Win32
+		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Debug|Win32.Build.0 = Debug|Win32
+		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Release|Win32.ActiveCfg = Release|Win32
+		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
