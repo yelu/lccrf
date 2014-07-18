@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+import json
 from LCCRFPy import X,Y,XSample,YSample
 
 class VectorizerManager:
@@ -44,6 +46,7 @@ class VectorizerManager:
     def transform(self, docs):
         x = X()
         y = Y()
+        count = 0
         for doc in docs:
             x.append(XSample(len(doc)))
             for v in self.__vectorizer:
@@ -51,6 +54,9 @@ class VectorizerManager:
             y.append(YSample())
             for idx, v in enumerate(doc):
                 y[-1, idx] = self.get_or_allocate_tagid(v[1])
+            count += 1
+            print >> sys.stderr, "[%d] transformed." % (count, )
+            sys.stderr.flush()
                 
         return (x, y)
         

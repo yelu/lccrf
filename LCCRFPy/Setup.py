@@ -7,6 +7,7 @@ from Cython.Build import cythonize
 # SET VS90COMNTOOLS=%VS110COMNTOOLS% (vs2012)
 # SET VS90COMNTOOLS=%VS120COMNTOOLS% (vs2013)
 
+'''
 setup(
 	name = 'LCCRFPy',
 	ext_modules=cythonize(
@@ -17,6 +18,22 @@ setup(
 			language="c++", 
             extra_compile_args=["/Zi", "/Od", "-std=c++11"],
             extra_link_args=["-debug"],
+            include_dirs=['../LCCRF'],			
+			)
+	]),
+)
+'''
+
+setup(
+	name = 'LCCRFPy',
+	ext_modules=cythonize(
+	[
+		Extension(
+			"LCCRFPy", 
+			['LCCRFPy.pyx'], 
+			language="c++", 
+            extra_compile_args=["-std=c++11"],
+            extra_link_args=[],
             include_dirs=['../LCCRF'],			
 			)
 	]),

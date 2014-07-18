@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python
 
 import os,sys
-lib_path = os.path.abspath('../LCCRFPy')
+lib_path = os.path.abspath('../../LCCRFPy')
 sys.path.append(lib_path)
 from CRFTagger import *
 import unittest
@@ -19,8 +19,12 @@ class TestCRFTagger(unittest.TestCase):
                 fields = line.strip().split('\t')
                 if len(fields) < 2:
                     continue
-                sentence = fields[1]
-                words = sentence.split()
+                sentence = fields[1].strip().replace("<", " <")
+                sentence = sentence.replace(">", "> ")
+                words = []
+                for token in sentence.split():
+                    if token != "":
+                        words.append(token)
                 doc = []
                 tag = 'oos'
                 has_tag = False
@@ -36,7 +40,8 @@ class TestCRFTagger(unittest.TestCase):
                 #print doc
                 if has_tag:
                     docs.append(doc)
-        shuffle(docs)
+        #shuffle(docs)
+        print >> sys.stderr, "%d sentences processed." % len(docs)
         return docs
     
     def setUp(self):
@@ -45,11 +50,12 @@ class TestCRFTagger(unittest.TestCase):
         
         tagger = CRFTagger()
         tagger.fit(train_doc)
+        #return
         
         for feature in tagger.readable_features_and_weights():
             print "%d\t%s\t%f" % (feature[0], feature[1], feature[2])
         
-        test_doc = self.ParseInput('./data/test.tsv')
+        test_doc = self.ParseInput('./data/train.tsv')
         test_y = tagger.transform(test_doc)
         #print test_y
         for i, doc in enumerate(test_doc):
