@@ -124,7 +124,7 @@ void LCCRF::Fit(const vector<XSampleType>& xs, const vector<YSampleType>& ys, in
 	_ys = &ys;
 
 	// reset _weights.
-	vector<double> newWeights(_featureCount, 1.0);
+	vector<double> newWeights(_featureCount, 0.0);
 	_weights.swap(newWeights);
 
 	// 1. make deriveatives
