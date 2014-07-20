@@ -85,7 +85,7 @@ public:
 		_length = length;
 	}
 
-	const std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo>& Raw()
+	const std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo>& Raw() const
     {
         return _features;
     }
