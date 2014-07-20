@@ -14,22 +14,38 @@ class CRFTagger:
         self.vm.add_vectorizer(NGramVectorizer(self.vm, 1))
         self.vm.add_vectorizer(TransitionVectorizer(self.vm))
         self.crf = None
+    
+    def SaveXYToFile(self, x, y):
+        x_array = x.to_array()
+        y_array = y.to_array()
+        with open('x', 'w') as f:
+            for idx, i in enumerate(x_array):
+                for j, features in i:
+                    for feature in features:
+                        feature_tuple = map(str, [idx,] + j + [feature,])
+                        print >> f, "\t".join(feature_tuple)
         
+        with open('y', 'w') as f:
+            for idx, i in enumerate(y_array):
+                for j, t in enumerate(i):
+                    print >> f, "\t".join(map(str, [idx, j, t]))
+    
     def fit(self, docs):
         self.vm.fit(docs)
         print >> sys.stderr, "tagger.fit finished."
         x, y = self.vm.transform(docs)
         print >> sys.stderr, "tagger.transform finished."
+        self.SaveXYToFile(x, y)
         #print x.to_array()
         #print y.to_array()
         self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count)
-        self.crf.fit(x, y, 100, 0.05, 0.001)
+        self.crf.fit(x, y, 1000, 0.005, 0.001)
         self.weights = self.crf.get_weights()
         self.readable_features = self.vm.readable_features()
         self.tags = self.vm.tagid_to_tagname
         
         #print json.dumps(self.vm.readable_features(), sort_keys = True, indent = 4)
-    
+        
     def transform(self, docs):
         x, _ = self.vm.transform(docs)
         

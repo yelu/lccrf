@@ -6,12 +6,14 @@
 #include <map>
 #include <set>
 #include <list>
+#include <unordered_map>
 #include "Log.h"
 using std::wstring;
 using std::vector;
 using std::set;
 using std::map;
 using std::list;
+using std::unordered_map;
 using std::shared_ptr;
 
 class XSampleType
@@ -28,34 +30,35 @@ public:
 		int j;
 		int s1;
 		int s2;
+
+		struct EqualTo
+		{
+			const bool operator()(const Key& key1, const Key& key2) const
+			{ 
+				return (key1.j == key2.j && key1.s1 == key2.s1 && key1.s2 == key2.s2);
+			}
+		};
+
+		struct Hash
+		{
+			std::size_t operator()(const Key& k) const
+			{
+				using std::size_t;
+				using std::hash;
+				using std::string;
+
+				// Compute individual hash values for first,
+				// second and third and combine them using XOR
+				// and bit shifting:
+
+				return ((hash<int>()(k.j)
+						^ (hash<int>()(k.s1) << 1)) >> 1)
+						^ (hash<int>()(k.s2) << 1);
+			}
+		};
 	};
 
-	class KeyCompare 
-	{ // simple comparison function
-	   public:
-		  bool operator()(const XSampleType::Key& x1,const XSampleType::Key& x2) const
-		  { 
-			  if(x1.j < x2.j)
-			  {
-				  return true;
-			  }
-			  else if(x1.j > x2.j)
-			  {
-				  return false;
-			  }
-
-			  if(x1.s1 < x2.s1)
-			  {
-				  return true;
-			  }
-			  else if(x1.s1 > x2.s1)
-			  {
-				  return false;
-			  }
-
-			  return x1.s2 < x2.s2;
-		  }
-	};
+	typedef std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo> FeaturesContainer;
 
 	// export to cython.
 	XSampleType(void);
@@ -82,7 +85,7 @@ public:
 		_length = length;
 	}
 
-    const std::map<Key, shared_ptr<std::set<int>>, KeyCompare>& Raw()
+	const std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo>& Raw()
     {
         return _features;
     }
@@ -93,7 +96,7 @@ public:
     }
 
 private:
-	std::map<Key, shared_ptr<std::set<int>>, KeyCompare> _features;
+	std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo> _features;
     std::set<int> _featureSet;
 
     int _length;

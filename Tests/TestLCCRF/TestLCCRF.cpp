@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
+#include <memory>
 #define private public
 #include "../../LCCRF/LCCRF.h"
-#include <memory>
 
 void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
 {

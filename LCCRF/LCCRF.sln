@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LCCRF", "LCCRF.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLCCRF", "..\Tests\TestLCCRF\Test.vcxproj", "{8576921C-FEAC-4AA5-918F-0D298FD86F66}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPerf", "..\Tests\TestPerf\TestPerf.vcxproj", "{D349406F-D9E8-46EE-AEA2-8B8B3A61AC54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,8 +21,15 @@ Global
 		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Debug|Win32.Build.0 = Debug|Win32
 		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Release|Win32.ActiveCfg = Release|Win32
 		{8576921C-FEAC-4AA5-918F-0D298FD86F66}.Release|Win32.Build.0 = Release|Win32
+		{D349406F-D9E8-46EE-AEA2-8B8B3A61AC54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D349406F-D9E8-46EE-AEA2-8B8B3A61AC54}.Debug|Win32.Build.0 = Debug|Win32
+		{D349406F-D9E8-46EE-AEA2-8B8B3A61AC54}.Release|Win32.ActiveCfg = Release|Win32
+		{D349406F-D9E8-46EE-AEA2-8B8B3A61AC54}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

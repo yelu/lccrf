@@ -24,6 +24,10 @@ double LCCRF::_Phi(int s1, int s2, int j,
 {
 	double ret = 0.0;
 	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
+	if(!pFeatures)
+	{
+		return ret;
+	}
 	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 	{
 		ret += (scale * weights[*ite]);
@@ -101,6 +105,10 @@ void LCCRF::_MakeLikelihood()
 			if(0 == j){y1 = -1;}
 			else {y1 = y.Tags()[j - 1];};
 			shared_ptr<std::set<int>> pFeatures = x.GetFeatures(j, y1, y.Tags()[j]);
+			if(!pFeatures)
+			{
+				continue;
+			}
 			for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
 			{
 				res1 += (scale * weights[*ite]);

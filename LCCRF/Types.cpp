@@ -8,18 +8,20 @@ XSampleType::XSampleType(void)
 shared_ptr<std::set<int>> XSampleType::GetFeatures(int j, int s1, int s2) const
 {
 	Key key(j, s1, s2);
-	if(_features.count(key) == 0)
+	auto ite = _features.find(key);
+	if( ite == _features.end())
 	{
-		shared_ptr<std::set<int>> ret(new std::set<int>());
+		shared_ptr<std::set<int>> ret;
 		return ret;
 	}
-	return _features.at(key);
+	return ite->second;
 }
 
 double XSampleType::GetFeatureValue(int j, int s1, int s2, int featureID) const 
 {
 	Key key(j, s1, s2);
-	if(_features.count(key) == 0 || (_features.at(key))->count(featureID) == 0)
+	auto ite = _features.find(key);
+	if(ite == _features.end() || ite->second->count(featureID) == 0)
 	{
 		return 0;
 	}
