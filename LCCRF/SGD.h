@@ -14,15 +14,28 @@ using std::list;
 class SGD
 {
 public:
-	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> DerivativeFunction;
-	typedef function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> ObjectFunction;
+	typedef function<double (const XSampleType&, 
+						     const YSampleType&, 
+							 vector<double>&, 
+							 double, 
+							 int,
+							 bool)> DerivativeFunction;
+
+	typedef function<double (const XSampleType&, 
+		                     const YSampleType&, 
+							 vector<double>&, 
+							 double)> ObjectFunction;
 
 	SGD(const vector<XSampleType>& xs,
 		const vector<YSampleType>& ys,
 		vector<double>& weights,
 		DerivativeFunction& derivative,
 		ObjectFunction& object):
-		_xs(xs), _ys(ys), _derivative(derivative), _object(object), _weights(weights)
+		_xs(xs), 
+		_ys(ys),
+		_derivative(derivative), 
+		_object(object), 
+		_weights(weights)
 	{
 		_isObjectProvided = true;
         _iterationCount = 0;
@@ -32,7 +45,10 @@ public:
 		const vector<YSampleType>& ys,
 		vector<double>& weights,
 		DerivativeFunction& derivative):
-		_xs(xs), _ys(ys), _derivative(derivative), _weights(weights)
+		_xs(xs), 
+		_ys(ys),
+		_derivative(derivative), 
+		_weights(weights)
 	{
 		_isObjectProvided = false;
         _iterationCount = 0;
@@ -88,11 +104,17 @@ public:
         
         // to save weights which has been changed.
         std::list<std::pair<int, double>> changedWeights;
-        // skip updating the i-th feature if the feature is not triggered in xSample. Since the derivative will be zero.
+        // skip updating the i-th feature if the feature is not triggered in xSample. 
+		// Since the derivative will be zero.
         auto featureSet = xSample.GetFeatureSet();
+		// For every x sample, when _derivitive is called for the first time, 
+		// we need to recalculate forward-nackward. otherwise, it can be 
+		// reused to save time.
+		bool reset = true;
         for(auto f = featureSet.begin(); f != featureSet.end(); f++)
         {
-            double delta = _derivative(xSample, ySample, _weights, oldScale, *f);
+            double delta = _derivative(xSample, ySample, _weights, oldScale, *f, reset);
+			reset = false;
             changedWeights.push_back(std::pair<int, double>(*f, _weights[*f] -  gain * delta));
         }
         // update changed weights to _weights.

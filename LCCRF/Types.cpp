@@ -1,10 +1,5 @@
 #include "Types.h"
 
-XSampleType::XSampleType(void)
-{
-	_length = 0;
-}
-
 shared_ptr<std::set<int>> XSampleType::GetFeatures(int j, int s1, int s2) const
 {
 	Key key(j, s1, s2);
@@ -65,7 +60,8 @@ void YSampleType::SetTag(int i, int tag)
 
 void XType::SetFeature(int i, int j, int s1, int s2, int featureID)
 {
-    for(int ite = (int)_xs.size(); ite < i + 1; ite++)
+	int ite = (int)(_xs.size());
+    for(; ite < i + 1; ++ite)
     {
         XSampleType x;
         _xs.push_back(x);

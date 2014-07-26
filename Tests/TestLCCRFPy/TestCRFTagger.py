@@ -49,8 +49,7 @@ class TestCRFTagger(unittest.TestCase):
         train_doc = self.ParseInput(filePath)
         
         tagger = CRFTagger()
-        (x, y) = tagger.fit(train_doc)
-        #return
+        tagger.fit(train_doc)
         
         for feature in tagger.readable_features_and_weights():
             print "%d\t%s\t%f" % (feature[0], feature[1], feature[2])

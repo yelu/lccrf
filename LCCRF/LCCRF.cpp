@@ -7,15 +7,17 @@ LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
 	_featureCount = featureCount;
 	_labelCount = labelCount;
-	_lastK = 0;
 	_cachedQMatrix = NULL;
 }
 
 LCCRF::~LCCRF(void)
 {
 }
+
 /*
-   S2, j current position, s1 is previous state
+   j  : current position
+   s1 : previous state
+   s2 : current state
 */
 double LCCRF::_Phi(int s1, int s2, int j,
 				  const XSampleType& doc, 
@@ -39,10 +41,38 @@ double LCCRF::_Phi(int s1, int s2, int j,
 	return ret;
 }
 
+void LCCRF::_MakePhiMatrix(const XSampleType& xSample, 
+						   vector<double>& weights, 
+						   double scale, 
+						   FWBW::Matrix3& phiMatrix)
+{
+	for(XSampleType::FeaturesContainer::const_iterator ite = xSample.Raw().begin();
+		ite != xSample.Raw().end(); ite++)
+	{
+		int j = ite->first.j;
+		int s1 = ite->first.s1;
+		int s2 = ite->first.s2;
+		auto features = ite->second;
+		if(0 == j && -1 == s1)
+		{
+			s1 = 0;
+		}
+		double phi = 0.0;
+		if(features)
+		{
+			for(auto feature = features->begin(); feature != features->end(); feature++)
+			{
+				phi += (scale * weights[*feature]);
+			}
+		}
+		phiMatrix[j][s1][s2] = phi;
+	}
+}
+
 void LCCRF::_MakeDervative()
 {
-	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int)> derivative = 
-		[&](const XSampleType& x, const YSampleType& y, vector<double>& weights, double scale, int k)
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double, int, bool)> derivative = 
+		[&](const XSampleType& x, const YSampleType& y, vector<double>& weights, double scale, int k, bool reset)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
@@ -50,15 +80,14 @@ void LCCRF::_MakeDervative()
 
 		// forward-backword calculation.
 		// use a cache to avoid unnecessary calculation.
-		if(k != (_lastK + 1))
+		if(reset)
 		{
-			function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-            { return _Phi(s1, s2, j, x, weights, NULL, scale); };
-			FWBW fwbw(phi, labelCount, y.Length());
+			FWBW::Matrix3 phiMatrix(y.Length(), vector<vector<double>>(labelCount, vector<double>(labelCount, 0.0)));
+			LCCRF::_MakePhiMatrix(x, weights, scale, phiMatrix);
+			FWBW fwbw(phiMatrix);
 			_cachedQMatrix = fwbw.GetQMatrix();
             //fwbw.PrintQMatrix();
 		}
-		_lastK = k;
 		
 		for(int j = 0; j < y.Length(); j++)
 		{
@@ -91,34 +120,27 @@ void LCCRF::_MakeDervative()
 
 void LCCRF::_MakeLikelihood()
 {
-	function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> likelihood= 
+	function<double (const XSampleType&, const YSampleType&, vector<double>&, double)> likelihood = 
 		[&]( const XSampleType& x, const YSampleType& y, vector<double>& weights, double scale)
 	{
 		int labelCount = _labelCount;
 		double res1 = 0.0; // linear
 		double res2 = 0.0; // linear
 
+		FWBW::Matrix3 phiMaxtrix(y.Length(), vector<vector<double>>(labelCount, vector<double>(labelCount, 0.0)));
+		LCCRF::_MakePhiMatrix(x, weights, scale, phiMaxtrix);
+
 		// calculate res1
 		for(int j = 0; j < y.Length(); j++)
 		{
-			int y1 = -1;
-			if(0 == j){y1 = -1;}
+			int y1 = 0;
+			if(0 == j){y1 = 0;}
 			else {y1 = y.Tags()[j - 1];};
-			shared_ptr<std::set<int>> pFeatures = x.GetFeatures(j, y1, y.Tags()[j]);
-			if(!pFeatures)
-			{
-				continue;
-			}
-			for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
-			{
-				res1 += (scale * weights[*ite]);
-			}
+			res1 += phiMaxtrix[j][y1][y.Tags()[j]];
 		}
 
 		// forward-backword calculation for res2.
-		function<double (int, int, int)> phi = [&](int s1, int s2, int j) 
-		{ return _Phi(s1, s2, j, x, weights, NULL, scale); };
-		FWBW fwbw(phi, labelCount, y.Length());
+		FWBW fwbw(phiMaxtrix);
 		res2 += fwbw.GetZ(); // linear
 
 		return 0 - (res1 - res2);
@@ -126,7 +148,11 @@ void LCCRF::_MakeLikelihood()
 	_likelihood = likelihood;
 }
 
-void LCCRF::Fit(const vector<XSampleType>& xs, const vector<YSampleType>& ys, int maxIteration, double learningRate, double l2)
+void LCCRF::Fit(const vector<XSampleType>& xs, 
+				const vector<YSampleType>& ys, 
+				int maxIteration, 
+				double learningRate, 
+				double l2)
 {
 	_xs = &xs;
 	_ys = &ys;

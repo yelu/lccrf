@@ -1,9 +1,7 @@
 #include <memory>
 #include <fstream>
 using std::ifstream;
-#define private public
 #include "../../LCCRF/LCCRF.h"
-
 
 int main(int argc, char* argv[])
 {
@@ -22,6 +20,8 @@ int main(int argc, char* argv[])
 	}
 	f1.close();
 
+	printf("x readed\n");
+
 	ifstream f2("../TestLCCRFPy/y");
 	int t;
 	while( f2 >> i >> j >> t)
@@ -30,8 +30,11 @@ int main(int argc, char* argv[])
 		y.SetTag(i, j, t);
 	}
 	f2.close();
+	printf("y readed\n");
 
-	LCCRF* crf = new LCCRF(features.size(), tags.size());
+	size_t featureCount = features.size();
+	size_t tagCount = tags.size();
+	LCCRF* crf = new LCCRF(featureCount, tagCount);
 	crf->Fit(x, y, 1000, 0.005, 0.001);
 	return 0;
 }

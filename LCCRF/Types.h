@@ -8,6 +8,7 @@
 #include <list>
 #include <unordered_map>
 #include "Log.h"
+#include "MurmurHash3.h"
 using std::wstring;
 using std::vector;
 using std::set;
@@ -26,7 +27,8 @@ public:
 			j = _j;
 			s1 = _s1;
 			s2 = _s2;
-		};
+		}
+
 		int j;
 		int s1;
 		int s2;
@@ -41,19 +43,11 @@ public:
 
 		struct Hash
 		{
-			std::size_t operator()(const Key& k) const
+			size_t operator()(const Key& k) const
 			{
-				using std::size_t;
-				using std::hash;
-				using std::string;
-
-				// Compute individual hash values for first,
-				// second and third and combine them using XOR
-				// and bit shifting:
-
-				return ((hash<int>()(k.j)
-						^ (hash<int>()(k.s1) << 1)) >> 1)
-						^ (hash<int>()(k.s2) << 1);
+				uint32_t res  = 0;
+				MurmurHash3_x86_32(&k, sizeof(Key), 47, &res);
+				return (size_t)res;
 			}
 		};
 	};
@@ -61,7 +55,10 @@ public:
 	typedef std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo> FeaturesContainer;
 
 	// export to cython.
-	XSampleType(void);
+	XSampleType(void)
+	{
+		_length = 0;
+	}
 
     XSampleType(int length)
     {
@@ -85,7 +82,7 @@ public:
 		_length = length;
 	}
 
-	const std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo>& Raw() const
+	const FeaturesContainer& Raw() const
     {
         return _features;
     }
@@ -96,7 +93,7 @@ public:
     }
 
 private:
-	std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo> _features;
+	FeaturesContainer _features;
     std::set<int> _featureSet;
 
     int _length;
@@ -139,6 +136,7 @@ class XType
 public:
 	XType()
 	{
+		printf("x constructed.\n");
 	}
 
 	// export to cython.
