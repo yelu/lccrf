@@ -41,7 +41,7 @@ public:
 			const bool operator()(const Position& pos1, const Position& pos2) const
 			{
 				if(pos1.j != pos2.j) {return pos1.j < pos2.j;}
-				if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s2;}
+				if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s1;}
 				return pos1.s2 < pos2.s2;
 			}
 		};

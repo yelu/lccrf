@@ -45,8 +45,8 @@ vector<YSampleType> LCCRFTestSuite::ys;
 TEST_F(LCCRFTestSuite, TestLearn)
 {
 	lccrf->Fit(xs, ys, 1100, 0.1, 0.1);
-	EXPECT_NEAR(1.63, lccrf->_weights[0], 10e-2);
-	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
+	EXPECT_NEAR(1.63, lccrf->_weights[0], 1e-2);
+	EXPECT_NEAR(1.63, lccrf->_weights[1], 1e-2);
 }
 
 TEST_F(LCCRFTestSuite, TestDerivative)
@@ -61,25 +61,25 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	weights.push_back(0);
 	weights.push_back(0);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
-	EXPECT_NEAR(-0.5, res, 10e-6);
+	EXPECT_NEAR(-0.5, res, 1e-6);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
-	EXPECT_NEAR(-0.5, res, 10e-6);
+	EXPECT_NEAR(-0.5, res, 1e-6);
 	
 	weights.clear();
 	weights.push_back(1.0);
 	weights.push_back(1.0);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
-	EXPECT_NEAR(-0.268941, res, 10e-6);
+	EXPECT_NEAR(-0.268941, res, 1e-6);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
-	EXPECT_NEAR(-0.268941, res, 10e-6);
+	EXPECT_NEAR(-0.268941, res, 1e-6);
 
 	weights.clear();
 	weights.push_back(0.5);
 	weights.push_back(2.0);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
-	EXPECT_NEAR(-0.3775406, res, 10e-6);
+	EXPECT_NEAR(-0.3775406, res, 1e-6);
 	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
-	EXPECT_NEAR(-0.1192029, res, 10e-6);
+	EXPECT_NEAR(-0.1192029, res, 1e-6);
 }
 /*
 TEST_F(LCCRFTestSuite, TestLikelihood)

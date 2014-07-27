@@ -67,17 +67,17 @@ void LCCRF::_MakeDervative()
 				int j = position->j;
 				int s1 = position->s1;
 				int s2 = position->s2;
-				if((0 == j && y.Tags()[j] == s2 )||
-					(y.Tags()[j-1] == s1 && y.Tags()[j] == s2))
+				if(0 == j && -1 == s1)
+				{
+					s1 = 0;
+				}
+				if((0 == j && y.Tags()[j] == s2 ) ||
+				   (0 != j && y.Tags()[j-1] == s1 && y.Tags()[j] == s2))
 				{
 					// assume feature value is 1.0 to avoid hash lookup.
 					// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
 					// for the following res2, it is the same.
 					res1 += 1.0;
-				}
-				if(0 == j && -1 == s1)
-				{
-					s1 = 0;
 				}
 				res2 += ((*_cachedQMatrix)[j][s1][s2] * 1.0);
 			}
