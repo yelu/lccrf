@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python
 
 import os,sys
-lib_path = os.path.abspath('../LCCRFPy')
+lib_path = os.path.abspath('../../LCCRFPy')
 sys.path.append(lib_path)
 from LCCRFPy import *
 import unittest

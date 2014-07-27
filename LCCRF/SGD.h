@@ -94,7 +94,7 @@ public:
 	void UpdateWeights(const XSampleType& xSample, const YSampleType& ySample)
 	{
         // rescale to void dense update of weights resulted by l2 regularition.
-		if(_scale <  0 - 10e6 || _scale > 10e6)
+		if(_scale <  0 - 1e6 || _scale > 1e6)
         {
             Rescale();
         }
@@ -106,16 +106,16 @@ public:
         std::list<std::pair<int, double>> changedWeights;
         // skip updating the i-th feature if the feature is not triggered in xSample. 
 		// Since the derivative will be zero.
-        auto featureSet = xSample.GetFeatureSet();
+		auto featureSet = xSample.Raw();
 		// For every x sample, when _derivitive is called for the first time, 
 		// we need to recalculate forward-nackward. otherwise, it can be 
 		// reused to save time.
 		bool reset = true;
         for(auto f = featureSet.begin(); f != featureSet.end(); f++)
         {
-            double delta = _derivative(xSample, ySample, _weights, oldScale, *f, reset);
+			double delta = _derivative(xSample, ySample, _weights, oldScale, f->first, reset);
 			reset = false;
-            changedWeights.push_back(std::pair<int, double>(*f, _weights[*f] -  gain * delta));
+			changedWeights.push_back(std::pair<int, double>(f->first, _weights[f->first] -  gain * delta));
         }
         // update changed weights to _weights.
         for(auto ite = changedWeights.begin(); ite != changedWeights.end(); ite++)
@@ -145,7 +145,7 @@ public:
 		{
 			delta = 0 - delta;
 		}
-		if(delta < 10e-6) 
+		if(delta < 1e-7) 
 		{
 			LOG_DEBUG("Converged. delta : %f", delta);
             // check if all derivatives equal to zero.

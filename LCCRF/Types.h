@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <list>
+#include <tuple>
 #include <unordered_map>
 #include "Log.h"
 #include "MurmurHash3.h"
@@ -14,15 +15,17 @@ using std::vector;
 using std::set;
 using std::map;
 using std::list;
+using std::tuple;
+using std::pair;
 using std::unordered_map;
 using std::shared_ptr;
 
 class XSampleType
 {
 public:
-	struct Key
+	struct Position
 	{
-		Key(int _j, int _s1, int _s2)
+		Position(int _j, int _s1, int _s2)
 		{
 			j = _j;
 			s1 = _s1;
@@ -33,26 +36,28 @@ public:
 		int s1;
 		int s2;
 
-		struct EqualTo
+		struct Compare
 		{
-			const bool operator()(const Key& key1, const Key& key2) const
-			{ 
-				return (key1.j == key2.j && key1.s1 == key2.s1 && key1.s2 == key2.s2);
+			const bool operator()(const Position& pos1, const Position& pos2) const
+			{
+				if(pos1.j != pos2.j) {return pos1.j < pos2.j;}
+				if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s2;}
+				return pos1.s2 < pos2.s2;
 			}
 		};
 
 		struct Hash
 		{
-			size_t operator()(const Key& k) const
+			size_t operator()(const Position& k) const
 			{
 				uint32_t res  = 0;
-				MurmurHash3_x86_32(&k, sizeof(Key), 47, &res);
+				MurmurHash3_x86_32(&k, sizeof(Position), 47, &res);
 				return (size_t)res;
 			}
 		};
 	};
 
-	typedef std::unordered_map<Key, shared_ptr<std::set<int>>, Key::Hash, Key::EqualTo> FeaturesContainer;
+	typedef std::unordered_map<int, shared_ptr<std::set<Position, Position::Compare>>> FeaturesContainer;
 
 	// export to cython.
 	XSampleType(void)
@@ -64,8 +69,6 @@ public:
     {
         _length = length;
     }
-
-	shared_ptr<std::set<int>> GetFeatures(int j, int s1, int s2) const;
 
 	double GetFeatureValue(int j, int s1, int s2, int featureID) const;
 
@@ -87,15 +90,8 @@ public:
         return _features;
     }
 
-    const std::set<int>& GetFeatureSet() const
-    {
-        return _featureSet;
-    }
-
 private:
 	FeaturesContainer _features;
-    std::set<int> _featureSet;
-
     int _length;
 };
 
@@ -136,7 +132,6 @@ class XType
 public:
 	XType()
 	{
-		printf("x constructed.\n");
 	}
 
 	// export to cython.
@@ -150,20 +145,25 @@ public:
         for(auto i = _xs.begin(); i != _xs.end(); i++)
         {
             auto x = i->Raw();
-            list<std::pair<list<int>, list<int>>> xOut;
+            list<pair<list<int>, list<int>>> xOut;
+			map<list<int>, list<int>> fs;
             for(auto j = x.begin(); j != x.end(); j++)
             {
-                std::pair<list<int>, list<int>> fs;
-                XSampleType::Key k = j->first;
-                fs.first.push_back(k.j);
-                fs.first.push_back(k.s1);
-                fs.first.push_back(k.s2);
-                for(auto f = j->second->begin(); f != j->second->end(); f++)
-                {
-                    fs.second.push_back(*f);
-                }
-                xOut.push_back(fs);
+				auto position = j->second->begin();
+				for(; position != j->second->end(); position++)
+				{
+					list<int> pos;
+					pos.push_back(position->j);
+					pos.push_back(position->s1);
+					pos.push_back(position->s2);
+					fs[pos].push_back(j->first);
+				}
             }
+			for(auto j = fs.begin(); j != fs.end(); j++)
+			{
+				list<int> position;
+				xOut.push_back(pair<list<int>, list<int>>(j->first, j->second));
+			}
             res.push_back(xOut);
         } 
     }

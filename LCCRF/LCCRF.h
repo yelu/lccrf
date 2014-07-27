@@ -42,8 +42,7 @@ private:
 	static double _Phi(int s1, int s2, int j,
 		const XSampleType& doc, 
 		vector<double>& weights,
-        list<pair<int, double>>* hitFeatures = NULL,
-        double c = 1.0);
+        list<pair<int, double>>* hitFeatures);
 
 	static void _MakePhiMatrix(const XSampleType& xSample, 
 						       vector<double>& weights, 

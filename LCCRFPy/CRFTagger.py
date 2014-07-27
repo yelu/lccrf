@@ -39,7 +39,7 @@ class CRFTagger:
         #print x.to_array()
         #print y.to_array()
         self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count)
-        self.crf.fit(x, y, 500, 0.05, 0.001)
+        self.crf.fit(x, y, 1000, 0.05, 0.001)
         self.weights = self.crf.get_weights()
         self.readable_features = self.vm.readable_features()
         self.tags = self.vm.tagid_to_tagname

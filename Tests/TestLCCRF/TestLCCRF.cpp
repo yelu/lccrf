@@ -6,7 +6,6 @@
 void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
 {
 	XSampleType x(2);
-	XSampleType::Key key1(0, -1, 0);
 	
 	x.SetFeature(0, -1, 0, 0);
 	x.SetFeature(1, 0, 1, 1);
@@ -45,12 +44,11 @@ vector<YSampleType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Fit(xs, ys, 1000, 0.1, 0.1);
+	lccrf->Fit(xs, ys, 1100, 0.1, 0.1);
 	EXPECT_NEAR(1.63, lccrf->_weights[0], 10e-2);
 	EXPECT_NEAR(1.63, lccrf->_weights[1], 10e-2);
 }
 
-/*
 TEST_F(LCCRFTestSuite, TestDerivative)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x
@@ -62,28 +60,28 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	weights.clear();
 	weights.push_back(0);
 	weights.push_back(0);
-	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
 	EXPECT_NEAR(-0.5, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
 	EXPECT_NEAR(-0.5, res, 10e-6);
 	
 	weights.clear();
 	weights.push_back(1.0);
 	weights.push_back(1.0);
-	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
-	EXPECT_NEAR(-0.168941, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
-	EXPECT_NEAR(-0.168941, res, 10e-6);
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
+	EXPECT_NEAR(-0.268941, res, 10e-6);
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
+	EXPECT_NEAR(-0.268941, res, 10e-6);
 
 	weights.clear();
 	weights.push_back(0.5);
 	weights.push_back(2.0);
-	res = lccrf->_derivatives[0](weights, *(xs.begin()), *(ys.begin()));
-	EXPECT_NEAR(-0.327541, res, 10e-6);
-	res = lccrf->_derivatives[1](weights, *(xs.begin()), *(ys.begin()));
-	EXPECT_NEAR(0.0807971, res, 10e-6);
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 0, true);
+	EXPECT_NEAR(-0.3775406, res, 10e-6);
+	res = lccrf->_derivative(*(xs.begin()), *(ys.begin()), weights, 1.0, 1, true);
+	EXPECT_NEAR(-0.1192029, res, 10e-6);
 }
-
+/*
 TEST_F(LCCRFTestSuite, TestLikelihood)
 {
 	// -d/dx = 1-(e^(x+y)+e^x)/(e^(x+y)+e^x+e^y+1)-0.1x

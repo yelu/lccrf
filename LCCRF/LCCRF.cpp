@@ -14,33 +14,6 @@ LCCRF::~LCCRF(void)
 {
 }
 
-/*
-   j  : current position
-   s1 : previous state
-   s2 : current state
-*/
-double LCCRF::_Phi(int s1, int s2, int j,
-				  const XSampleType& doc, 
-				  vector<double>& weights,
-                  list<pair<int, double>>* hitFeatures, double scale)
-{
-	double ret = 0.0;
-	shared_ptr<std::set<int>> pFeatures = doc.GetFeatures(j, s1, s2);
-	if(!pFeatures)
-	{
-		return ret;
-	}
-	for(auto ite = (*pFeatures).begin(); ite != (*pFeatures).end(); ite++)
-	{
-		ret += (scale * weights[*ite]);
-        if(NULL != hitFeatures)
-        {
-            hitFeatures->push_back(pair<int, double>(*ite, scale * weights[*ite]));
-        }
-	}
-	return ret;
-}
-
 void LCCRF::_MakePhiMatrix(const XSampleType& xSample, 
 						   vector<double>& weights, 
 						   double scale, 
@@ -49,23 +22,19 @@ void LCCRF::_MakePhiMatrix(const XSampleType& xSample,
 	for(XSampleType::FeaturesContainer::const_iterator ite = xSample.Raw().begin();
 		ite != xSample.Raw().end(); ite++)
 	{
-		int j = ite->first.j;
-		int s1 = ite->first.s1;
-		int s2 = ite->first.s2;
-		auto features = ite->second;
-		if(0 == j && -1 == s1)
+		auto positions = ite->second;
+		auto featureID = ite->first;
+		for(auto position = positions->begin(); position != positions->end(); position++)
 		{
-			s1 = 0;
-		}
-		double phi = 0.0;
-		if(features)
-		{
-			for(auto feature = features->begin(); feature != features->end(); feature++)
+			int j = position->j;
+			int s1 = position->s1;
+			int s2 = position->s2;
+			if(0 == j && -1 == s1)
 			{
-				phi += (scale * weights[*feature]);
+				s1 = 0;
 			}
+			phiMatrix[j][s1][s2] += (scale * weights[featureID]);
 		}
-		phiMatrix[j][s1][s2] = phi;
 	}
 }
 
@@ -88,29 +57,30 @@ void LCCRF::_MakeDervative()
 			_cachedQMatrix = fwbw.GetQMatrix();
             //fwbw.PrintQMatrix();
 		}
-		
-		for(int j = 0; j < y.Length(); j++)
-		{
-			// If j is the first token, then j-1 is not avaliable, use -1 instead.
-			int y1 = -1;
-			if(0 == j){y1 = -1;}
-			else {y1 = y.Tags()[j - 1];}
-			res1 += x.GetFeatureValue(j, y1, y.Tags()[j], k);
-			for(int y1 = 0; y1 < labelCount; y1++)
-			{
-				for(int y2 = 0; y2 < labelCount; y2++)
-				{
-					double q = (*_cachedQMatrix)[j][y1][y2];
-					int y = y1;
-					if(0 == j)
-					{
-						y = -1;
-					}
-					double featureHit = x.GetFeatureValue(j, y, y2, k);
-					res2 += (q * featureHit);
-				}
-			}
 
+		auto positions = x.Raw().find(k);
+		if(positions != x.Raw().end())
+		{
+			auto position = positions->second->begin();
+			for(; position != positions->second->end(); position++)
+			{
+				int j = position->j;
+				int s1 = position->s1;
+				int s2 = position->s2;
+				if((0 == j && y.Tags()[j] == s2 )||
+					(y.Tags()[j-1] == s1 && y.Tags()[j] == s2))
+				{
+					// assume feature value is 1.0 to avoid hash lookup.
+					// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
+					// for the following res2, it is the same.
+					res1 += 1.0;
+				}
+				if(0 == j && -1 == s1)
+				{
+					s1 = 0;
+				}
+				res2 += ((*_cachedQMatrix)[j][s1][s2] * 1.0);
+			}
 		}
         //LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
 		return 0 - (res1 - res2);
@@ -178,31 +148,7 @@ void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, dou
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
 	Viterbi::Matrix3 graph(x.Length(), vector<vector<double>>(_labelCount, vector<double>(_labelCount, 0.0)));
-    for(int j = 0; j < (int)x.Length(); j++)
-	{
-		for(int s2 = 0; s2 < (int)_labelCount; s2++)
-		{
-			for(int s1 = 0; s1 < (int)_labelCount; s1++)
-			{
-				if(0 == j)
-				{
-					if(s1 != 0)
-					{
-						// fill graph[0][1..._sCount-1][0..._sCount] with 0.
-						graph[j][s1][s2] = 0.0;
-					}
-					else
-					{
-						graph[j][s1][s2] = _Phi(-1, s2, j, x, _weights);
-					}
-				}
-				else
-				{
-					graph[j][s1][s2] = _Phi(s1, s2, j, x, _weights);
-				}
-			}
-		}
-	}
+	LCCRF::_MakePhiMatrix(x, _weights, 1.0, graph);
     vector<int> path(x.Length(), -1);
 	Viterbi::GetPath(graph, path);
 	y.Clear();
@@ -228,19 +174,47 @@ vector<double>& LCCRF::GetWeights()
 	return _weights;
 }
 
-pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& doc, const YSampleType& y)
+/*
+   j  : current position
+   s1 : previous state
+   s2 : current state
+*/
+double LCCRF::_Phi(int s1, int s2, int j,
+				  const XSampleType& x, 
+				  vector<double>& weights,
+                  list<pair<int, double>>* hitFeatures)
+{
+	double ret = 0.0;
+	for(auto ite = x.Raw().begin(); ite != x.Raw().end(); ite++)
+	{
+		auto featureID = ite->first;
+		auto positions = ite->second;
+		for(auto position = positions->begin(); position != positions->end(); position++)
+		{
+			if(j == position->j && s1 == position->s1 && s2 == position->s2)
+			{
+				ret += (weights[featureID]);
+				hitFeatures->push_back(pair<int, double>(featureID, weights[featureID]));
+			}
+		}
+	}
+	return ret;
+}
+
+pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x, 
+	                                                     const YSampleType& y)
 {
 	int preState = -1;
 	double score = 0.0;
 	pair<list<list<pair<int, double>>>, double> res;
-    for(int j = 0; j < doc.Length(); j++)
+    for(int j = 0; j < x.Length(); j++)
 	{
 		if(y.Tags()[j] >= _labelCount)
 		{
 			return res;
 		}
         res.first.push_back(list<pair<int, double>>());
-        score += _Phi(preState, y.Tags()[j], j, doc, _weights, &(res.first.back()));
+        score += _Phi(preState, y.Tags()[j], j, x, _weights, &(res.first.back()));
 		preState = y.Tags()[j];
 	}
     res.second = score;

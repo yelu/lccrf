@@ -1,22 +1,10 @@
 #include "Types.h"
 
-shared_ptr<std::set<int>> XSampleType::GetFeatures(int j, int s1, int s2) const
-{
-	Key key(j, s1, s2);
-	auto ite = _features.find(key);
-	if( ite == _features.end())
-	{
-		shared_ptr<std::set<int>> ret;
-		return ret;
-	}
-	return ite->second;
-}
-
 double XSampleType::GetFeatureValue(int j, int s1, int s2, int featureID) const 
 {
-	Key key(j, s1, s2);
-	auto ite = _features.find(key);
-	if(ite == _features.end() || ite->second->count(featureID) == 0)
+	Position pos(j, s1, s2);
+	auto ite = _features.find(featureID);
+	if(ite == _features.end() || ite->second->count(pos) == 0)
 	{
 		return 0;
 	}
@@ -25,13 +13,13 @@ double XSampleType::GetFeatureValue(int j, int s1, int s2, int featureID) const
 
 void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
 {
-	Key key(j, s1, s2);
-	if(_features.count(key) == 0)
+	Position pos(j, s1, s2);
+	if(_features.count(featureID) == 0)
 	{
-		_features[key] = shared_ptr<std::set<int>>(new std::set<int>());
+		_features[featureID] = shared_ptr<std::set<Position, Position::Compare>>(
+			                   new std::set<Position, Position::Compare>());
 	}
-	_features[key]->insert(featureID);
-    _featureSet.insert(featureID);
+	_features[featureID]->insert(pos);
 }
 
 int YSampleType::Length() const 
