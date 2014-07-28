@@ -12,6 +12,7 @@ class CRFTagger:
     def __init__(self):
         self.vm = VectorizerManager()
         self.vm.add_vectorizer(NGramVectorizer(self.vm, 1))
+        #self.vm.add_vectorizer(NGramVectorizer(self.vm, 2))
         self.vm.add_vectorizer(TransitionVectorizer(self.vm))
         self.crf = None
     
@@ -47,8 +48,7 @@ class CRFTagger:
         #print json.dumps(self.vm.readable_features(), sort_keys = True, indent = 4)
         
     def transform(self, docs):
-        x, _ = self.vm.transform(docs)
-        
+        x, _ = self.vm.transform(docs)        
         y = Y()
         y = self.crf.predict(x)
         y_array = y.to_array()
@@ -62,6 +62,12 @@ class CRFTagger:
         for key, value in self.vm.readable_features().items():
             res.append([key, value, self.weights[key]])
         return res
+    
+    def save(self, file_path):
+        feature_weight = self.readable_features_and_weights()
+        with open(file_path, 'w') as f:
+            for feature_id, feature_name, weight in feature_weight:
+                print >> f, "%s\t%s\t%f" % (feature_id, feature_name, weight)
      
     def debug(self, doc):
         x, y = self.vm.transform([doc])
@@ -72,3 +78,40 @@ class CRFTagger:
             for feature in step:
                 res["path"]["position %s"%idx]["features"].append((self.readable_features[feature[0]], feature[1]))
         return res
+        
+    def test(self, docs):
+        predicted_tages = self.transform(docs)
+        tags_map = {}
+        total = 0
+        right_tags = 0
+        for i, doc in enumerate(docs):
+            for j, token in enumerate(doc):
+                total += 1
+                true_tag = predicted_tages[i][j]
+                predicted_tag = token[1]
+                if true_tag not in tags_map:
+                    tags_map[true_tag] = {"tp":0,"fp":0,"fn":0,"tn":0}
+                if predicted_tag not in tags_map:
+                    tags_map[predicted_tag] = {"tp":0,"fp":0,"fn":0,"tn":0}
+                if predicted_tag == true_tag:
+                    tags_map[true_tag]["tp"] += 1
+                    right_tags += 1
+                else:
+                    tags_map[predicted_tag]["fp"] += 1
+                    tags_map[true_tag]["fn"] += 1
+        for key, value in tags_map.items():
+            value["precision"] = 0.0
+            if value["tp"] + value["fp"] != 0:
+                value["precision"] = float(value["tp"]) / float(value["tp"] + value["fp"])
+            value["recall"] = 0.0
+            if value["tp"] + value["fn"] != 0:
+                value["recall"] = float(value["tp"]) / float(value["tp"] + value["fn"])
+            value["f1"] = 0.0
+            if abs(value["precision"] + value["recall"]) > 1e-6:
+                value["f1"] = 2 * value["precision"] * value["recall"] / float(value["precision"] + value["recall"])
+        if right_tags == 0:
+            tags_map["accuracy"] = 0.0
+        else:
+            tags_map["accuracy"] = float(right_tags) / float(total)
+        return tags_map
+        

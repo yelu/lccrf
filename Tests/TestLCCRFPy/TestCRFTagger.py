@@ -51,32 +51,11 @@ class TestCRFTagger(unittest.TestCase):
         tagger = CRFTagger()
         tagger.fit(train_doc)
         
-        for feature in tagger.readable_features_and_weights():
-            print "%d\t%s\t%f" % (feature[0], feature[1], feature[2])
+        tagger.save('./tagger.model')
         
         test_doc = self.ParseInput('./data/train.tsv')
-        test_y = tagger.transform(test_doc)
-        #print test_y
-        for i, doc in enumerate(test_doc):
-            mismatch = False
-            for j, token in enumerate(doc):
-                if token[1] != test_y[i][j]:
-                    mismatch = True
-                    break
-            if mismatch:
-                print doc
-                print test_y[i]
-                print ""
-        #print test_y
-
-        #debugRes1 = tagger.debug(test_doc[0])
-        #print json.dumps(debugRes1, sort_keys = True, indent = 4)
-        
-        # change tag and get another path result.
-        #for idx, i in enumerate(test_doc[0]):
-        #    i[1] = test_y[0][idx]
-        #debugRes2 = tagger.debug(test_doc[0])
-        #print json.dumps(debugRes2, sort_keys = True, indent = 4)
+        res = tagger.test(test_doc)
+        print json.dumps(res, sort_keys = True, indent = 4)
         
     def tearDown(self):
         pass
