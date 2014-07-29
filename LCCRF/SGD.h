@@ -145,7 +145,7 @@ public:
 		{
 			delta = 0 - delta;
 		}
-		if(delta < 1e-7) 
+		if(delta < 1e-6) 
 		{
 			LOG_DEBUG("Converged. delta : %f", delta);
             // check if all derivatives equal to zero.

@@ -34,10 +34,8 @@ void FWBW::_CalculateAlphaMatrix()
 			_alphaMatrix[j][s2] = std::numeric_limits<double>::lowest();
 			for(int s1 = 0; s1 < _sCount; s1++)
 			{
-				//printf("pos:%d,%d,%d _phiMatrix:%d,%d,%d\n", j, s1, s2, _phiMatrix.size(), _phiMatrix[0].size(), _phiMatrix[0][0].size());
 				double phi = ExpPlus(_alphaMatrix[j][s2], _alphaMatrix[j-1][s1] + _phiMatrix[j][s1][s2]);
 				_alphaMatrix[j][s2] = phi;
-				//printf("pos:%d,%d,%d _phiMatrix:%d,%d,%d\n", j, s1, s2, _phiMatrix.size(), _phiMatrix[0].size(), _phiMatrix[0][0].size());
 			}
 		}
 	}
@@ -109,11 +107,7 @@ void FWBW::_CalculateZ()
 	{
 		_z1 = ExpPlus(_z1, _betaMatrix[0][k] + _phiMatrix[0][0][k]);
 	}
-    assert(abs(_z1 - _z) < 10e-4);
-    if(abs(_z1 - _z) > 10e-4)
-    {
-        LOG_DEBUG("fb : %f\t%f", _z, _z1);
-    }
+    assert(abs(_z1 - _z) < 1e-4);
 }
 
 shared_ptr<const FWBW::Matrix3> FWBW::GetQMatrix()
@@ -148,17 +142,35 @@ double FWBW::GetZ()
 
 double FWBW::ExpPlus(double exp1, double exp2)
 {
-	if(exp1 < exp2)
-	{
-		double t = exp1;
-		exp1 = exp2;
-		exp2  = t;
-	}
-	if(exp1 - exp2 > 20)
-	{
-		return exp1;
-	}
-	return exp2 + log(exp(exp1 - exp2) + 1);
+    // log(exp(x) + exp(y)) = max(x,y) + log(1 + exp(-abs(x-y))),
+    // if y-x > 20, then the later is 0. so result is max(x,y).
+    double bigger = std::max(exp1, exp2);
+    double gap = std::abs(exp1 - exp2);
+    if(gap > 20)
+    {
+        return bigger;
+    }
+    return bigger + log(1 + exp(0 - gap));
+    // if not, use taylor series to expand the later:
+    // let x <= exp(-abs(x-y)), then 0<x<=1.
+    // log(1+x) = x-x^2/2+x^3/3-x^4/4+...
+    /*
+    if(gap < 1e-6)
+    {
+        return bigger + 0.69314718;
+    }
+    // taylor expansion.
+    double scale = exp(-gap);
+    double x = scale;
+    int n = 1;
+    double res = bigger;
+    do
+    {
+        res += (x/(double)n);
+        x *= (-1 * scale);
+    }while(std::abs(x) > 1e-6);
+	return res;
+    */
 }
 
 void FWBW::PrintQMatrix()
