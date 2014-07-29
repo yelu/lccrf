@@ -14,7 +14,6 @@ class TestCRFTagger(unittest.TestCase):
     def ParseInput(self, filePath):
         docs = []
         with open(filePath) as f:
-            f.readline()
             for line in f:
                 fields = line.strip().split('\t')
                 if len(fields) < 2:

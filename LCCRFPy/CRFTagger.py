@@ -12,7 +12,7 @@ class CRFTagger:
     def __init__(self):
         self.vm = VectorizerManager()
         self.vm.add_vectorizer(NGramVectorizer(self.vm, 1))
-        #self.vm.add_vectorizer(NGramVectorizer(self.vm, 2))
+        self.vm.add_vectorizer(NGramVectorizer(self.vm, 2))
         self.vm.add_vectorizer(TransitionVectorizer(self.vm))
         self.crf = None
     

@@ -126,7 +126,7 @@ shared_ptr<const FWBW::Matrix3> FWBW::GetQMatrix()
 					(*_pQMatrix)[j][s1][s2] = 0.0;
 					continue;
 				}
-				(*_pQMatrix)[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
+                (*_pQMatrix)[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
 			}
 		}
 	}
