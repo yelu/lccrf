@@ -44,24 +44,11 @@ private:
 		vector<double>& weights,
         list<pair<int, double>>* hitFeatures);
 
-	static void _MakePhiMatrix(const XSampleType& xSample, 
-						       vector<double>& weights, 
-							   double scale, 
-							   FWBW::Matrix3& phiMatrix);
-
-	void _MakeDervative();
-
-	void _MakeLikelihood();
-
 private:
-	SGD::ObjectFunction _likelihood;
-	SGD::DerivativeFunction _derivative;
 	const vector<XSampleType>* _xs;
 	const vector<YSampleType>* _ys;
 	vector<double> _weights;
 	int _featureCount;
 	int _labelCount;
-	// for accelarating derivitive calculation.
-	shared_ptr<const FWBW::Matrix3> _cachedQMatrix;
 };
 

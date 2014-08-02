@@ -33,6 +33,9 @@
     <ClCompile Include="MurmurHash3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SGD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FWBW.h">

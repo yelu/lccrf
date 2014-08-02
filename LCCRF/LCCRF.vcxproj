@@ -82,6 +82,7 @@
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="MurmurHash3.cpp" />
+    <ClCompile Include="SGD.cpp" />
     <ClCompile Include="Types.cpp" />
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>

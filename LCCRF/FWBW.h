@@ -17,7 +17,7 @@ public:
 	FWBW(Matrix3& phiMatrix);
 	virtual ~FWBW(void);
 
-	shared_ptr<const Matrix3> GetQMatrix();
+	const Matrix3& GetQMatrix();
 	double GetZ();
 
 	static double ExpPlus(double, double);
@@ -37,7 +37,7 @@ private:
 	Matrix2 _alphaMatrix;	// log
 	Matrix2 _betaMatrix;	// log
 	Matrix3 _muMatrix;	// log
-	shared_ptr<Matrix3> _pQMatrix;	//linear, probability [0,1]
+	Matrix3 _qMatrix;	//linear, probability [0,1]
 	double _z; // log
 };
 

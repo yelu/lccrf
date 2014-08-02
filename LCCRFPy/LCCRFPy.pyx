@@ -1,5 +1,5 @@
 ﻿# distutils: language = c++
-# distutils: sources = ../LCCRF/Types.cpp ../LCCRF/FWBW.cpp ../LCCRF/Viterbi.cpp ../LCCRF/LCCRF.cpp ../LCCRF/MurmurHash3.cpp
+# distutils: sources = ../LCCRF/Types.cpp ../LCCRF/FWBW.cpp ../LCCRF/Viterbi.cpp ../LCCRF/LCCRF.cpp ../LCCRF/SGD.cpp ../LCCRF/MurmurHash3.cpp
 
 from libcpp.list cimport list
 from libcpp.vector cimport vector

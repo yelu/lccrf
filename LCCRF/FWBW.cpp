@@ -9,7 +9,7 @@ FWBW::FWBW(Matrix3& phiMatrix):
 	_alphaMatrix(_jCount, vector<double>(_sCount, 0.0)),
 	_betaMatrix(_jCount, vector<double>(_sCount, 0.0)),
 	_muMatrix(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0))),
-	_pQMatrix(new Matrix3(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0))))
+	_qMatrix(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0)))
 {
 	_z = std::numeric_limits<double>::lowest();
 	_CalculateAlphaMatrix();
@@ -110,7 +110,7 @@ void FWBW::_CalculateZ()
     assert(abs(_z1 - _z) < 1e-4);
 }
 
-shared_ptr<const FWBW::Matrix3> FWBW::GetQMatrix()
+const FWBW::Matrix3& FWBW::GetQMatrix()
 {
 	_CalculateMuMatrix();
 	_CalculateZ();
@@ -123,19 +123,18 @@ shared_ptr<const FWBW::Matrix3> FWBW::GetQMatrix()
 				// fill _qMatrix[0][1..._sCount-1][0..._sCount] with 0.
 				if(0 == j && s1 != 0)
 				{
-					(*_pQMatrix)[j][s1][s2] = 0.0;
+					_qMatrix[j][s1][s2] = 0.0;
 					continue;
 				}
-                (*_pQMatrix)[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
+                _qMatrix[j][s1][s2] = exp(_muMatrix[j][s1][s2] - _z);
 			}
 		}
 	}
-	return _pQMatrix;
+	return _qMatrix;
 }
 
 double FWBW::GetZ()
 {
-	_CalculateZ();
 	return _z;	// log
 }
 
@@ -182,7 +181,7 @@ void FWBW::PrintQMatrix()
 		{
 			for(int s2 =0; s2 < _sCount; s2++)
 			{
-				double v = (*_pQMatrix)[j][s1][s2];
+				double v = _qMatrix[j][s1][s2];
 				LOG_DEBUG("%d,%d\t%f", s1, s2, v);
 			}
 		}
