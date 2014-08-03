@@ -153,6 +153,7 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
 	SGD::MakePhiMatrix(xSample, _weights, _scale, phiMatrix);
 	FWBW fwbw(phiMatrix);
 	const FWBW::Matrix3& qMatrix = fwbw.GetQMatrix();
+	//fwbw.PrintQMatrix();
     for(auto f = featureSet.begin(); f != featureSet.end(); f++)
     {
 		double delta = _CaculateGradient(xSample, ySample, _weights, oldScale,

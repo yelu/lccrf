@@ -20,24 +20,33 @@ public:
 	const Matrix3& GetQMatrix();
 	double GetZ();
 
-	static double ExpPlus(double, double);
-
 	void PrintQMatrix();
+
+	static void Matrix3Exp(Matrix3&);
+
+	static void VectorLog(vector<double>&);
+
+	static void VectorExp(vector<double>&);
+
+	static double VectorNormalize(vector<double>&);
+
+	static void VectorDivide(const vector<double>& v1, 
+		const vector<double>& v2, 
+		vector<double>& res);
 
 private:
 	void _CalculateAlphaMatrix();
 	void _CalculateBetaMatrix();
-	void _CalculateMuMatrix();
-	void _CalculateZ();
 
 private:
-	Matrix3& _phiMatrix;
+	Matrix3 _phiMatrix;
 	int _jCount;
 	int _sCount;
-	Matrix2 _alphaMatrix;	// log
-	Matrix2 _betaMatrix;	// log
-	Matrix3 _muMatrix;	// log
+	Matrix2 _alphaMatrix;	// normalized linear with scale at each j
+	Matrix2 _betaMatrix;	// normalized linear with scale at each j
 	Matrix3 _qMatrix;	//linear, probability [0,1]
 	double _z; // log
+	vector<double> _alphaScale;
+	vector<double> _betaScale;
 };
 
