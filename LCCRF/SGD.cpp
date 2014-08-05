@@ -27,36 +27,33 @@ void SGD::MakePhiMatrix(const XSampleType& xSample,
 double SGD::_CalculateLikelihood(const XSampleType& x, 
 							  const YSampleType& y, 
 							  const MultiArray<double, 3>& phiMatrix,
-							  double z)
+							  double logNorm)
 {
 	// calculate res1
-	double res1 = 0.0; // log
+	double logOfTaggedPath = 0.0; // log
 	for(int j = 0; j < y.Length(); j++)
 	{
 		int y1 = 0;
 		if(0 == j){y1 = 0;}
 		else {y1 = y.Tags()[j - 1];};
-		res1 += (phiMatrix(j, y1, y.Tags()[j]));
+		logOfTaggedPath += (phiMatrix(j, y1, y.Tags()[j]));
 	}
 
-	// res2 is the norm.
-	double res2 = z; // log
-
-	return 0 - (res1 - res2);
+	return 0 - (logOfTaggedPath - logNorm);
 }
 
 double SGD::_CaculateGradient(const XSampleType& x, 
 		                      const YSampleType& y, 
 							  int k,
-							  const MultiArray<double, 3>& qMatrix)
+							  FWBW& fwbw)
 {
-	double res1 = 0.0; // linear
-	double res2 = 0.0; // linear
+	double empirical = 0.0; // linear
+	double expected = 0.0; // linear
 
-	// forward-backword calculation.
 	auto positions = x.Raw().find(k);
 	if(positions != x.Raw().end())
 	{
+		// get empirical.
 		auto position = positions->second->begin();
 		for(; position != positions->second->end(); position++)
 		{
@@ -73,13 +70,15 @@ double SGD::_CaculateGradient(const XSampleType& x,
 				// assume feature value is 1.0 to avoid hash lookup.
 				// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
 				// for the following res2, it is the same.
-				res1 += 1.0;
+				empirical += 1.0;
 			}
-			res2 += (qMatrix(j, s1, s2) * 1.0);
 		}
+		// get expected under model distribution.
+		expected = fwbw.GetModelExpectation(*(positions->second));
 	}
+
 	//LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
-	return 0 - (res1 - res2);
+	return 0 - (empirical - expected);
 }
 
 const vector<double>& SGD::Run(double learningRate, double l2, int maxIteration)
@@ -149,11 +148,10 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
 	MultiArray<double, 3> phiMatrix(ySample.Length(), _labelCount, _labelCount, 0.0);
 	SGD::MakePhiMatrix(xSample, _weights, _scale, phiMatrix);
 	FWBW fwbw(phiMatrix);
-	const MultiArray<double, 3>& qMatrix = fwbw.GetQMatrix();
-	//fwbw.PrintQMatrix();
+
     for(auto f = featureSet.begin(); f != featureSet.end(); f++)
     {
-		double delta = _CaculateGradient(xSample, ySample, f->first, qMatrix);
+		double delta = _CaculateGradient(xSample, ySample, f->first, fwbw);
 		changedWeights.push_back(std::pair<int, double>(f->first, 
 				                    _weights[f->first] -  gain * delta));
     }
@@ -164,6 +162,6 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
     }
 
 	// calculate log-likelihood.
-	double likelihood = _CalculateLikelihood(xSample, ySample, phiMatrix, fwbw.GetZ());
+	double likelihood = _CalculateLikelihood(xSample, ySample, phiMatrix, fwbw.GetLogNorm());
 	return likelihood;
 }

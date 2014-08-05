@@ -18,10 +18,9 @@ public:
 	FWBW(MultiArray<double, 3>& phiMatrix);
 	virtual ~FWBW(void);
 
-	const MultiArray<double, 3>& GetQMatrix();
-	double GetZ();
-
-	void PrintQMatrix();
+	double GetModelExpectation(const std::set<XSampleType::Position, 
+		                       XSampleType::Position::Compare>&);
+	double GetLogNorm();
 
 	static void VectorDivide(const MultiArray<double, 1, 100>& v1, 
 		const MultiArray<double, 1, 100>& v2, 
@@ -32,10 +31,14 @@ private:
 	void _CalculateBetaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 100>&);
 
 private:
-    MultiArray<double, 3> _phiMatrix;
 	int _jCount;
 	int _sCount;
-	MultiArray<double, 3> _qMatrix;	//linear, probability [0,1]
-	double _z; // log
+    MultiArray<double, 3> _phiMatrix;
+	MultiArray<double, 2> _alphaMatrix;
+	MultiArray<double, 2> _betaMatrix;
+	MultiArray<double, 1, 100> _alphaScales;
+	MultiArray<double, 1, 100> _betaScales;
+	MultiArray<double, 1, 100> _div;
+	double _logNorm; // log
 };
 

@@ -43,7 +43,7 @@ public:
 	static double _CaculateGradient(const XSampleType& x, 
 									const YSampleType& y, 
 									int k,
-									const MultiArray<double, 3>& qMatrix);
+									FWBW& fwbw);
 
 	static double _CalculateLikelihood(const XSampleType& x, 
 									   const YSampleType& y,

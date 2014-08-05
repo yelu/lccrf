@@ -65,10 +65,9 @@ TEST_F(LCCRFTestSuite, TestDerivative)
     MultiArray<double, 3> phiMatrix1(y.Length(), labelCount, labelCount, 0.0);
 	SGD::MakePhiMatrix(x, weights, 1.0, phiMatrix1);
 	FWBW fwbw1(phiMatrix1);
-    const MultiArray<double, 3>& qMatrix1 = fwbw1.GetQMatrix();
-	res = SGD::_CaculateGradient(x, y, 0, qMatrix1);
+	res = SGD::_CaculateGradient(x, y, 0, fwbw1);
 	EXPECT_NEAR(-0.5, res, 1e-6);
-	res = SGD::_CaculateGradient(x, y, 1, qMatrix1);
+	res = SGD::_CaculateGradient(x, y, 1, fwbw1);
 	EXPECT_NEAR(-0.5, res, 1e-6);
 	
 	weights.clear();
@@ -77,10 +76,9 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	MultiArray<double, 3> phiMatrix2(y.Length(), labelCount, labelCount, 0.0);
 	SGD::MakePhiMatrix(x, weights, 1.0, phiMatrix2);
 	FWBW fwbw2(phiMatrix2);
-	const MultiArray<double, 3>& qMatrix2 = fwbw2.GetQMatrix();
-	res = SGD::_CaculateGradient(x, y, 0, qMatrix2);
+	res = SGD::_CaculateGradient(x, y, 0, fwbw2);
 	EXPECT_NEAR(-0.268941, res, 1e-6);
-	res = SGD::_CaculateGradient(x, y, 1, qMatrix2);
+	res = SGD::_CaculateGradient(x, y, 1, fwbw2);
 	EXPECT_NEAR(-0.268941, res, 1e-6);
 
 	weights.clear();
@@ -89,10 +87,9 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	MultiArray<double, 3> phiMatrix3(y.Length(), labelCount, labelCount, 0.0);
 	SGD::MakePhiMatrix(x, weights, 1.0, phiMatrix3);
 	FWBW fwbw3(phiMatrix3);
-	const MultiArray<double, 3>& qMatrix3 = fwbw3.GetQMatrix();
-	res = SGD::_CaculateGradient(x, y, 0, qMatrix3);
+	res = SGD::_CaculateGradient(x, y, 0, fwbw3);
 	EXPECT_NEAR(-0.3775406, res, 1e-6);
-	res = SGD::_CaculateGradient(x, y, 1, qMatrix3);
+	res = SGD::_CaculateGradient(x, y, 1, fwbw3);
 	EXPECT_NEAR(-0.1192029, res, 1e-6);
 }
 

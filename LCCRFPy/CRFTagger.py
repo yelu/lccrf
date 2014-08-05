@@ -36,9 +36,10 @@ class CRFTagger:
         print >> sys.stderr, "tagger.fit finished."
         x, y = self.vm.transform(docs)
         print >> sys.stderr, "tagger.transform finished."
-        self.SaveXYToFile(x, y)
+        #self.SaveXYToFile(x, y)
         #print x.to_array()
         #print y.to_array()
+        #print "tag_count : %d" % self.vm.tag_count
         self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count)
         self.crf.fit(x, y, 1000, 0.05, 0.001)
         self.weights = self.crf.get_weights()

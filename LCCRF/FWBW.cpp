@@ -3,13 +3,27 @@
 #include <cassert>
 
 FWBW::FWBW(MultiArray<double, 3>& phiMatrix):
-	_phiMatrix(phiMatrix),
-    _jCount(phiMatrix.Dim1()),
+	_jCount(phiMatrix.Dim1()),
     _sCount(phiMatrix.Dim2()),
-	_qMatrix(_jCount, _sCount, _sCount)
+	_phiMatrix(phiMatrix),
+	_alphaMatrix(_jCount, _sCount),
+	_betaMatrix(_jCount, _sCount),
+	_alphaScales(_jCount),
+	_betaScales(_jCount),
+	_div(_jCount)
 {
-	_z = std::numeric_limits<double>::lowest();
+	_logNorm = std::numeric_limits<double>::lowest();
     _phiMatrix.ExpInPlace();
+	_CalculateAlphaMatrix(_alphaMatrix, _alphaScales);
+	_CalculateBetaMatrix(_betaMatrix, _betaScales);
+	VectorDivide(_betaScales, _alphaScales, _div);
+
+	// calculate log norm.
+    _logNorm = 0.0;
+    for(int i = 0; i < _alphaScales.Dim1(); i++)
+	{
+        _logNorm += std::log(_alphaScales[i]);
+	}
 }
 
 FWBW::~FWBW(void)
@@ -58,77 +72,44 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
 	}
 }
 
-const MultiArray<double, 3>& FWBW::GetQMatrix()
+double FWBW::GetModelExpectation(const std::set<XSampleType::Position, 
+		                       XSampleType::Position::Compare>& positions)
 {
-    MultiArray<double, 2> alphaMatrix(_jCount, _sCount);
-    MultiArray<double, 2> betaMatrix(_jCount, _sCount);
-    MultiArray<double, 1, 100> alphaScales(_jCount);
-    MultiArray<double, 1, 100> betaScales(_jCount);
-    _CalculateAlphaMatrix(alphaMatrix, alphaScales);
-    _CalculateBetaMatrix(betaMatrix, betaScales);
-
-    MultiArray<double, 1, 100> div(_jCount);
-    VectorDivide(betaScales, alphaScales, div);
-	for(int j = 0; j < _jCount; j++)
+	double res = 0.0;
+	auto position = positions.begin();
+	for(; position != positions.end(); position++)
 	{
-		for(int s1 = 0; s1 < _sCount; s1++)
+		int j = position->j;
+		int s1 = position->s1;
+		int s2 = position->s2;
+		if(0 == j && -1 == s1)
 		{
-			for(int s2 = 0; s2 < _sCount; s2++)
-			{
-				if(0 == j)
-				{
-					// fill _muMatrix[0][1..._sCount-1][0..._sCount] with 0.
-					if(s1 != 0)
-					{
-						_qMatrix[j][s1][s2] = 0.0;
-					}
-					else
-					{
-						double a = alphaMatrix(j, s2);
-						double b = betaMatrix(j, s2);
-						_qMatrix(j, s1, s2) = (a * b * div[j] * alphaScales[j]);
-					}
-				}
-				else
-				{
-					double a = alphaMatrix(j - 1, s1);
-					double p = _phiMatrix(j, s1, s2);
-					double b = betaMatrix(j, s2);
-					_qMatrix(j, s1, s2) = (a * p * b * div[j]);
-				}
-			}
+			s1 = 0;
 		}
+		double probability = 0.0;
+		if(0 == j && 0 == s1)
+		{
+			probability = _alphaMatrix(j, s2) *
+						  _betaMatrix(j, s2) *
+						  _div[j] * _alphaScales[j];
+		}
+		else if(0 != j)
+		{
+			probability = _alphaMatrix(j - 1, s1) * 
+						  _phiMatrix(j, s1, s2) *
+						  _betaMatrix(j, s2) *
+						  _div[j];
+		}
+		// assume feature value is 1.0 to avoid hash lookup.
+		// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
+		res += (probability * 1.0);
 	}
-
-    // calculate _z.
-    _z = 0.0;
-    for(int i = 0; i < alphaScales.Dim1(); i++)
-	{
-        _z += std::log(alphaScales[i]);
-	}
-
-	return _qMatrix;
+	return res;
 }
 
-double FWBW::GetZ()
+double FWBW::GetLogNorm()
 {
-	return _z;
-}
-
-void FWBW::PrintQMatrix()
-{
-	for(int j = 0; j < _jCount; j++)
-	{
-		LOG_DEBUG("\nj = %d", j);
-		for(int s1 = 0; s1 < _sCount; s1++)
-		{
-			for(int s2 =0; s2 < _sCount; s2++)
-			{
-				double v = _qMatrix(j, s1, s2);
-				LOG_DEBUG("%d,%d\t%f", s1, s2, v);
-			}
-		}
-	}
+	return _logNorm;
 }
 
 void FWBW::VectorDivide(const MultiArray<double, 1, 100>& v1, 

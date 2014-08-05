@@ -33,7 +33,6 @@ setup(
 			['LCCRFPy.pyx'], 
 			language="c++", 
             extra_compile_args=["-std=c++11", "/D_VARIADIC_MAX=10"],
-            extra_link_args=["-debug"],
             include_dirs=['../LCCRF'],			
 			)
 	]),
