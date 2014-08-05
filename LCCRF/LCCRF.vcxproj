@@ -90,6 +90,7 @@
     <ClInclude Include="FWBW.h" />
     <ClInclude Include="LCCRF.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="MultiArray.h" />
     <ClInclude Include="MurmurHash3.h" />
     <ClInclude Include="SGD.h" />
     <ClInclude Include="Types.h" />

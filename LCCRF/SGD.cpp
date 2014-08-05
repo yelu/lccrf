@@ -3,7 +3,7 @@
 void SGD::MakePhiMatrix(const XSampleType& xSample, 
 						   vector<double>& weights, 
 						   double scale, 
-						   FWBW::Matrix3& phiMatrix)
+						   MultiArray<double, 3>& phiMatrix)
 {
 	for(XSampleType::FeaturesContainer::const_iterator ite = xSample.Raw().begin();
 		ite != xSample.Raw().end(); ite++)
@@ -19,14 +19,14 @@ void SGD::MakePhiMatrix(const XSampleType& xSample,
 			{
 				s1 = 0;
 			}
-			phiMatrix[j][s1][s2] += (scale * weights[featureID]);
+			phiMatrix(j, s1, s2) += (scale * weights[featureID]);
 		}
 	}
 }
 
 double SGD::_CalculateLikelihood(const XSampleType& x, 
 							  const YSampleType& y, 
-							  const FWBW::Matrix3& phiMatrix,
+							  const MultiArray<double, 3>& phiMatrix,
 							  double z)
 {
 	// calculate res1
@@ -36,7 +36,7 @@ double SGD::_CalculateLikelihood(const XSampleType& x,
 		int y1 = 0;
 		if(0 == j){y1 = 0;}
 		else {y1 = y.Tags()[j - 1];};
-		res1 += phiMatrix[j][y1][y.Tags()[j]];
+		res1 += (phiMatrix(j, y1, y.Tags()[j]));
 	}
 
 	// res2 is the norm.
@@ -47,10 +47,8 @@ double SGD::_CalculateLikelihood(const XSampleType& x,
 
 double SGD::_CaculateGradient(const XSampleType& x, 
 		                      const YSampleType& y, 
-							  vector<double>& weights, 
-							  double scale, 
 							  int k,
-							  const FWBW::Matrix3& qMatrix)
+							  const MultiArray<double, 3>& qMatrix)
 {
 	double res1 = 0.0; // linear
 	double res2 = 0.0; // linear
@@ -77,7 +75,7 @@ double SGD::_CaculateGradient(const XSampleType& x,
 				// for the following res2, it is the same.
 				res1 += 1.0;
 			}
-			res2 += (qMatrix[j][s1][s2] * 1.0);
+			res2 += (qMatrix(j, s1, s2) * 1.0);
 		}
 	}
 	//LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
@@ -148,16 +146,14 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
 	// Since the derivative will be zero.
 	auto featureSet = xSample.Raw();
 	// For every x sample, forward-nackward can be reused to save time.
-	FWBW::Matrix3 phiMatrix(ySample.Length(), vector<vector<double>>(_labelCount, 
-		vector<double>(_labelCount, 0.0)));
+	MultiArray<double, 3> phiMatrix(ySample.Length(), _labelCount, _labelCount, 0.0);
 	SGD::MakePhiMatrix(xSample, _weights, _scale, phiMatrix);
 	FWBW fwbw(phiMatrix);
-	const FWBW::Matrix3& qMatrix = fwbw.GetQMatrix();
+	const MultiArray<double, 3>& qMatrix = fwbw.GetQMatrix();
 	//fwbw.PrintQMatrix();
     for(auto f = featureSet.begin(); f != featureSet.end(); f++)
     {
-		double delta = _CaculateGradient(xSample, ySample, _weights, oldScale,
-			f->first, qMatrix);
+		double delta = _CaculateGradient(xSample, ySample, f->first, qMatrix);
 		changedWeights.push_back(std::pair<int, double>(f->first, 
 				                    _weights[f->first] -  gain * delta));
     }

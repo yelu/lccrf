@@ -10,10 +10,10 @@ Viterbi::~Viterbi(void)
 {
 }
 
-void Viterbi::GetPath(const Matrix3& graph, vector<int>& res)
+void Viterbi::GetPath(const MultiArray<double, 3>& graph, vector<int>& res)
 {
-	int nStep = graph.size();
-	int nState = graph[0].size();
+    int nStep = graph.Dim1();
+    int nState = graph.Dim2();
 	vector<double> pi(nState, 0);
 	vector<vector<int>> backTraceMatrix(nStep, vector<int>(nState, -1));
 

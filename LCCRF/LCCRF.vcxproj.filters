@@ -59,5 +59,8 @@
     <ClInclude Include="MurmurHash3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MultiArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

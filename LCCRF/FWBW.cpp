@@ -2,72 +2,73 @@
 #include "Log.h"
 #include <cassert>
 
-FWBW::FWBW(Matrix3& phiMatrix):
+FWBW::FWBW(MultiArray<double, 3>& phiMatrix):
 	_phiMatrix(phiMatrix),
-	_jCount(phiMatrix.size()),
-	_sCount(phiMatrix[0].size()),
-	_alphaMatrix(_jCount, vector<double>(_sCount, 0.0)),
-	_betaMatrix(_jCount, vector<double>(_sCount, 0.0)),
-	_qMatrix(_jCount, vector<vector<double>>(_sCount, vector<double>(_sCount, 0.0))),
-	_alphaScale(_jCount),
-	_betaScale(_jCount)
+    _jCount(phiMatrix.Dim1()),
+    _sCount(phiMatrix.Dim2()),
+	_qMatrix(_jCount, _sCount, _sCount)
 {
 	_z = std::numeric_limits<double>::lowest();
-	Matrix3Exp(_phiMatrix);
-	_CalculateAlphaMatrix();
-	_CalculateBetaMatrix();
+    _phiMatrix.ExpInPlace();
 }
 
 FWBW::~FWBW(void)
 {
 }
 
-void FWBW::_CalculateAlphaMatrix()
+void FWBW::_CalculateAlphaMatrix(MultiArray<double, 2>& alphaMatrix, MultiArray<double, 1, 100>& scales)
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		_alphaMatrix[0][s] = _phiMatrix[0][0][s];
+		alphaMatrix(0,s) = _phiMatrix(0, 0, s);
 	}
-	_alphaScale[0] = VectorNormalize(_alphaMatrix[0]);
+    scales[0] = alphaMatrix[0].NormalizeInPlace();
 	for(int j = 1; j < _jCount; j++)
 	{
 		for(int s2 = 0; s2 < _sCount; s2++)
 		{
-			_alphaMatrix[j][s2] = 0.0;
+			alphaMatrix(j, s2) = 0.0;
 			for(int s1 = 0; s1 < _sCount; s1++)
 			{
-				_alphaMatrix[j][s2] += (_alphaMatrix[j-1][s1] * _phiMatrix[j][s1][s2]);
+				alphaMatrix(j, s2) += (alphaMatrix(j-1, s1) * _phiMatrix(j, s1, s2));
 			}
 		}
-		_alphaScale[j] = VectorNormalize(_alphaMatrix[j]);
+        scales[j] = alphaMatrix[j].NormalizeInPlace();
 	}
 }
 
-void FWBW::_CalculateBetaMatrix()
+void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<double, 1, 100>& scales)
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		_betaMatrix[_jCount - 1][s] = 1.0;	// linear
+		betaMatrix(_jCount - 1, s) = 1.0;	// linear
 	}
-	_betaScale[_jCount - 1] = VectorNormalize(_betaMatrix[_jCount - 1]);
+    scales[_jCount - 1] = betaMatrix[_jCount - 1].NormalizeInPlace();
 	for(int j = _jCount - 2; j >= 0; j--)
 	{
 		for(int s1 = 0; s1 < _sCount; s1++)
 		{
-			_betaMatrix[j][s1] = 0.0;
+			betaMatrix(j, s1) = 0.0;
 			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				_betaMatrix[j][s1] += (_betaMatrix[j+1][s2] * _phiMatrix[j+1][s1][s2]);
+				betaMatrix(j, s1) += (betaMatrix(j+1, s2) * _phiMatrix(j+1, s1, s2));
 			}
 		}
-		_betaScale[j] = VectorNormalize(_betaMatrix[j]);
+        scales[j] = betaMatrix[j].NormalizeInPlace();
 	}
 }
 
-const FWBW::Matrix3& FWBW::GetQMatrix()
+const MultiArray<double, 3>& FWBW::GetQMatrix()
 {
-	vector<double> div(_jCount);
-	VectorDivide(_betaScale, _alphaScale, div);
+    MultiArray<double, 2> alphaMatrix(_jCount, _sCount);
+    MultiArray<double, 2> betaMatrix(_jCount, _sCount);
+    MultiArray<double, 1, 100> alphaScales(_jCount);
+    MultiArray<double, 1, 100> betaScales(_jCount);
+    _CalculateAlphaMatrix(alphaMatrix, alphaScales);
+    _CalculateBetaMatrix(betaMatrix, betaScales);
+
+    MultiArray<double, 1, 100> div(_jCount);
+    VectorDivide(betaScales, alphaScales, div);
 	for(int j = 0; j < _jCount; j++)
 	{
 		for(int s1 = 0; s1 < _sCount; s1++)
@@ -83,44 +84,35 @@ const FWBW::Matrix3& FWBW::GetQMatrix()
 					}
 					else
 					{
-						double a = _alphaMatrix[j][s2];
-						double b = _betaMatrix[j][s2];
-						_qMatrix[j][s1][s2] = (a * b * div[j] * _alphaScale[j]);
+						double a = alphaMatrix(j, s2);
+						double b = betaMatrix(j, s2);
+						_qMatrix(j, s1, s2) = (a * b * div[j] * alphaScales[j]);
 					}
 				}
 				else
 				{
-					double a = _alphaMatrix[j - 1][s1];
-					double p = _phiMatrix[j][s1][s2];
-					double b = _betaMatrix[j][s2];
-					_qMatrix[j][s1][s2] = (a * p * b * div[j]);
+					double a = alphaMatrix(j - 1, s1);
+					double p = _phiMatrix(j, s1, s2);
+					double b = betaMatrix(j, s2);
+					_qMatrix(j, s1, s2) = (a * p * b * div[j]);
 				}
 			}
 		}
 	}
+
+    // calculate _z.
+    _z = 0.0;
+    for(int i = 0; i < alphaScales.Dim1(); i++)
+	{
+        _z += std::log(alphaScales[i]);
+	}
+
 	return _qMatrix;
 }
 
 double FWBW::GetZ()
 {
-	_z = 0.0;
-	for(auto ite = _alphaScale.begin(); ite != _alphaScale.end(); ite++)
-	{
-		_z += std::log(*ite);
-	}
 	return _z;
-	/*
-    double _z1 = std::numeric_limits<double>::lowest();
-	for(int s = 0; s < _sCount; s++)
-	{
-		_z = ExpPlus(_z, _alphaMatrix[_jCount - 1][s]);
-	}
-    for(int k = 0; k < _sCount; k++)
-	{
-		_z1 = ExpPlus(_z1, _betaMatrix[0][k] + _phiMatrix[0][0][k]);
-	}
-    assert(abs(_z1 - _z) < 1e-4);
-	*/
 }
 
 void FWBW::PrintQMatrix()
@@ -132,78 +124,24 @@ void FWBW::PrintQMatrix()
 		{
 			for(int s2 =0; s2 < _sCount; s2++)
 			{
-				double v = _qMatrix[j][s1][s2];
+				double v = _qMatrix(j, s1, s2);
 				LOG_DEBUG("%d,%d\t%f", s1, s2, v);
 			}
 		}
 	}
 }
 
-
-void FWBW::Matrix3Exp(Matrix3& matrix3)
+void FWBW::VectorDivide(const MultiArray<double, 1, 100>& v1, 
+						const MultiArray<double, 1, 100>& v2, 
+						MultiArray<double, 1, 100>& res)
 {
-	for(auto ite1 = matrix3.begin(); ite1 != matrix3.end(); ite1++)
+    for(int i = 0; i < res.Dim1(); i++)
 	{
-		for(auto ite2 = ite1->begin(); ite2 != ite1->end(); ite2++)
-		{
-			for(auto ite3 = ite2->begin(); ite3 != ite2->end(); ite3++)
-			{
-				(*ite3) = std::exp(*ite3);
-			}
-		}
+		res[i] = std::log(v1[i]) - std::log(v2[i]);
 	}
-}
-
-double FWBW::VectorNormalize(vector<double>& v)
-{
-	double sum = 0.0;
-	for(auto ite = v.begin(); ite != v.end(); ite++)
+    for(int i = res.Dim1() - 2; i >= 0; i--)
 	{
-		sum += (*ite);
+		res[i] += res[i + 1];
 	}
-	for(auto ite = v.begin(); ite != v.end(); ite++)
-	{
-		(*ite) /= sum;
-	}
-	return sum;
-}
-
-void FWBW::VectorDivide(const vector<double>& v1, 
-						const vector<double>& v2, 
-						vector<double>& res)
-{
-	vector<double> v1Copy(v1);
-	vector<double> v2Copy(v2);
-	VectorLog(v1Copy);
-	VectorLog(v2Copy);
-	for(int i = (int)v1Copy.size() - 2; i >= 0; i--)
-	{
-		v1Copy[i] += v1Copy[i + 1];
-	}
-	for(int i = (int)v2Copy.size() - 2; i >= 0; i--)
-	{
-		v2Copy[i] += v2Copy[i + 1];
-	}
-
-	for(size_t i = 0; i < res.size(); i++)
-	{
-		res[i] = v1Copy[i] - v2Copy[i];
-	}
-	VectorExp(res);
-}
-
-void FWBW::VectorLog(vector<double>& v)
-{
-	for(auto ite = v.begin(); ite != v.end(); ite++)
-	{
-		(*ite) = std::log(*ite);
-	}
-}
-
-void FWBW::VectorExp(vector<double>& v)
-{
-	for(auto ite = v.begin(); ite != v.end(); ite++)
-	{
-		(*ite) = std::exp(*ite);
-	}
+    res.ExpInPlace();
 }

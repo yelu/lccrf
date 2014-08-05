@@ -32,7 +32,7 @@ void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, dou
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
-	Viterbi::Matrix3 graph(x.Length(), vector<vector<double>>(_labelCount, vector<double>(_labelCount, 0.0)));
+    MultiArray<double, 3> graph(x.Length(), _labelCount, _labelCount, 0.0);
 	SGD::MakePhiMatrix(x, _weights, 1.0, graph);
     vector<int> path(x.Length(), -1);
 	Viterbi::GetPath(graph, path);

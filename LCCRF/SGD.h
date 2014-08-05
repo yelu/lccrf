@@ -38,18 +38,16 @@ public:
 	static void MakePhiMatrix(const XSampleType& xSample, 
 					vector<double>& weights, 
 					double scale, 
-					FWBW::Matrix3& phiMatrix);
+					MultiArray<double, 3>& phiMatrix);
 
 	static double _CaculateGradient(const XSampleType& x, 
 									const YSampleType& y, 
-									vector<double>& weights, 
-									double scale, 
 									int k,
-									const FWBW::Matrix3& qMatrix);
+									const MultiArray<double, 3>& qMatrix);
 
 	static double _CalculateLikelihood(const XSampleType& x, 
 									   const YSampleType& y,
-							           const FWBW::Matrix3& phiMatrix,
+							           const MultiArray<double, 3>& phiMatrix,
 							           double z);
 
 private:
