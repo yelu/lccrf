@@ -8,6 +8,7 @@
 #include <list>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include "Log.h"
 #include "MurmurHash3.h"
 using std::wstring;
@@ -18,6 +19,7 @@ using std::list;
 using std::tuple;
 using std::pair;
 using std::unordered_map;
+using std::unordered_set;
 using std::shared_ptr;
 
 class XSampleType
@@ -46,6 +48,14 @@ public:
 			}
 		};
 
+        struct Equal
+		{
+			const bool operator()(const Position& pos1, const Position& pos2) const
+			{
+				return (pos1.j == pos2.j && pos1.s1 == pos2.s1 && pos1.s2 == pos2.s2);
+			}
+		};
+
 		struct Hash
 		{
 			size_t operator()(const Position& k) const
@@ -57,7 +67,8 @@ public:
 		};
 	};
 
-	typedef std::unordered_map<int, shared_ptr<std::set<Position, Position::Compare>>> FeaturesContainer;
+    typedef std::unordered_set<Position, Position::Hash, Position::Equal> PositionSet;
+	typedef std::unordered_map<int, shared_ptr<PositionSet>> FeaturesContainer;
 
 	// export to cython.
 	XSampleType(void)

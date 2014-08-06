@@ -72,8 +72,7 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
 	}
 }
 
-double FWBW::GetModelExpectation(const std::set<XSampleType::Position, 
-		                       XSampleType::Position::Compare>& positions)
+double FWBW::GetModelExpectation(const XSampleType::PositionSet& positions)
 {
 	double res = 0.0;
 	auto position = positions.begin();

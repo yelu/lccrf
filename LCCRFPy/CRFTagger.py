@@ -33,15 +33,15 @@ class CRFTagger:
     
     def fit(self, docs):
         self.vm.fit(docs)
-        print >> sys.stderr, "tagger.fit finished."
+        print >> sys.stderr, "vm.fit finished."
         x, y = self.vm.transform(docs)
-        print >> sys.stderr, "tagger.transform finished."
+        print >> sys.stderr, "vm.transform finished."
         #self.SaveXYToFile(x, y)
         #print x.to_array()
         #print y.to_array()
         #print "tag_count : %d" % self.vm.tag_count
         self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count)
-        self.crf.fit(x, y, 1000, 0.05, 0.001)
+        self.crf.fit(x, y, 1000, 0.05, 0.0008)
         self.weights = self.crf.get_weights()
         self.readable_features = self.vm.readable_features()
         self.tags = self.vm.tagid_to_tagname
@@ -88,8 +88,8 @@ class CRFTagger:
         for i, doc in enumerate(docs):
             for j, token in enumerate(doc):
                 total += 1
-                true_tag = predicted_tages[i][j]
-                predicted_tag = token[1]
+                true_tag = token[1]
+                predicted_tag = predicted_tages[i][j]
                 if true_tag not in tags_map:
                     tags_map[true_tag] = {"tp":0,"fp":0,"fn":0,"tn":0}
                 if predicted_tag not in tags_map:

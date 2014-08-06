@@ -5,21 +5,21 @@ void SGD::MakePhiMatrix(const XSampleType& xSample,
 						   double scale, 
 						   MultiArray<double, 3>& phiMatrix)
 {
-	for(XSampleType::FeaturesContainer::const_iterator ite = xSample.Raw().begin();
-		ite != xSample.Raw().end(); ite++)
+    XSampleType::FeaturesContainer::const_iterator ite = xSample.Raw().begin();
+	for( ; ite != xSample.Raw().end(); ++ite)
 	{
-		auto positions = ite->second;
-		auto featureID = ite->first;
-		for(auto position = positions->begin(); position != positions->end(); position++)
+        const XSampleType::PositionSet& positions = *(ite->second);
+		int featureID = ite->first;
+        XSampleType::PositionSet::const_iterator position = positions.begin();
+        for( ; position != positions.end(); ++position)
 		{
-			int j = position->j;
-			int s1 = position->s1;
-			int s2 = position->s2;
-			if(0 == j && -1 == s1)
+            const XSampleType::Position& p = *position;
+			int s1 = p.s1;
+			if(0 == p.j && -1 == s1)
 			{
 				s1 = 0;
 			}
-			phiMatrix(j, s1, s2) += (scale * weights[featureID]);
+			phiMatrix(p.j, s1, p.s2) += (scale * weights[featureID]);
 		}
 	}
 }
@@ -55,7 +55,7 @@ double SGD::_CaculateGradient(const XSampleType& x,
 	{
 		// get empirical.
 		auto position = positions->second->begin();
-		for(; position != positions->second->end(); position++)
+		for(; position != positions->second->end(); ++position)
 		{
 			int j = position->j;
 			int s1 = position->s1;
@@ -143,7 +143,7 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
     std::list<std::pair<int, double>> changedWeights;
     // skip updating the i-th feature if the feature is not triggered in xSample. 
 	// Since the derivative will be zero.
-	auto featureSet = xSample.Raw();
+    const XSampleType::FeaturesContainer& featureSet = xSample.Raw();
 	// For every x sample, forward-nackward can be reused to save time.
 	MultiArray<double, 3> phiMatrix(ySample.Length(), _labelCount, _labelCount, 0.0);
 	SGD::MakePhiMatrix(xSample, _weights, _scale, phiMatrix);

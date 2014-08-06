@@ -16,8 +16,7 @@ void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
 	Position pos(j, s1, s2);
 	if(_features.count(featureID) == 0)
 	{
-		_features[featureID] = shared_ptr<std::set<Position, Position::Compare>>(
-			                   new std::set<Position, Position::Compare>());
+        _features[featureID] = shared_ptr<PositionSet>(new PositionSet());
 	}
 	_features[featureID]->insert(pos);
 }

@@ -55,8 +55,7 @@ class VectorizerManager:
             for idx, v in enumerate(doc):
                 y[-1, idx] = self.get_or_allocate_tagid(v[1])
             count += 1
-            print >> sys.stderr, "[%d] transformed." % (count, )
-            sys.stderr.flush()
+            print >> sys.stderr, "transforming... [%d/%d]\r" % (count, len(docs)),
                 
         return (x, y)
         

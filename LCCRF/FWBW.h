@@ -18,8 +18,7 @@ public:
 	FWBW(MultiArray<double, 3>& phiMatrix);
 	virtual ~FWBW(void);
 
-	double GetModelExpectation(const std::set<XSampleType::Position, 
-		                       XSampleType::Position::Compare>&);
+    double GetModelExpectation(const XSampleType::PositionSet&);
 	double GetLogNorm();
 
 	static void VectorDivide(const MultiArray<double, 1, 100>& v1, 

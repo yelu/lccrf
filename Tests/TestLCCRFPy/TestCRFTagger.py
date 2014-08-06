@@ -36,11 +36,9 @@ class TestCRFTagger(unittest.TestCase):
                         tag = 'oos'
                         continue
                     doc.append([[word], tag])
-                #print doc
                 if has_tag:
                     docs.append(doc)
         #shuffle(docs)
-        print >> sys.stderr, "%d sentences processed." % len(docs)
         return docs
     
     def setUp(self):
