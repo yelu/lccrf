@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from itertools import combinations
 
 class TransitionVectorizer():
     def __init__(self, vm):
@@ -10,8 +11,7 @@ class TransitionVectorizer():
         return self.features
         
     def __make_transition(self, s1, s2):
-        tr = s1 + " " + s2
-        return tr
+        return " ".join([s1, s2])
     
     def fit(self, doc):
         for i in range(1, len(doc)):
@@ -20,15 +20,15 @@ class TransitionVectorizer():
                 new_featureid = self.vm.allocate_featureid()
                 self.features[tr] = new_featureid
 
-    def transform(self, doc, x):
+    def transform(self, doc):
+        res = {}
         for j in range(1, len(doc)):
             for s2 in self.tags.keys():
                 for s1 in self.tags.keys():
                     tr = self.__make_transition(self.tags[s1], self.tags[s2])                   
                     if tr in self.features:
-                        x[j, s1, s2, self.features[tr]] = 1
-        
-        return x
+                        res[j, s1, s2, self.features[tr]] = 1.0
+        return res
     
     @property
     def feature_count(self):

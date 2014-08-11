@@ -33,9 +33,10 @@ class CRFTagger:
     
     def fit(self, docs):
         self.vm.fit(docs)
-        print >> sys.stderr, "vm.fit finished."
+        print >> sys.stderr, "\nvm.fit finished."
         x, y = self.vm.transform(docs)
-        print >> sys.stderr, "vm.transform finished."
+        print >> sys.stderr, "\nvm.transform finished."
+        return
         #self.SaveXYToFile(x, y)
         #print x.to_array()
         #print y.to_array()

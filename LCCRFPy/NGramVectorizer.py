@@ -11,11 +11,10 @@ class NGramVectorizer:
         return self.features
         
     def __make_gram(self, doc, end_pos, tag):
-        gram = tag + " "
+        tokens = [tag,]
         for j in range(end_pos - self.__ngram  + 1, end_pos + 1):
-            gram += doc[j][0][0]
-            gram += "\t"
-        return gram
+            tokens.append(doc[j][0][0])
+        return " ".join(tokens)
     
     def fit(self, doc):
         for i in range(self.__ngram - 1, len(doc)):
@@ -24,7 +23,8 @@ class NGramVectorizer:
                 new_featureid = self.vm.allocate_featureid()
                 self.features[gram] = new_featureid
 
-    def transform(self, doc, x):
+    def transform(self, doc):
+        res = {}
         for j in range(self.__ngram - 1, len(doc)):
             for s2 in self.tags.keys():
                 if j == 0:
@@ -34,8 +34,8 @@ class NGramVectorizer:
                 for s1 in s1_range:
                     gram = self.__make_gram(doc, j, self.tags[s2])
                     if gram in self.features:
-                        x[j, s1, s2, self.features[gram]] = 1
-        return x
+                        res[j, s1, s2, self.features[gram]] = 1.0
+        return res
     
     @property
     def feature_count(self):

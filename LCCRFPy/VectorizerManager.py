@@ -39,23 +39,25 @@ class VectorizerManager:
         
     def fit(self, docs):
         self.allocate_tagid(docs)
-        for doc in docs:
+        for i, doc in enumerate(docs):
             for v in self.__vectorizer:
                 v.fit(doc)
+            print >> sys.stderr, "fitting... [%d/%d]\r" % (i + 1, len(docs)),
                
     def transform(self, docs):
         x = X()
         y = Y()
-        count = 0
-        for doc in docs:
+        for i, doc in enumerate(docs):
             x.append(XSample(len(doc)))
             for v in self.__vectorizer:
-                v.transform(doc, x[-1])
+                res = v.transform(doc)
+                for key, value in res.items():
+                    j, s1, s2, feature = key
+                    x[-1][ j, s1, s2, feature] = value
             y.append(YSample())
             for idx, v in enumerate(doc):
                 y[-1, idx] = self.get_or_allocate_tagid(v[1])
-            count += 1
-            print >> sys.stderr, "transforming... [%d/%d]\r" % (count, len(docs)),
+            print >> sys.stderr, "transforming... [%d/%d]\r" % (i + 1, len(docs)),
                 
         return (x, y)
         

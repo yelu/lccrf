@@ -9,7 +9,8 @@ import re
 import json
 from random import shuffle
 
-class TestCRFTagger(unittest.TestCase):
+#class TestCRFTagger(unittest.TestCase):
+class TestCRFTagger:
 
     def ParseInput(self, filePath):
         docs = []
@@ -47,7 +48,7 @@ class TestCRFTagger(unittest.TestCase):
         
         tagger = CRFTagger()
         tagger.fit(train_doc)
-        
+        return
         tagger.save('./tagger.model')
         
         test_doc = self.ParseInput('./data/train.tsv')
@@ -61,7 +62,9 @@ class TestCRFTagger(unittest.TestCase):
         pass
         
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
+    test = TestCRFTagger()
+    test.setUp()
     
     
     
