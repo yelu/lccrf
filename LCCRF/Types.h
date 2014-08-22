@@ -129,7 +129,7 @@ public:
         _tags.push_back(tag);
     }
 
-    const std::vector<int>& Raw()
+    const std::vector<int>& Raw() const
     {
         return _tags;
     }
@@ -185,6 +185,8 @@ public:
     // export to cython.
     void Append(XSampleType& x);
 
+    static int GetFeatureCount(const vector<XSampleType>& xs);
+
 private:
 	vector<XSampleType> _xs;
 };
@@ -220,7 +222,9 @@ public:
     // export to cython.
     YSampleType& At(int i);
 
-    const vector<YSampleType>& Raw();
+    const vector<YSampleType>& Raw() const;
+
+    static int GetTagCount(const vector<YSampleType>& ys);
 
 private:
 	vector<YSampleType> _ys;

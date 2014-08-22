@@ -14,9 +14,11 @@ class LCCRF
 public:
 
 	LCCRF(int, int);
+    LCCRF();
 	virtual ~LCCRF(void);
 
-	void Fit(const vector<XSampleType>& xs, 
+    
+    void Fit(const vector<XSampleType>& xs, 
 		     const vector<YSampleType>& ys, 
 			 int maxIteration = 1, 
 			 double learningRate = 0.001, 
@@ -49,6 +51,6 @@ private:
 	const vector<YSampleType>* _ys;
 	vector<double> _weights;
 	int _featureCount;
-	int _labelCount;
+	int _tagCount;
 };
 

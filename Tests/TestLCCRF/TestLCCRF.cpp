@@ -26,7 +26,7 @@ protected:
 	static void SetUpTestCase() 
 	{
 		MakeDocument(xs, ys);
-		lccrf = new LCCRF(2, 2);
+		lccrf = new LCCRF();
 	}
 
 	static void TearDownTestCase() 

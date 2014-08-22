@@ -80,6 +80,19 @@ XSampleType& XType::At(int i)
     return _xs[i];
 }
 
+int XType::GetFeatureCount(const vector<XSampleType>& xs)
+{
+    std::unordered_set<int> features;
+    for(auto x = xs.begin(); x != xs.end(); x++)
+    {
+        for(auto feature = x->Raw().begin(); feature != x->Raw().end(); feature++)
+        {
+            features.insert(feature->first);
+        }
+    }
+    return features.size();
+}
+
 void YType::SetTag(int i, int j, int tag)
 {
     for(int ite = (int)_ys.size(); ite < i + 1; ite++)
@@ -111,7 +124,20 @@ YSampleType& YType::At(int i)
     return _ys[i];
 }
 
-const vector<YSampleType>& YType::Raw()
+const vector<YSampleType>& YType::Raw() const
 {
 	return _ys;
+}
+
+int YType::GetTagCount(const vector<YSampleType>& ys)
+{
+    std::unordered_set<int> tags;
+    for(auto y = ys.begin(); y != ys.end(); y++)
+    {
+        for(auto tag = y->Raw().begin(); tag != y->Raw().end(); tag++)
+        {
+            tags.insert(*tag);
+        }
+    }
+    return tags.size();
 }

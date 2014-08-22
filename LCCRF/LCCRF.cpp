@@ -6,7 +6,13 @@
 LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
 	_featureCount = featureCount;
-	_labelCount = labelCount;
+	_tagCount = labelCount;
+}
+
+LCCRF::LCCRF()
+{
+	_featureCount = -1;
+	_tagCount = -1;
 }
 
 LCCRF::~LCCRF(void)
@@ -21,7 +27,17 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
 {
 	_xs = &xs;
 	_ys = &ys;
-	SGD sgd(*_xs, *_ys, _weights, _labelCount);
+
+    // if no feature/tag count provided, iterate through training set to get it.
+    if(_featureCount <= 0 || _featureCount <= 0)
+    {
+        _featureCount = XType::GetFeatureCount(*_xs);
+        _tagCount = YType::GetTagCount(*_ys);
+        std::vector<double> tmpWeights(_featureCount, 0.0);
+        _weights.swap(tmpWeights);
+    }
+
+	SGD sgd(*_xs, *_ys, _weights, _tagCount);
 	sgd.Run(learningRate, l2, maxIteration);
 }
 
@@ -32,7 +48,7 @@ void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, dou
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
-    MultiArray<double, 3> graph(x.Length(), _labelCount, _labelCount, 0.0);
+    MultiArray<double, 3> graph(x.Length(), _tagCount, _tagCount, 0.0);
 	SGD::MakePhiMatrix(x, _weights, 1.0, graph);
     vector<int> path(x.Length(), -1);
 	Viterbi::GetPath(graph, path);
@@ -94,7 +110,7 @@ pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x,
 	pair<list<list<pair<int, double>>>, double> res;
     for(int j = 0; j < x.Length(); j++)
 	{
-		if(y.Tags()[j] >= _labelCount)
+		if(y.Tags()[j] >= _tagCount)
 		{
 			return res;
 		}
