@@ -93,6 +93,18 @@ TEST_F(LCCRFTestSuite, TestDerivative)
 	EXPECT_NEAR(-0.1192029, res, 1e-6);
 }
 
+TEST_F(LCCRFTestSuite, TestSaveLoad)
+{
+    lccrf->Save(L"./test.model");
+
+    LCCRF lccrf1;
+    lccrf1.Load(L"./test.model");
+    YSampleType y;
+    lccrf1.Predict(xs[0], y);
+    EXPECT_EQ(y.Raw()[0], 0);
+    EXPECT_EQ(y.Raw()[1], 1);
+}
+
 /*
 TEST_F(LCCRFTestSuite, TestLikelihood)
 {
