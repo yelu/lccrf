@@ -39,6 +39,9 @@ public:
 
 	vector<double>& GetWeights();
 
+    void Save(wstring path);
+    void Load(wstring path);
+
 private:
 
 	static double _Phi(int s1, int s2, int j,

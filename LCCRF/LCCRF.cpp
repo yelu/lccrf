@@ -2,6 +2,9 @@
 #include "Viterbi.h"
 #include "SGD.h"
 #include "FWBW.h"
+#include <fstream>
+using std::wofstream;
+using std::wifstream;
 
 LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
@@ -120,4 +123,27 @@ pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x,
 	}
     res.second = score;
     return res;
+}
+
+void LCCRF::Save(wstring path)
+{
+    wofstream ofs(path);
+    ofs << _featureCount << L"\t" << _tagCount << std::endl;
+    for(size_t i = 0; i < _weights.size(); i++)
+    {
+        ofs << i << "\t" << _weights[i] << std::endl;
+    }
+}
+
+void LCCRF::Load(wstring path)
+{
+    wifstream ifs(path);
+    ifs >> _featureCount >> _tagCount;
+    int featureID = 0;
+    double featureWeight = 0.0;
+    _weights.clear();
+    while(ifs >> featureID >> featureWeight)
+    {
+        _weights.push_back(featureWeight);
+    }
 }
