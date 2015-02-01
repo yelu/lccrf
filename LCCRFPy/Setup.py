@@ -2,7 +2,7 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
 
-# If want to use msvc, set this in command line. the use 'python Setup.py build --compiler=msvc'
+# If want to use msvc, set this in command line. then use 'python Setup.py build --compiler=msvc'
 # SET VS90COMNTOOLS=%VS100COMNTOOLS% (vs2010)
 # SET VS90COMNTOOLS=%VS110COMNTOOLS% (vs2012)
 # SET VS90COMNTOOLS=%VS120COMNTOOLS% (vs2013)
@@ -24,6 +24,9 @@ setup(
 )
 '''
 
+#/D_VARIADIC_MAX=10
+#extra_compile_args=["-std=c++11"],
+
 setup(
 	name = 'LCCRFPy',
 	ext_modules=cythonize(
@@ -32,7 +35,8 @@ setup(
 			"LCCRFPy", 
 			['LCCRFPy.pyx'], 
 			language="c++", 
-            extra_compile_args=["-std=c++11", "/D_VARIADIC_MAX=10"],
+            extra_compile_args=["-std=c++11"],
+
             include_dirs=['../LCCRF'],			
 			)
 	]),
