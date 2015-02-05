@@ -2,77 +2,78 @@
 
 import os,sys
 from LCCRFPy import *
-from VectorizerManager import VectorizerManager
-from NGramVectorizer import NGramVectorizer
-from TransitionVectorizer import TransitionVectorizer
+from FeaturizerManager import FeaturizerManager
+from NGramFeaturizer import NGramFeaturizer
+from AnyFeaturizer import AnyFeaturizer
 import json
 
 class CRFTagger:
 
     def __init__(self):
-        self.vm = VectorizerManager()
-        self.vm.add_vectorizer(NGramVectorizer(self.vm, 1))
-        self.vm.add_vectorizer(NGramVectorizer(self.vm, 2))
-        self.vm.add_vectorizer(TransitionVectorizer(self.vm))
+        self.fm = FeaturizerManager()
         self.crf = None
+
+    def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
+        self.fm.AddFeaturizer(name, featurizer, shift, unigram, bigram)
     
     def SaveXYToFile(self, x, y):
-        x_array = x.to_array()
-        y_array = y.to_array()
+        xArray = x.to_array()
+        yArray = y.to_array()
         with open('x', 'w') as f:
-            for idx, i in enumerate(x_array):
+            for idx, i in enumerate(xArray):
                 for j, features in i:
                     for feature in features:
                         feature_tuple = map(str, [idx,] + j + [feature,])
                         print >> f, "\t".join(feature_tuple)
         
         with open('y', 'w') as f:
-            for idx, i in enumerate(y_array):
+            for idx, i in enumerate(yArray):
                 for j, t in enumerate(i):
                     print >> f, "\t".join(map(str, [idx, j, t]))
     
-    def fit(self, docs):
-        self.vm.fit(docs)
-        print >> sys.stderr, "\nvm.fit finished."
-        x, y = self.vm.transform(docs)
-        print >> sys.stderr, "\nvm.transform finished."
-        return
+    def Fit(self, xs, ys):
+        self.fm.Fit(xs, ys)
+        print >> sys.stderr, "vm.fit finished."
+        x = self.fm.TransformX(xs)
+        y = self.fm.TransformY(ys)
+        print >> sys.stderr, "vm.Transform finished."
         #self.SaveXYToFile(x, y)
-        #print x.to_array()
-        #print y.to_array()
-        #print "tag_count : %d" % self.vm.tag_count
-        self.crf = LinearChainCRF(self.vm.feature_count, self.vm.tag_count)
-        self.crf.fit(x, y, 1000, 0.05, 0.0008)
-        self.weights = self.crf.get_weights()
-        self.readable_features = self.vm.readable_features()
-        self.tags = self.vm.tagid_to_tagname
+        #print >> sys.stderr, x.ToArray()
+        #print >> sys.stderr, y.ToArray()
+        self.crf = LCCRFPy(self.fm.FeatureCount, self.fm.TagCount)
+        self.crf.Fit(x, y, 1000, 0.05, 0.0008)
+        print >> sys.stderr, "Fit finished."
+        return
         
-        #print json.dumps(self.vm.readable_features(), sort_keys = True, indent = 4)
-        
-    def transform(self, docs):
-        x, _ = self.vm.transform(docs)        
+    def Transform(self, xs, ys):
+        x, _ = self.fm.Transform(xs)        
         y = Y()
-        y = self.crf.predict(x)
-        y_array = y.to_array()
-        for case in y_array:
+        y = self.crf.Predict(x)
+        yArray = y.toArray()
+        for case in yArray:
             for i in range(0, len(case)):
                 case[i] = self.tags[case[i]]
-        return y_array
+        return yArray
         
-    def readable_features_and_weights(self):
+    def ReadableFeaturesAndWeights(self):
         res = []
-        for key, value in self.vm.readable_features().items():
-            res.append([key, value, self.weights[key]])
+        if self.crf != None:
+            weights = self.crf.GetWeights()
+        else:
+            weights = [0.0] * self.fm.FeatureCount
+        readableFeatures = self.fm.ReadableFeatures()
+        for key, value in readableFeatures.items():
+            res.append([key, value, weights[key - 1]])
         return res
     
-    def save(self, file_path):
-        feature_weight = self.readable_features_and_weights()
-        with open(file_path, 'w') as f:
-            for feature_id, feature_name, weight in feature_weight:
-                print >> f, "%s\t%s\t%f" % (feature_id, feature_name, weight)
+    def SaveReadableFeaturesAndWeights(self, filePath):
+        featureWeight = self.ReadableFeaturesAndWeights()
+        with open(filePath, 'w') as f:
+            for featureId, featureName, weight in featureWeight:
+                print >> f, "%s\t%s\t%f" % (featureId, featureName, weight)
      
-    def debug(self, doc):
-        x, y = self.vm.transform([doc])
+    def Debug(self, x):
+        x, y = self.fm.Transform([x])
         debugInfo = self.crf.debug(x[0], y[0])
         res = {"path":{}, "score":debugInfo[1]}
         for idx, step in enumerate(debugInfo[0]):
@@ -82,7 +83,7 @@ class CRFTagger:
         return res
         
     def test(self, docs):
-        predicted_tages = self.transform(docs)
+        predicted_tages = self.Transform(docs)
         tags_map = {}
         total = 0
         right_tags = 0

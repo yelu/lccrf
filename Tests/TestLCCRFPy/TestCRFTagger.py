@@ -9,11 +9,12 @@ import re
 import json
 from random import shuffle
 
-#class TestCRFTagger(unittest.TestCase):
-class TestCRFTagger:
+class TestCRFTagger(unittest.TestCase):
+#class TestCRFTagger:
 
     def ParseInput(self, filePath):
-        docs = []
+        xs = []
+        ys = []
         with open(filePath) as f:
             for line in f:
                 fields = line.strip().split('\t')
@@ -25,7 +26,8 @@ class TestCRFTagger:
                 for token in sentence.split():
                     if token != "":
                         words.append(token)
-                doc = []
+                x = []
+                y = []
                 tag = 'oos'
                 has_tag = False
                 for word in words:
@@ -36,24 +38,37 @@ class TestCRFTagger:
                     if word.startswith('</'):
                         tag = 'oos'
                         continue
-                    doc.append([[word], tag])
+                    x.append(word)
+                    y.append(tag)
                 if has_tag:
-                    docs.append(doc)
+                    xs.append(x)
+                    ys.append(y)
         #shuffle(docs)
-        return docs
+        return xs, ys
     
     def setUp(self):
-        filePath = './data/train.tsv'
-        train_doc = self.ParseInput(filePath)
+        #testDoc = self.ParseInput('./data/train.tsv')
+        #res = tagger.test(testDoc)
+        #print json.dumps(res, sort_keys = True, indent = 4)
+        pass
+
+    def test_Fit(self):
+        filePath = './data/testset.tsv'
+        trainXs, trainYs = self.ParseInput(filePath)
+        print trainXs
+        print trainYs
         
         tagger = CRFTagger()
-        tagger.fit(train_doc)
-        return
-        tagger.save('./tagger.model')
+        tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = True)
+        tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = True)
+        tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        tagger.Fit(trainXs, trainYs)
+        print sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
+                                                                    tagger.fm.TagCount)
+        tagger.SaveReadableFeaturesAndWeights("./tagger.model")
+        #tagger.Save('./tagger.model')
+
         
-        test_doc = self.ParseInput('./data/train.tsv')
-        res = tagger.test(test_doc)
-        print json.dumps(res, sort_keys = True, indent = 4)
         
     def tearDown(self):
         pass
@@ -62,9 +77,9 @@ class TestCRFTagger:
         pass
         
 if __name__ == "__main__":
-    #unittest.main()
-    test = TestCRFTagger()
-    test.setUp()
+    unittest.main()
+    #test = TestCRFTagger()
+    #test.setUp()
     
     
     

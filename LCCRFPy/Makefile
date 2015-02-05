@@ -1,7 +1,8 @@
 #edit-mode: -*- Makefile -*-
 
 MAKE=make
-PYTHON="/cygdrive/c/Anaconda/python.exe"
+#PYTHON="/cygdrive/c/Anaconda/python.exe"
+PYTHON="python"
 CC=gcc
 CXX=g++
 CXXFLAGS=-g \
@@ -26,13 +27,12 @@ all:py_module
 
 .PHONY:py_module
 py_module:
-	export VS90COMNTOOLS=${$(VS110COMNTOOLS)// /\ }
-	$(PYTHON) Setup.py build --compiler=msvc
-	cp ./build/lib.*/LCCRFPy.pyd .
+	$(PYTHON) Setup.py build
+	cp ./build/lib.*/LCCRFPy.so .
 
 .PHONY:clean
 clean:
-	rm -f ./LCCRFPy.pyd
+	rm -f ./LCCRFPy.so
 	rm -rf ./build
 	rm -f ./*.pyc
 
@@ -49,3 +49,4 @@ distclean:
 .PHONY:love
 love:
 	@echo "make love done"
+
