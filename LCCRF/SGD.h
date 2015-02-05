@@ -7,6 +7,8 @@
 #include "Log.h"
 #include "Types.h"
 #include "FWBW.h"
+#include <cstring>
+
 using std::function;
 using std::vector;
 using std::list;
@@ -53,8 +55,8 @@ public:
 private:
 	const vector<XSampleType>& _xs;
 	const vector<YSampleType>& _ys;
-	int _labelCount;
 	vector<double>& _weights;
+	int _labelCount;
     double _scale;
     double _l2;
     double _learningRate;

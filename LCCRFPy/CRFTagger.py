@@ -63,7 +63,7 @@ class CRFTagger:
             weights = [0.0] * self.fm.FeatureCount
         readableFeatures = self.fm.ReadableFeatures()
         for key, value in readableFeatures.items():
-            res.append([key, value, weights[key - 1]])
+            res.append([key, value, weights[key]])
         return res
     
     def SaveReadableFeaturesAndWeights(self, filePath):

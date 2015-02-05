@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 template <typename T, int Dim, int N = 4096>
 class MultiArray
 {
@@ -17,7 +19,7 @@ public:
     MultiArray(int d1, T& initValue)
     {
         AllocMemory(d1);
-        for(int i = 0; i < _d1, i++)
+        for(int i = 0; i < _d1; i++)
         {
             _pData[i] = initValue;
         }
@@ -134,7 +136,7 @@ public:
     MultiArray(int d1, int d2, T& initValue)
     {
         AllocMemory(d1, d2);
-        for(int i = 0; i < _d1 * _d2, i++)
+        for(int i = 0; i < _d1 * _d2; i++)
         {
             _pData[i] = initValue;
         }

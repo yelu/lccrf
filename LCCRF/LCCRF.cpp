@@ -125,9 +125,9 @@ pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x,
     return res;
 }
 
-void LCCRF::Save(wstring path)
+void LCCRF::Save(string& path)
 {
-    wofstream ofs(path);
+    wofstream ofs(path.c_str());
     ofs << _featureCount << L"\t" << _tagCount << std::endl;
     for(size_t i = 0; i < _weights.size(); i++)
     {
@@ -135,9 +135,9 @@ void LCCRF::Save(wstring path)
     }
 }
 
-void LCCRF::Load(wstring path)
+void LCCRF::Load(string& path)
 {
-    wifstream ifs(path);
+    wifstream ifs(path.c_str());
     ifs >> _featureCount >> _tagCount;
     int featureID = 0;
     double featureWeight = 0.0;

@@ -84,9 +84,9 @@ cdef class X:
         return res
     def __setitem__(self, idx, value):
         self.thisptr.SetFeature(idx[0], idx[1], idx[2], idx[3], idx[4])
-    def append(self, XSample x):
+    def Append(self, XSample x):
         self.thisptr.Append(x.thisptr[0])
-    def to_array(self):
+    def ToArray(self):
         cdef list[list[pair[list[int], list[int]]]] res
         self.thisptr.ToArray(res)
         return res
@@ -97,7 +97,7 @@ cdef class Y:
         self.thisptr = new YType()
     def __dealloc__(self):
         del self.thisptr
-    def append(self, YSample y):
+    def Append(self, YSample y):
         self.thisptr.Append(y.thisptr[0])
     def __getitem__(self, idx):
         res = YSample(0)
@@ -105,24 +105,25 @@ cdef class Y:
         return res
     def __setitem__(self, idx, value):
         self.thisptr.SetTag(idx[0], idx[1], value)
-    def to_array(self):
+    def ToArray(self):
         cdef list[list[int]] res
         self.thisptr.ToArray(res)
         return res
         
-cdef class LinearChainCRF:
+cdef class LCCRFPy:
     cdef LCCRF* thisptr
     def __cinit__(self, int featureCount, int labelCount):
         self.thisptr = new LCCRF(featureCount, labelCount)
     def __dealloc__(self):
         del self.thisptr
-    def fit(self, X x, Y y, maxIteration = 1, learningRate = 0.001, l2 = 0.001):
+    def Fit(self, X x, Y y, maxIteration = 1, learningRate = 0.001, l2 = 0.001):
         self.thisptr.Fit(x.thisptr[0], y.thisptr[0], maxIteration, learningRate, l2)
-    def predict(self, X x):
+    def Predict(self, X x):
         y = Y()
         self.thisptr.Predict(x.thisptr[0], y.thisptr[0])
         return y
-    def get_weights(self):
+    def GetWeights(self):
         return self.thisptr.GetWeights()
-    def debug(self, XSample x, YSample y):
+    def Debug(self, XSample x, YSample y):
         return self.thisptr.Debug(x.thisptr[0], y.thisptr[0])
+

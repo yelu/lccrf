@@ -135,7 +135,6 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
     {
         Rescale();
     }
-	double oldScale = _scale;
 	_scale *= (1 - _learningRate * _l2);
 	double gain = _learningRate / _scale;
         

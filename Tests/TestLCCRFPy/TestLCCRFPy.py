@@ -30,8 +30,8 @@ class TestCaseLinearChainCRF(unittest.TestCase):
     def test_fit(self):
         self.crf.fit(self.x, self.y, 1000, 0.1, 0.1)
         weights = self.crf.get_weights()
-        self.assertAlmostEqual(weights[0], 1.6306, 4)
-        self.assertAlmostEqual(weights[1], 1.6306, 4)
+        self.assertAlmostEqual(weights[0], 1.63906, 4)
+        self.assertAlmostEqual(weights[1], 1.63906, 4)
         
 if __name__ == "__main__":
     unittest.main()

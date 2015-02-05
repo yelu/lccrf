@@ -1,6 +1,7 @@
 #include "FWBW.h"
 #include "Log.h"
 #include <cassert>
+#include <limits>
 
 FWBW::FWBW(MultiArray<double, 3>& phiMatrix):
 	_jCount(phiMatrix.Dim1()),

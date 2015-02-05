@@ -1,13 +1,16 @@
 #pragma once
 
-#include "Types.h"
 #include <list>
 #include <functional>
+#include <cmath>
+#include <string>
+#include "Types.h"
 #include "FWBW.h"
 #include "SGD.h"
 using std::list;
 using std::function;
 using std::pair;
+using std::string;
 
 class LCCRF
 {
@@ -39,8 +42,8 @@ public:
 
 	vector<double>& GetWeights();
 
-    void Save(wstring path);
-    void Load(wstring path);
+    void Save(string& path);
+    void Load(string& path);
 
 private:
 

@@ -1,4 +1,5 @@
 #include "Viterbi.h"
+#include <limits>
 
 
 Viterbi::Viterbi()

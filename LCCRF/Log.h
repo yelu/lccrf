@@ -29,7 +29,7 @@
 		fprintf(stderr, "[%s][%s][%d][%s]"##_fmt_"\n", buffer, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);\
     }while(false)
 
-#ifdef NDEBUGX
+#ifdef NDEBUG
 #undef LOG
 #undef LOG_DEBUG
 #define LOG(_fmt_, ...) do{}while(false)
