@@ -1,0 +1,14 @@
+1554026	how much <weather_condition> rain </weather_condition> is expected in <absolute_location> hilton head </absolute_location> <date_range> today </date_range>
+4292484	do i need an <suitable_for> umbrella </suitable_for> <date_range> tomorrow </date_range>
+1435215	give me the <temperature_range> average high </temperature_range> temp for <absolute_location> dallas </absolute_location>
+4213171	what is the weather like and <absolute_location> kathmandu </absolute_location>
+4208930	weather <date_range> today </date_range> in <absolute_location> forth mill south carolina </absolute_location>
+1550946	<temperature_range> high </temperature_range> average for <absolute_location> west palm beach </absolute_location>
+1549904	is it <weather_condition> breezy </weather_condition> <date_range> today </date_range>
+4307538	will it <weather_condition> rain </weather_condition>
+1571849	what will the temperature be <date_range> tomorrow </date_range>
+1566270	what is the weather in <absolute_location> stuart florida </absolute_location>
+4194213	what is the weather in <absolute_location> mission viejo california </absolute_location>
+4208795	weather in <absolute_location> issaquah washington </absolute_location>
+4208797	weather in <absolute_location> jakarta </absolute_location>
+1434130	will it be too <weather_condition> cold </weather_condition> for a <suitable_for> sundress </suitable_for> on <date_range> wednesday </date_range>
