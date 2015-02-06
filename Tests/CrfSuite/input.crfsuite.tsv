@@ -1,0 +1,102 @@
+how	oos
+much	oos
+rain	weather_condition
+is	oos
+expected	oos
+in	oos
+hilton	absolute_location
+head	absolute_location
+today	date_range
+
+do	oos
+i	oos
+need	oos
+an	oos
+umbrella	suitable_for
+tomorrow	date_range
+
+give	oos
+me	oos
+the	oos
+average	temperature_range
+high	temperature_range
+temp	oos
+for	oos
+dallas	absolute_location
+
+what	oos
+is	oos
+the	oos
+weather	oos
+like	oos
+and	oos
+kathmandu	absolute_location
+
+weather	oos
+today	date_range
+in	oos
+forth	absolute_location
+mill	absolute_location
+south	absolute_location
+carolina	absolute_location
+
+high	temperature_range
+average	oos
+for	oos
+west	absolute_location
+palm	absolute_location
+beach	absolute_location
+
+is	oos
+it	oos
+breezy	weather_condition
+today	date_range
+
+will	oos
+it	oos
+rain	weather_condition
+
+what	oos
+will	oos
+the	oos
+temperature	oos
+be	oos
+tomorrow	date_range
+
+what	oos
+is	oos
+the	oos
+weather	oos
+in	oos
+stuart	absolute_location
+florida	absolute_location
+
+what	oos
+is	oos
+the	oos
+weather	oos
+in	oos
+mission	absolute_location
+viejo	absolute_location
+california	absolute_location
+
+weather	oos
+in	oos
+issaquah	absolute_location
+washington	absolute_location
+
+weather	oos
+in	oos
+jakarta	absolute_location
+
+will	oos
+it	oos
+be	oos
+too	oos
+cold	weather_condition
+for	oos
+a	oos
+sundress	suitable_for
+on	oos
+wednesday	date_range
+

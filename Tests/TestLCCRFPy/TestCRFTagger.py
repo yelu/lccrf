@@ -59,13 +59,14 @@ class TestCRFTagger(unittest.TestCase):
         print trainYs
         
         tagger = CRFTagger()
-        tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = True)
-        tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = True)
-        tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
+        tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
+        #tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
         tagger.Fit(trainXs, trainYs)
         print sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                     tagger.fm.TagCount)
         tagger.SaveReadableFeaturesAndWeights("./tagger.model")
+        self.assertEqual(tagger.fm.FeatureCount, 119)
         #tagger.Save('./tagger.model')
 
         
