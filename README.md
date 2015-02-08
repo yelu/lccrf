@@ -1,10 +1,43 @@
 LCCRF
 =====
 
-A C++ implementation of Linear Chain Conditional Random Field. 
+A Linear Chain Conditional Random Field Library implemented in C++. Python interface provided.
 
-This implementation aims to:
+This implementation features:
 
+* Be easy to use. It is an API library, thus can be embeded into your own code more easily and gracefully compared to calling a standalone binary.
+* Rich features. NGram, Transition, Regex(in progress), Bag-of-Words(in progress), Contextual-Free-Grammar(cfg, in progress) features are build-in.
+* Extensible featurizer. It allows you to add any features you need freely by implementing self-defined featurizers. For example you may want a featurizer checking if two consecutive tags are the same. It is difficult to add such kind of features by using CRF++, crfpp or crfsuite.
 * Be easy to understand. It follows the theoretical derivation and uses the same mathematical symbols in [Log-Linear Models, MEMMs, and CRFs](http://www.cs.columbia.edu/~mcollins/crf.pdf) and [The Forward-Backward Algorithm](http://www.cs.columbia.edu/~mcollins/fb.pdf) by [Michael Collins](http://www.cs.columbia.edu/~mcollins/).
-* Leave features flexible. LCCRF accepts a batch of hypothesises to extract features. So you can provide any kind of feature you want and apply it easily by expressing it in a function with signature : double Hypothesis(x, y(j-1), y(j), j).
-* Be pure. The core algorithm(LCCRF) itself is strictly seperated from other distracting purposes of application, e.g. chunking, entity tagging and etc.
+
+## Get Started
+
+```python
+import os,sys
+from CRFTagger import *
+
+# training samples.
+trainXs = ["what is the weather in shang hai".split(),
+           "what is the weather in hong kong".split()]
+trainYs = [["O", "O", "O", "O", "O", "City", "City"],
+           ["O", "O", "O", "O", "O", "City", "City"],
+          ]
+
+# 1. instantiate a CRFTagger and add three featurizers.
+tagger = CRFTagger()
+# add a ngram featurizer : current word together with current tag.
+tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
+# add a ngram featurizer : current bi-word together with current tag.
+tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
+# add an any featurizer : trigger a feature at any position of x, thus a transition featurizer purely on y.
+tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+# 2. train a crf model.
+tagger.Fit(trainXs, trainYs)
+print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, tagger.fm.TagCount)
+
+xs = ["what is the weather in beijing".split()]
+3. inference on new data.
+ys = tagger.Transform(xs)
+print ys
+```
+
