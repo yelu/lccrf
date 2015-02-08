@@ -2,6 +2,7 @@
 
 import sys
 import json
+from log import *
 from LCCRFPy import X,Y,XSample,YSample
 
 class FeaturizerManager:
@@ -11,6 +12,7 @@ class FeaturizerManager:
         self._nextFeatureId = 0
         self._nextTagId = 0
         self._tags = {}
+        self._idToTag = {}
     
     def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
         self._featurizers[name] = {"unigram" : unigram, "bigram" : bigram, "shift" : shift, "instance":featurizer}
@@ -53,6 +55,8 @@ class FeaturizerManager:
                         if featureOfY not in self._features[featureOfX]:
                             self._features[featureOfX][featureOfY] = self._nextFeatureId
                             self._nextFeatureId += 1
+        # swap key and value in self._tags to reconstruct self._idToTag.
+        self._idToTag = {value:key for key, value in self._tags.items()}
 
     def TransformY(self, ys):
         yInner = Y()
@@ -60,8 +64,7 @@ class FeaturizerManager:
             yInner.Append(YSample())
             for idx, tag in enumerate(y):
                 yInner[-1, idx] = self._tags[tag]
-            print >> sys.stderr, "\rtransforming y ... [%d/%d] " % (i + 1, len(ys)),
-        print >> sys.stderr, "done."
+            log.debug("transforming y ... [%d/%d] " % (i + 1, len(ys)))
         return yInner
         
     def TransformX(self, xs):
@@ -97,8 +100,7 @@ class FeaturizerManager:
                             prevTag, currTag = featureOfY[1]
                             xInner[-1][end, self._tags[prevTag], self._tags[currTag], featureId] = 1.0
 
-            print >> sys.stderr, "\rtransforming x ... [%d/%d] " % (i + 1, len(xs)),
-        print >> sys.stderr, "done."
+            log.debug("transforming x ... [%d/%d] " % (i + 1, len(xs)))
         return xInner
         
     @property
