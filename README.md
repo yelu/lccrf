@@ -37,7 +37,7 @@ tagger.Fit(trainXs, trainYs)
 print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                tagger.fm.TagCount)
 
-xs = ["what is the weather in beijing".split()]
+xs = ["what is the weather in bei jing".split()]
 # 3. inference on new data.
 ys = tagger.Transform(xs)
 print ys
