@@ -1,7 +1,7 @@
 LCCRF
 =====
 
-A Linear Chain Conditional Random Field Library implemented in C++. Python interface provided.
+A practical Linear Chain Conditional Random Field(LC CRF) Library implemented in C++. Python interface provided.
 
 This implementation features:
 
