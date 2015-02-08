@@ -25,9 +25,9 @@ trainYs = [["O", "O", "O", "O", "O", "City", "City"],
 
 # 1. instantiate a CRFTagger and add three featurizers.
 tagger = CRFTagger()
-# add a ngram featurizer : current word together with current tag.
+# add unigram(on x) featurizer : current word together with current tag.
 tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
-# add a ngram featurizer : current bi-word together with current tag.
+# add bigram(on x) featurizer : current bi-word together with current tag.
 tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
 # add an any featurizer : trigger a feature at any position of x, 
 # thus a transition featurizer purely on y.
@@ -38,7 +38,7 @@ print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.Feature
                                                                tagger.fm.TagCount)
 
 xs = ["what is the weather in beijing".split()]
-3. inference on new data.
+# 3. inference on new data.
 ys = tagger.Transform(xs)
 print ys
 ```
