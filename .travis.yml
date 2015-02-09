@@ -4,8 +4,8 @@ python:
 # command to install dependencies
 install:
   - "pip install cython"
-  - "python ./LCCRFPy/Setup.py build"
-  - "python ./LCCRFPy/Setup.py install"
+  - "cd ./LCCRFPy/ && python Setup.py build && cd .."
+  - "cd ./LCCRFPy/ && python Setup.py install && cd .."
 # command to run tests
 script:
   - "cd ./Tests/TestLCCRFPy/ && make clean && make test"
