@@ -14,6 +14,26 @@ This implementation features:
 
 ## Get Started
 
+### Installition
+
+Prerequisites:
+
+```bash
+# 1. gcc 4.8 or higher (with full C++11 support)
+# 2. cython
+sudo apt-get install cython
+```
+
+Install LCCRFPy:
+
+```bash
+cd ./LCCRFPy/
+python Setup.py build
+sudo python Setup.py install
+```
+
+Hello world:
+
 ```python
 import os,sys
 from CRFTagger import *
