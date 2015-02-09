@@ -9,12 +9,12 @@ before_install:
 
 # command to install dependencies
 install:
-  - sudo apt-get install -qq gcc-4.8 g++-4.8
   # We want to compile with g++ 4.8 when rather than the default g++
+  - sudo apt-get install -qq gcc-4.8 g++-4.8
   - export CXX="g++-4.8" CC="gcc-4.8"
-  - gcc --version
-  - apt-get install cython
+  - pip install cython
 
 # command to run tests
 script:
   - cd ./Tests/TestLCCRFPy/ && make clean && make test
+
