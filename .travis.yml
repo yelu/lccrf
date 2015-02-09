@@ -3,10 +3,9 @@ python:
   - "2.7"
 # command to install dependencies
 install:
-  - "sudo apt-get install python-dev build-essential"
-  - "sudo pip install cython"
+  - "pip install cython"
   - "python ./LCCRFPy/Setup.py build"
-  - "sudo python ./LCCRFPy/Setup.py install"
+  - "python ./LCCRFPy/Setup.py install"
 # command to run tests
 script:
   - "cd ./Tests/TestLCCRFPy/ && make clean && make test"
