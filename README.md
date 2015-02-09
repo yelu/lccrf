@@ -7,9 +7,9 @@ A practical Linear Chain Conditional Random Field(LC CRF) Library implemented in
 
 This implementation features:
 
-* Be easy to use. It is an API library, thus can be embeded into your own code more easily and gracefully compared to calling a standalone binary.
-* Rich features. NGram, Transition, Regex(in progress), Bag-of-Words(in progress), Contextual-Free-Grammar(cfg, in progress) features are built-in.
-* Extensible featurizer. It allows you to add any features you need freely by implementing self-defined featurizers, e.g. a featurizer checking if two consecutive tags are the same. It is difficult to add such kind of features by using CRF++, crfpp or crfsuite.
+* Rich features. NGram, Transition, Regex(in progress), Dictionary(in progress), Contextual-Free-Grammar(cfg, in progress) features are built-in.
+* Extensible featurizers. By implementing self-defined featurizers, you can add any feature you need freely, e.g. a feature checking if two consecutive tags are the same.
+* API library. It can be embedded into your own code more easily and gracefully compared to calling a standalone binary.
 * Be easy to understand. It follows the theoretical derivation and uses the same mathematical symbols in [Log-Linear Models, MEMMs, and CRFs](http://www.cs.columbia.edu/~mcollins/crf.pdf) and [The Forward-Backward Algorithm](http://www.cs.columbia.edu/~mcollins/fb.pdf) by [Michael Collins](http://www.cs.columbia.edu/~mcollins/).
 
 ## Get Started
@@ -32,7 +32,7 @@ python Setup.py build
 sudo python Setup.py install
 ```
 
-Hello world:
+### Hello World
 
 ```python
 import os,sys
