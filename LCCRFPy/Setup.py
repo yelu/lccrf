@@ -10,7 +10,7 @@ setup(
 			"LCCRFPy", 
 			['LCCRFPy.pyx'], 
 			language="c++", 
-            extra_compile_args=["-std=c++11"],
+            extra_compile_args=["-std=gnu++11"],
             include_dirs=['../LCCRF'],			
 			)
 	]),
