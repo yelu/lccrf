@@ -4,7 +4,7 @@ python:
 # command to install dependencies
 install:
   - "sudo apt-get install python-dev build-essential"
-  - "sudo apt-get install cython"
+  - "sudo pip install cython"
   - "python ./LCCRFPy/Setup.py build"
   - "sudo python ./LCCRFPy/Setup.py install"
 # command to run tests
