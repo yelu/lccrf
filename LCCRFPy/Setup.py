@@ -4,13 +4,14 @@ from Cython.Build import cythonize
 
 setup(
 	name = 'LCCRFPy',
+    py_modules=['log', 'AnyFeaturizer', 'CRFTagger', 'FeaturizerManager', 'NGramFeaturizer'],
 	ext_modules=cythonize(
 	[
 		Extension(
 			"LCCRFPy", 
 			['LCCRFPy.pyx'], 
 			language="c++", 
-            extra_compile_args=["-std=gnu++11"],
+            extra_compile_args=["-std=c++11"],
             include_dirs=['../LCCRF'],			
 			)
 	]),

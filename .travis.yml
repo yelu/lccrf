@@ -13,7 +13,7 @@ install:
   # We want to compile with g++ 4.8 when rather than the default g++
   - export CXX="g++-4.8" CC="gcc-4.8"
   - gcc --version
-  - pip install cython
+  - apt-get install cython
   - cd ./LCCRFPy/ && python Setup.py build && cd ..
   - cd ./LCCRFPy/ && python Setup.py install && cd ..
 
