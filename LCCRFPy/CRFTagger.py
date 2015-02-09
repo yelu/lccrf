@@ -32,7 +32,8 @@ class CRFTagger:
                 for j, t in enumerate(i):
                     print >> f, "\t".join(map(str, [idx, j, t]))
     
-    def Fit(self, xs, ys):
+    def Fit(self, xs, ys, \
+            maxIteration = 1, learningRate = 0.001, variance = 0.001):
         self.fm.Fit(xs, ys)
         log.debug("fm.fit finished.")
         x = self.fm.TransformX(xs)
@@ -42,7 +43,7 @@ class CRFTagger:
         #print >> sys.stderr, x.ToArray()
         #print >> sys.stderr, y.ToArray()
         self.crf = LCCRFPy(self.fm.FeatureCount, self.fm.TagCount)
-        self.crf.Fit(x, y, 1000, 0.05, 0.0008)
+        self.crf.Fit(x, y, maxIteration, learningRate, variance)
         log.debug("Fit finished.")
         return
         

@@ -27,7 +27,10 @@ class TestCRFTagger(unittest.TestCase):
         tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
         tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
         #tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
-        tagger.Fit(trainXs, trainYs)
+        tagger.Fit(trainXs, trainYs, \
+                   maxIteration = 1000,\
+                   learningRate = 0.05, \
+                   variance = 0.0008)
         print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                     tagger.fm.TagCount)
         tagger.SaveReadableFeaturesAndWeights("./tagger.model")
@@ -42,7 +45,10 @@ class TestCRFTagger(unittest.TestCase):
         tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
         tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
         tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
-        tagger.Fit(trainXs, trainYs)
+        tagger.Fit(trainXs, trainYs, \
+                   maxIteration = 1000,\
+                   learningRate = 0.05, \
+                   variance = 0.0008)
         print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                     tagger.fm.TagCount)
         xs = ["what is the weather in shang hai".split(),

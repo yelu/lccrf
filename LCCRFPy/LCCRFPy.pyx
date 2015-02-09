@@ -116,8 +116,8 @@ cdef class LCCRFPy:
         self.thisptr = new LCCRF(featureCount, labelCount)
     def __dealloc__(self):
         del self.thisptr
-    def Fit(self, X x, Y y, maxIteration = 1, learningRate = 0.001, l2 = 0.001):
-        self.thisptr.Fit(x.thisptr[0], y.thisptr[0], maxIteration, learningRate, l2)
+    def Fit(self, X x, Y y, maxIteration = 1, learningRate = 0.001, variance = 0.001):
+        self.thisptr.Fit(x.thisptr[0], y.thisptr[0], maxIteration, learningRate, variance)
     def Predict(self, X x):
         y = Y()
         self.thisptr.Predict(x.thisptr[0], y.thisptr[0])

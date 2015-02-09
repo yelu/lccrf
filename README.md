@@ -26,16 +26,23 @@ trainYs = [["O", "O", "O", "O", "O", "City", "City"],
 # 1. instantiate a CRFTagger and add three featurizers.
 tagger = CRFTagger()
 # add unigram(on x) featurizer : current word together with current tag.
-tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
+tagger.AddFeaturizer("ngram1", NGramFeaturizer(1),\
+                     shift = 0, unigram = True, bigram = False)
 # add bigram(on x) featurizer : current bi-word together with current tag.
-tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
-# add an any featurizer : trigger a feature at any position of x, 
-# thus a transition featurizer purely on y.
-tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), 
+                     shift = 0, unigram = True, bigram = False)
+# add any featurizer : trigger a feature at any position of x, 
+# the final feature depends purely on transitions of y.
+tagger.AddFeaturizer("any", AnyFeaturizer(), 
+                      shift = 0, unigram = False, bigram = True)
 # 2. train a crf model.
 tagger.Fit(trainXs, trainYs)
-print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
-                                                               tagger.fm.TagCount)
+tagger.Fit(trainXs, trainYs, \
+           maxIteration = 1000,\
+           learningRate = 0.05, \
+           variance = 0.0008)
+print "Features : %d    Tags : %d" % (tagger.fm.FeatureCount, \
+                                      tagger.fm.TagCount)
 
 # 3. inference on new data.
 xs = ["what is the weather in bei jing".split()]
