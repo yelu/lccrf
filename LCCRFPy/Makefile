@@ -1,7 +1,6 @@
 #edit-mode: -*- Makefile -*-
 
 MAKE=make
-#PYTHON="/cygdrive/c/Anaconda/python.exe"
 PYTHON="python"
 CC=gcc
 CXX=g++

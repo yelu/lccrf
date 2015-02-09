@@ -36,7 +36,6 @@ tagger.AddFeaturizer("ngram2", NGramFeaturizer(2),
 tagger.AddFeaturizer("any", AnyFeaturizer(), 
                       shift = 0, unigram = False, bigram = True)
 # 2. train a crf model.
-tagger.Fit(trainXs, trainYs)
 tagger.Fit(trainXs, trainYs, \
            maxIteration = 1000,\
            learningRate = 0.05, \

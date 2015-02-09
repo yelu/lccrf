@@ -1,7 +1,7 @@
 #edit-mode: -*- Makefile -*-
 
 MAKE=make
-PYTHON="/cygdrive/c/Anaconda/python.exe"
+PYTHON="python"
 CC=gcc
 CXX=g++
 CXXFLAGS=-g \
@@ -21,21 +21,16 @@ INCPATH=
 DEP_INCPATH=
 
 
-.PHONY:all
-all:
-	$(MAKE) -C ../../LCCRFPy
-
 .PHONY:test
 test:
 	$(PYTHON) TestLCCRFPy.py >/dev/null
-	$(PYTHON) TestNGramVectorizer.py >/dev/null
-	$(PYTHON) TestVectorizerManager.py >/dev/null
+	$(PYTHON) TestNGramFeaturizer.py >/dev/null
+	$(PYTHON) TestFeaturizerManager.py >/dev/null
 	$(PYTHON) TestCRFTagger.py >/dev/null
 
 .PHONY:clean
 clean:
 	rm -f ./*.pyc
-	$(MAKE) -C ../../LCCRFPy clean
 
 .PHONY:dist
 dist:

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import os,sys
-lib_path = os.path.abspath('../../LCCRFPy')
-sys.path.append(lib_path)
+#lib_path = os.path.abspath('../../LCCRFPy')
+#sys.path.append(lib_path)
 from FeaturizerManager import FeaturizerManager
 from NGramFeaturizer import NGramFeaturizer
 from AnyFeaturizer import AnyFeaturizer
