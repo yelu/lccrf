@@ -3,9 +3,10 @@ python:
   - "2.7"
 # command to install dependencies
 install:
-  - "pip install cython"
-  - "cd ./LCCRFPy/ && python Setup.py build && cd .."
-  - "cd ./LCCRFPy/ && python Setup.py install && cd .."
+  - "which gcc"
+#  - "pip install cython"
+#  - "cd ./LCCRFPy/ && python Setup.py build && cd .."
+#  - "cd ./LCCRFPy/ && python Setup.py install && cd .."
 # command to run tests
-script:
-  - "cd ./Tests/TestLCCRFPy/ && make clean && make test"
+#script:
+#  - "cd ./Tests/TestLCCRFPy/ && make clean && make test"
