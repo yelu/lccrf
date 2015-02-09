@@ -14,7 +14,7 @@ This implementation features:
 
 ## Get Started
 
-### Installition
+### Installation
 
 Prerequisites:
 
