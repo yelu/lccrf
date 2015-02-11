@@ -17,7 +17,6 @@ class TestCaseNGramFeaturizer(unittest.TestCase):
         f1 = NGramFeaturizer(2)
         docs = ['a', 'b', 'c']
         print f1.Fit(docs)
-        print f1.readable()
         features = list(f1.GetFeatures())
         features = f1.GetFeatures()
         self.assertEqual(features, set([('a', 'b'), ('b', 'c')]))
@@ -25,16 +24,28 @@ class TestCaseNGramFeaturizer(unittest.TestCase):
         f2 = NGramFeaturizer(3)
         docs = ['a', 'b', 'c']
         print f2.Fit(docs)
-        print f2.readable()
         features = f2.GetFeatures()
         self.assertEqual(features, set([('a', 'b', 'c')]))
         
         f3 = NGramFeaturizer(1)
         docs = ['a', 'b', 'c']
         print f3.Fit(docs)
-        print f3.readable()
         features = f3.GetFeatures()
         self.assertEqual(features, set([('a', ), ('b', ), ('c', )]))
+    
+    def test_Serialize(self):
+        f1 = NGramFeaturizer(2)
+        docs = ['a', 'b', 'c']
+        f1.Fit(docs)
+        print f1.Readable()
+        NGramFeaturizer.Serialize(f1, './ngram.bin')
+
+        f2 = NGramFeaturizer.Deserialize('./ngram.bin')
+        print f2.Readable()
+
+        self.assertEqual(f1._n, f2._n)
+        self.assertEqual(f1._features, f2._features)
+
         
 if __name__ == "__main__":
     unittest.main()

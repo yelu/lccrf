@@ -16,3 +16,17 @@ class AnyFeaturizer:
             res.append((i, i, ('')))
         return res
 
+    @staticmethod
+    def Serialize(obj, filePath):
+        with open(filePath, 'w') as f:
+            pickle.dump(obj, f)
+            #pickle.dump(self._n)
+            #pickle.dump(self._features)
+
+    @staticmethod
+    def Deserialize(filePath):
+        with open(filePath, 'r') as f:
+            obj = pickle.load(f)
+            return obj
+
+

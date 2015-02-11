@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+import pickle
 
-class NGramFeaturizer:
+class NGramFeaturizer(object):
     def __init__(self, ngram = 2):
         self._n = ngram
         self._features = set([])
@@ -22,11 +23,20 @@ class NGramFeaturizer:
                 res.append((i + 1 - self._n, i, gram))
         return res
 
-    @property
-    def size(self):
-        return len(self._features)
-        
-    def readable(self):
+    @staticmethod
+    def Serialize(obj, filePath):
+        with open(filePath, 'w') as f:
+            pickle.dump(obj, f)
+            #pickle.dump(self._n)
+            #pickle.dump(self._features)
+
+    @staticmethod
+    def Deserialize(filePath):
+        with open(filePath, 'r') as f:
+            obj = pickle.load(f)
+            return obj
+
+    def Readable(self):
         readable_features = set([])
         for f in self._features:
             readable_features.add("ngram%d %s"%(self._n, f))
