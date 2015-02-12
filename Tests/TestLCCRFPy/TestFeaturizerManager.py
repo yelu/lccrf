@@ -19,23 +19,21 @@ class TestCaseFeaturizerManager(unittest.TestCase):
         xs = [['a', 'b', 'c']]
         ys = [['tag1', 'tag2', 'tag3']]
     
-        vm = FeaturizerManager()
-        vm.AddFeaturizer("ngram2", NGramFeaturizer(2))
+        fm = FeaturizerManager()
+        fm.AddFeaturizer("ngram2", NGramFeaturizer(2))
         
-        vm.Fit(xs, ys)
-        #print vm._features
+        fm.Fit(xs, ys)
 
     def test_Transform(self): 
         xs = [['a', 'a', 'b', 'c']]
         ys = [['tag1', 'tag1', 'tag2', 'tag3']]
     
-        vm = FeaturizerManager()
-        vm.AddFeaturizer("ngram2", NGramFeaturizer(2), -1)
+        fm = FeaturizerManager()
+        fm.AddFeaturizer("ngram2", NGramFeaturizer(2), -1)
         
-        vm.Fit(xs, ys)
-        #print vm._features
-        x = vm.TransformX(xs)
-        y = vm.TransformY(ys)
+        fm.Fit(xs, ys)
+        x = fm.TransformX(xs)
+        y = fm.TransformY(ys)
         xPy = x.ToArray()
         yPy = y.ToArray()
         self.assertEqual(xPy[0][0], ([2, 0, 1], [1, 0]))
@@ -50,22 +48,48 @@ class TestCaseFeaturizerManager(unittest.TestCase):
         xs = [['a', 'b', 'c']]
         ys = [['tag1', 'tag2', 'tag3']]
     
-        vm = FeaturizerManager()
-        vm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        fm = FeaturizerManager()
+        fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
         
-        vm.Fit(xs, ys)
-        x = vm.TransformX(xs)
-        y = vm.TransformY(ys)
+        fm.Fit(xs, ys)
+        x = fm.TransformX(xs)
+        y = fm.TransformY(ys)
         xPy = x.ToArray()
         yPy = y.ToArray()
-        print xPy
-        print yPy
+        #print xPy
+        #print yPy
         self.assertEqual(xPy[0][0], ([1, 0, 1], [0]))
         self.assertEqual(xPy[0][1], ([1, 1, 2], [1]))
         self.assertEqual(xPy[0][2], ([2, 0, 1], [0]))
         self.assertEqual(xPy[0][3], ([2, 1, 2], [1]))
         self.assertEqual(yPy[0], [0, 1, 2])
 
+
+    def test_Serialize(self):
+        xs = [['a', 'a', 'b', 'c']]
+        ys = [['tag1', 'tag1', 'tag2', 'tag3']]
+    
+        fm = FeaturizerManager()
+        fm.AddFeaturizer("ngram2", NGramFeaturizer(2), -1)
+        #fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        #fm.AddFeaturizer("ngram1", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
+        
+        fm.Fit(xs, ys)
+
+        FeaturizerManager.Serialize(fm, "./model/")
+        
+        fm1 = FeaturizerManager.Deserialize("./model")
+        x = fm1.TransformX(xs)
+        y = fm1.TransformY(ys)
+        xPy = x.ToArray()
+        yPy = y.ToArray()
+        self.assertEqual(xPy[0][0], ([2, 0, 1], [1, 0]))
+        self.assertEqual(xPy[0][1], ([2, 1, 1], [0]))
+        self.assertEqual(xPy[0][2], ([2, 2, 1], [0]))
+        self.assertEqual(xPy[0][3], ([3, 0, 2], [3]))
+        self.assertEqual(xPy[0][4], ([3, 1, 2], [3, 2]))
+        self.assertEqual(xPy[0][5], ([3, 2, 2], [3]))
+        self.assertEqual(yPy[0], [0, 0, 1, 2])
 
 
         

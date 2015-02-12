@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import pickle
 
 class NGramFeaturizer(object):
@@ -24,14 +25,14 @@ class NGramFeaturizer(object):
         return res
 
     @staticmethod
-    def Serialize(obj, filePath):
+    def Serialize(obj, fileDir):
+        filePath = os.path.join(fileDir, "ngram.bin")
         with open(filePath, 'w') as f:
             pickle.dump(obj, f)
-            #pickle.dump(self._n)
-            #pickle.dump(self._features)
 
     @staticmethod
-    def Deserialize(filePath):
+    def Deserialize(fileDir):
+        filePath = os.path.join(fileDir, "ngram.bin")
         with open(filePath, 'r') as f:
             obj = pickle.load(f)
             return obj

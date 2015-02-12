@@ -23,7 +23,7 @@ DEP_INCPATH=
 
 .PHONY:test
 test:
-	cd ../../LCCRFPy/ && python Setup.py build && sudo python Setup.py install
+	cd ../../LCCRFPy/ && python Setup.py build && python Setup.py install
 	$(PYTHON) TestLCCRFPy.py
 	$(PYTHON) TestNGramFeaturizer.py
 	$(PYTHON) TestFeaturizerManager.py

@@ -38,9 +38,13 @@ class TestCaseNGramFeaturizer(unittest.TestCase):
         docs = ['a', 'b', 'c']
         f1.Fit(docs)
         print f1.Readable()
-        NGramFeaturizer.Serialize(f1, './ngram.bin')
 
-        f2 = NGramFeaturizer.Deserialize('./ngram.bin')
+        fileDir = "./model/ngram"
+        if not os.path.exists(fileDir):
+            os.makedirs(fileDir)
+        NGramFeaturizer.Serialize(f1, fileDir)
+
+        f2 = NGramFeaturizer.Deserialize(fileDir)
         print f2.Readable()
 
         self.assertEqual(f1._n, f2._n)

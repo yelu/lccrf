@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import json
+import pickle
 from log import *
 from LCCRFPy import X,Y,XSample,YSample
 
-class FeaturizerManager:
+class FeaturizerManager(object):
     def __init__(self):
         self._featurizers = {}
         self._features = {}
@@ -15,7 +17,8 @@ class FeaturizerManager:
         self._idToTag = {}
     
     def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
-        self._featurizers[name] = {"unigram" : unigram, "bigram" : bigram, "shift" : shift, "instance":featurizer}
+        self._featurizers[name] = {"unigram" : unigram, "bigram" : bigram, "shift" : shift, \
+                                   "instance":featurizer, "type" : type(featurizer)}
     
     def Fit(self, xs, ys):
         xys = zip(xs, ys)
@@ -117,4 +120,51 @@ class FeaturizerManager:
             for featureOfY, id in featuresOfY.items():
                 allFeatures[id] = (featureOfX, featureOfY)
         return allFeatures
+
+    @staticmethod
+    def Serialize(obj, directory):
+        # serialize featurizers.
+        for name, featurizer in obj._featurizers.items():
+            instance = featurizer["instance"]
+            # if featurizer don't have a serialize method.
+            # use pickle to serialize it. file name is name of
+            # the featurizer.
+            fileDir = os.path.join(directory, name)
+            if not os.path.exists(fileDir):
+                os.makedirs(fileDir)
+            if "Serialize" not in dir(instance):
+                filePath = os.path.join(fileDir, name + ".bin")
+                with open(filePath, 'w') as f:
+                    pickle.dump(instance, f)
+            else:
+                getattr(instance, "Serialize")(instance, fileDir)
+        
+        # remove featurizer instance and pickle the fm. then recover it.
+        featurizersBackup = {}
+        for name, featurizer in obj._featurizers.items():
+            featurizersBackup[name] = featurizer["instance"]
+            featurizer["instance"] = None
+
+        with open(os.path.join(directory, "fm.bin"), 'w') as f:
+            pickle.dump(obj, f)
+
+        for name, featurizer in obj._featurizers.items():
+            featurizer["instance"] = featurizersBackup[name]
+   
+    @staticmethod
+    def Deserialize(directory):
+        fm = FeaturizerManager()
+        with open(os.path.join(directory, "fm.bin"), 'r') as f:
+            fm = pickle.load(f)
+
+        # deserialize featurizers.
+        for name, featurizer in fm._featurizers.items():
+            fileDir = os.path.join(directory, name)
+            if "Deserialize" in dir(featurizer["type"]):
+                featurizer["instance"] = getattr(featurizer["type"], "Deserialize")(fileDir)
+            else:
+                with open(os.path.join(fileDir, name + ".bin")) as f:
+                    featurizer["instance"] = pickle.load(f)
+
+        return fm
 
