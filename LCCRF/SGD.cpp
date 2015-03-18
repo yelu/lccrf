@@ -68,8 +68,8 @@ double SGD::_CaculateGradient(const XSampleType& x,
 				(0 != j && y.Tags()[j-1] == s1 && y.Tags()[j] == s2))
 			{
 				// assume feature value is 1.0 to avoid hash lookup.
-				// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
-				// for the following res2, it is the same.
+				// actually it should be empirical += x.GetFeatureValue(j, s1, s2, k);
+				// for the expected value, it is the same.
 				empirical += 1.0;
 			}
 		}
@@ -143,10 +143,10 @@ double SGD::UpdateWeights(const XSampleType& xSample, const YSampleType& ySample
     // skip updating the i-th feature if the feature is not triggered in xSample. 
 	// Since the derivative will be zero.
     const XSampleType::FeaturesContainer& featureSet = xSample.Raw();
-	// For every x sample, forward-nackward can be reused to save time.
+	// For every x sample, forward-backward can be reused to save time.
 	MultiArray<double, 3> phiMatrix(ySample.Length(), _labelCount, _labelCount, 0.0);
 	SGD::MakePhiMatrix(xSample, _weights, _scale, phiMatrix);
-	FWBW fwbw(phiMatrix);
+	FWBW fwbw(xSample, _weights, 0);
 
     for(auto f = featureSet.begin(); f != featureSet.end(); f++)
     {

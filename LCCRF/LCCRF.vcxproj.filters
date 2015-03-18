@@ -33,7 +33,7 @@
     <ClCompile Include="MurmurHash3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SGD.cpp">
+    <ClCompile Include="SGDL1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,9 +42,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LCCRF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SGD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Viterbi.h">
@@ -60,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MultiArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SGDL1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

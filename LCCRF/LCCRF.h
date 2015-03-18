@@ -20,7 +20,6 @@ public:
     LCCRF();
 	virtual ~LCCRF(void);
 
-    
     void Fit(const vector<XSampleType>& xs, 
 		     const vector<YSampleType>& ys, 
 			 int maxIteration = 1, 
@@ -48,9 +47,9 @@ public:
 private:
 
 	static double _Phi(int s1, int s2, int j,
-		const XSampleType& doc, 
-		vector<double>& weights,
-        list<pair<int, double>>* hitFeatures);
+					   const XSampleType& doc, 
+					   vector<double>& weights,
+					   list<pair<int, double>>* hitFeatures);
 
 private:
 	const vector<XSampleType>* _xs;

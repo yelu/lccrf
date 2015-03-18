@@ -133,7 +133,7 @@ public:
         AllocMemory(d1, d2);
     }
 
-    MultiArray(int d1, int d2, T& initValue)
+    MultiArray(int d1, int d2, T initValue)
     {
         AllocMemory(d1, d2);
         for(int i = 0; i < _d1 * _d2; i++)
@@ -210,6 +210,14 @@ public:
     {
         return _d2;
     }
+
+	void ExpInPlace()
+	{
+		for (int i = 0; i < _d1 * _d2; i++)
+		{
+			_pData[i] = std::exp(_pData[i]);
+		}
+	}
 
 private:
      bool _ownership;

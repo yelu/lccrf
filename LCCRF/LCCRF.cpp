@@ -1,6 +1,6 @@
 #include "LCCRF.h"
 #include "Viterbi.h"
-#include "SGD.h"
+#include "SGDL1.h"
 #include "FWBW.h"
 #include <fstream>
 using std::wofstream;
@@ -40,7 +40,7 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
         _weights.swap(tmpWeights);
     }
 
-	SGD sgd(*_xs, *_ys, _weights, _tagCount);
+	SGDL1 sgd(*_xs, *_ys, _weights, _tagCount);
 	sgd.Run(learningRate, l2, maxIteration);
 }
 
@@ -51,10 +51,12 @@ void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, dou
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
-    MultiArray<double, 3> graph(x.Length(), _tagCount, _tagCount, 0.0);
-	SGD::MakePhiMatrix(x, _weights, 1.0, graph);
+    MultiArray<double, 3> edges(x.Length(), _tagCount, _tagCount, 0.0);
+	MultiArray<double, 2> nodes(x.Length(), _tagCount, 0.0);
+	//SGD::MakePhiMatrix(x, _weights, 1.0, graph);
+	FWBW::MakeEdgesAndNodes(x, _weights, edges, nodes);
     vector<int> path(x.Length(), -1);
-	Viterbi::GetPath(graph, path);
+	Viterbi::GetPath(edges, nodes, path);
 	y.Clear();
 	for(auto ite = path.begin(); ite != path.end(); ite++)
 	{

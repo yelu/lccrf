@@ -14,7 +14,10 @@ public:
 
 	typedef vector<vector<vector<double>>> Matrix3;
 
-	static void GetPath(const MultiArray<double, 3>& graph, vector<int>& res);
+	static void GetPath(const MultiArray<double, 3>& edges, 
+		                const MultiArray<double, 2>& nodes, 
+						vector<int>& res);
+
 private:
 };
 

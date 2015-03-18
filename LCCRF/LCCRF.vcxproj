@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -82,7 +82,7 @@
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="MurmurHash3.cpp" />
-    <ClCompile Include="SGD.cpp" />
+    <ClCompile Include="SGDL1.cpp" />
     <ClCompile Include="Types.cpp" />
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="MultiArray.h" />
     <ClInclude Include="MurmurHash3.h" />
-    <ClInclude Include="SGD.h" />
+    <ClInclude Include="SGDL1.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Viterbi.h" />
   </ItemGroup>
