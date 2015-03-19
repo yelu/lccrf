@@ -72,7 +72,14 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
 			betaMatrix(j, s1) = 0.0;
 			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				betaMatrix(j, s1) += (betaMatrix(j + 1, s2) * _edges(j + 1, s1, s2) * _nodes(j + 1, s1));
+				double preNode = 1.0;
+				double edge = 1.0;
+				if (j + 2 < _jCount)
+				{ 
+					preNode = betaMatrix(j + 2, s2);
+					edge = _edges(j + 2, s1, s2);
+				}
+				betaMatrix(j, s1) += (preNode * edge * _nodes(j + 1, s1));
 			}
 		}
         scales[j] = betaMatrix[j].NormalizeInPlace();
