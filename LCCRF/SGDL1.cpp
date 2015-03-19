@@ -23,16 +23,16 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
 		double objective = sumLogLikelihood;
 		for (auto w = _weights.begin(); w != _weights.end(); w++)
 		{
-			objective += (_l1 * std::abs(*w));
+			objective -= (_l1 * std::abs(*w));
 		}
 
 		// one iteration(epoch) finished, check it converged.
-		double improvementRatio = (lastObjective - objective) / std::abs(objective);
+		double improvementRatio = (objective - lastObjective) / std::abs(objective);
 		LOG_DEBUG("Iteration:%d, loss:%f, improvement ratio:%f", i, objective, improvementRatio);
-		//if (std::abs(improvementRatio) < 1e-6)
+		if (std::abs(improvementRatio) < 1e-6)
 		{
 			LOG_DEBUG("Converged.");
-			//break;
+			break;
 		}
 		lastObjective = objective;
 	}
@@ -55,17 +55,18 @@ double SGDL1::UpdateWeights(const XSampleType& x, const YSampleType& y, vector<d
 	{
 		int fid = f->first;
 		double delta = fwbw.CalcGradient(x, y, fid);
-		double newWeight = _weights[fid] - _learningRate * delta;
+		double newWeight = _weights[fid] + _learningRate * delta;
+		double newWeightWithPenalty = newWeight;
 		if (newWeight > 0)
 		{
-			newWeight = std::fmax(0.0, newWeight - u - qs[fid]);
+			newWeightWithPenalty = std::fmax(0.0, newWeight - u - qs[fid]);
 		}
 		else
 		{
-			newWeight = std::fmin(0.0, newWeight + u - qs[fid]);
+			newWeightWithPenalty = std::fmin(0.0, newWeight + u - qs[fid]);
 		}
-		qs[fid] += (newWeight - _weights[fid]);
-		changedWeights.push_back(std::pair<int, double>(fid, newWeight));
+		qs[fid] += (newWeightWithPenalty - newWeight);
+		changedWeights.push_back(std::pair<int, double>(fid, newWeightWithPenalty));
 	}
 	// update changed weights to _weights.
 	for (auto ite = changedWeights.begin(); ite != changedWeights.end(); ite++)

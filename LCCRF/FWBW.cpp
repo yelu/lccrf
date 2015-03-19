@@ -161,7 +161,7 @@ double FWBW::CalcLikelihood(const XSampleType& x, const YSampleType& y)
 		logOfTaggedPath += _nodes(j, y.Tags()[j]);
 	}
 
-	return _logNorm - logOfTaggedPath;
+	return logOfTaggedPath - _logNorm;
 }
 
 double FWBW::CalcGradient(const XSampleType& x,  const YSampleType& y, int k)
@@ -209,7 +209,7 @@ double FWBW::CalcGradient(const XSampleType& x,  const YSampleType& y, int k)
 	}
 
 	//LOG_DEBUG("emperical:%f expeted:%f", res1, res2);
-	return 0 - (empirical - expected);
+	return empirical - expected;
 }
 
 double FWBW::GetLogNorm()
