@@ -24,7 +24,7 @@ public:
 		     const vector<YSampleType>& ys, 
 			 int maxIteration = 1, 
 			 double learningRate = 0.001, 
-			 double l2 = 0.001);
+			 double l1 = 0.001);
 
 	void Fit(XType& xs, 
 		     YType& ys, 

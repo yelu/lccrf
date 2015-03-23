@@ -8,8 +8,8 @@ void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
 	XSampleType x(2);
 	
 	x.SetFeature(0, -1, 0, 0);
-	x.SetFeature(1, -1, 1, 1);
-	x.SetFeature(1, 0, 1, 2);
+	x.SetFeature(1, 0, 1, 1);
+	x.SetFeature(1, -1, 1, 2);
 
 	x.SetLength(2);
 
@@ -46,9 +46,15 @@ vector<YSampleType> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Fit(xs, ys, 100000, 0.01, 0.1);
-	EXPECT_NEAR(1.63, lccrf->_weights[0], 1e-2);
-	EXPECT_NEAR(1.63, lccrf->_weights[1], 1e-2);
+	lccrf->Fit(xs, ys, 10000, 0.1, 0.1);
+	EXPECT_NEAR(0, lccrf->_weights[0], 1e-2);
+	EXPECT_NEAR(3.27, lccrf->_weights[1], 1e-2);
+	EXPECT_NEAR(0, lccrf->_weights[2], 1e-2);
+
+	// check likelihood, without regularization.
+	FWBW fwbw(xs.front(), lccrf->_weights, xs.front().Length());
+	double likehoold = fwbw.CalcLikelihood(xs.front(), ys.front());
+	EXPECT_NEAR(-0.107199, likehoold, 1e-3);
 }
 
 /*

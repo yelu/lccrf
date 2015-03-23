@@ -22,7 +22,7 @@ FWBW::FWBW(const XSampleType& x,
 	_nodes.ExpInPlace();
 	_CalculateAlphaMatrix(_alphaMatrix, _alphaScales);
 	_CalculateBetaMatrix(_betaMatrix, _betaScales);
-	VectorDivide(_betaScales, _alphaScales, _div);
+	VectorDivide(_alphaScales, _betaScales, _div);
 
 	// calculate log norm.
 	_logNorm = 0.0;
@@ -51,7 +51,7 @@ void FWBW::_CalculateAlphaMatrix(MultiArray<double, 2>& alphaMatrix, MultiArray<
 			alphaMatrix(j, s2) = 0.0;
 			for(int s1 = 0; s1 < _sCount; s1++)
 			{
-				alphaMatrix(j, s2) += (alphaMatrix(j-1, s1) * _edges(j, s1, s2) * _nodes(j, s2));
+				alphaMatrix(j, s2) += (alphaMatrix(j - 1, s1) * _edges(j, s1, s2) * _nodes(j, s2));
 			}
 		}
         scales[j] = alphaMatrix[j].NormalizeInPlace();
@@ -62,9 +62,10 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
 {
 	for(int s = 0; s < _sCount; s++)
 	{
-		betaMatrix(_jCount - 1, s) = 1.0;	// linear
+		betaMatrix(_jCount - 1, s) = _nodes(_jCount - 1, s);	// linear
 	}
-    scales[_jCount - 1] = betaMatrix[_jCount - 1].NormalizeInPlace();
+	scales[_jCount - 1] = betaMatrix[_jCount - 1].NormalizeInPlace();
+    
 	for(int j = _jCount - 2; j >= 0; j--)
 	{
 		for(int s1 = 0; s1 < _sCount; s1++)
@@ -72,14 +73,9 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
 			betaMatrix(j, s1) = 0.0;
 			for(int s2 = 0; s2 < _sCount; s2++)
 			{
-				double preNode = 1.0;
-				double edge = 1.0;
-				if (j + 2 < _jCount)
-				{ 
-					preNode = betaMatrix(j + 2, s2);
-					edge = _edges(j + 2, s1, s2);
-				}
-				betaMatrix(j, s1) += (preNode * edge * _nodes(j + 1, s1));
+				double preNode = betaMatrix(j + 1, s2);
+				double edge = _edges(j + 1, s1, s2);
+				betaMatrix(j, s1) += (preNode * edge * _nodes(j, s1));
 			}
 		}
         scales[j] = betaMatrix[j].NormalizeInPlace();
@@ -121,10 +117,12 @@ double FWBW::CalcNodesExpectation(const XSampleType::PositionSet& positions)
 	{
 		int j = position->j;
 		int s2 = position->s2;
+		double forward = _alphaMatrix(j, s2);
+		double backward = _betaMatrix(j, s2);
 		double probability = 0.0;
-		probability = _alphaMatrix(j, s2) *
-					  _betaMatrix(j, s2) *
-					  _div[j] * _alphaScales[j];
+		probability = forward * backward * _div[j] * _betaScales[j];
+		// _nodes[j, s2] has been included twice. divive out one.
+		probability /= _nodes(j, s2);
 		// assume feature value is 1.0 to avoid hash lookup.
 		// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
 		res += (probability * 1.0);
@@ -141,16 +139,12 @@ double FWBW::CalcEdgesExpectation(const XSampleType::PositionSet& positions)
 		int j = position->j;
 		int s1 = position->s1;
 		int s2 = position->s2;
-		if (0 == j && -1 == s1)
-		{
-			s1 = 0;
-		}
-		double probability = _alphaMatrix(j - 1, s1) *
-				_edges(j, s1, s2) *
-				_betaMatrix(j, s2) *
-				_div[j];
-		// assume feature value is 1.0 to avoid hash lookup.
-		// actually it should be res1 += x.GetFeatureValue(j, s1, s2, k);
+
+		assert(j - 1 >= 0);
+		double forward = _alphaMatrix(j - 1, s1);
+		double backword = _betaMatrix(j, s2);
+		double probability = forward * _edges(j, s1, s2) * backword * _div[j - 1];
+
 		res += (probability * 1.0);
 	}
 	return res;
@@ -163,9 +157,9 @@ double FWBW::CalcLikelihood(const XSampleType& x, const YSampleType& y)
 	{
 		if (0 != j && y.Tags()[j - 1] >= 0)
 		{
-			logOfTaggedPath += (_edges(j, y.Tags()[j - 1], y.Tags()[j]));
+			logOfTaggedPath += std::log(_edges(j, y.Tags()[j - 1], y.Tags()[j]));
 		}
-		logOfTaggedPath += _nodes(j, y.Tags()[j]);
+		logOfTaggedPath += std::log(_nodes(j, y.Tags()[j]));
 	}
 
 	return logOfTaggedPath - _logNorm;
@@ -191,16 +185,9 @@ double FWBW::CalcGradient(const XSampleType& x,  const YSampleType& y, int k)
 			int j = position->j;
 			int s1 = position->s1;
 			int s2 = position->s2;
-			if (0 == j && -1 == s1)
+			if ((!isBigram && y.Tags()[j] == s2) ||
+				(isBigram && y.Tags()[j - 1] == s1 && y.Tags()[j] == s2))
 			{
-				s1 = 0;
-			}
-			if ((0 == j && y.Tags()[j] == s2) ||
-				(0 != j && y.Tags()[j - 1] == s1 && y.Tags()[j] == s2))
-			{
-				// assume feature value is 1.0 to avoid hash lookup.
-				// actually it should be empirical += x.GetFeatureValue(j, s1, s2, k);
-				// for the expected value, it is the same.
 				empirical += 1.0;
 			}
 		}
@@ -232,9 +219,10 @@ void FWBW::VectorDivide(const MultiArray<double, 1, 100>& v1,
 	{
 		res[i] = std::log(v1[i]) - std::log(v2[i]);
 	}
-    for(int i = res.Dim1() - 2; i >= 0; i--)
+	for (int i = 1; i < res.Dim1(); i++)
 	{
-		res[i] += res[i + 1];
+		res[i] += res[i - 1];
 	}
     res.ExpInPlace();
+	assert(std::abs(res[res.Dim1() - 1] - 1.0) < 1e-4);
 }

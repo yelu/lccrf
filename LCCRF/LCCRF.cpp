@@ -26,7 +26,7 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
 				const vector<YSampleType>& ys, 
 				int maxIteration, 
 				double learningRate, 
-				double l2)
+				double l1)
 {
 	_xs = &xs;
 	_ys = &ys;
@@ -41,7 +41,7 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
     }
 
 	SGDL1 sgd(*_xs, *_ys, _weights, _tagCount);
-	sgd.Run(learningRate, l2, maxIteration);
+	sgd.Run(learningRate, l1, maxIteration);
 }
 
 void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l2)

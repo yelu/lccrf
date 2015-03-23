@@ -16,7 +16,7 @@ public:
         AllocMemory(d1);
     }
 
-    MultiArray(int d1, T& initValue)
+    MultiArray(int d1, T initValue)
     {
         AllocMemory(d1);
         for(int i = 0; i < _d1; i++)

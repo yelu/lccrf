@@ -70,15 +70,13 @@ TEST_F(FWBWTestSuite, TestLearn)
 	EXPECT_EQ(fwbw->_betaMatrix.Dim2(), 2);
 
 	// beta matrix.
-	EXPECT_NEAR(0.731058, fwbw->_betaMatrix[0][0], 1e-4);
-	EXPECT_NEAR(0.268941, fwbw->_betaMatrix[0][1], 1e-4);
-	EXPECT_NEAR(0.5, fwbw->_betaMatrix[1][0], 1e-4);
-	EXPECT_NEAR(0.5, fwbw->_betaMatrix[1][1], 1e-4);
+	EXPECT_NEAR(0.859804, fwbw->_betaMatrix[0][0], 1e-4);
+	EXPECT_NEAR(0.140195, fwbw->_betaMatrix[0][1], 1e-4);
+	EXPECT_NEAR(0.268941, fwbw->_betaMatrix[1][0], 1e-4);
+	EXPECT_NEAR(0.731058, fwbw->_betaMatrix[1][1], 1e-4);
 
-	EXPECT_NEAR(3.718281, fwbw->_alphaScales[0], 1e-4);
-	EXPECT_NEAR(7.132891, fwbw->_alphaScales[1], 1e-4);
-
-
+	EXPECT_NEAR(7.132891, fwbw->_betaScales[0], 1e-4);
+	EXPECT_NEAR(3.718281, fwbw->_betaScales[1], 1e-4);
 }
 
 /*
