@@ -91,12 +91,9 @@ class FeaturizerManager(object):
                     for featureOfY, featureId in featuresOfY.items():
                         # if it is unigram
                         if featureOfY[0] == "unigram":
-                            prevTags = self._tags.values()
-                            if end == 0:
-                                prevTags = [-1]
+                            prevTag = -1
                             currTag = featureOfY[1][0]
-                            for prevTag in prevTags:
-                                xInner[-1][end, prevTag, self._tags[currTag], featureId] = 1.0
+                            xInner[-1][end, prevTag, self._tags[currTag], featureId] = 1.0
 
                         # if it is bigram
                         if featureOfY[0] == "bigram" and end - 1 >= 0:

@@ -36,12 +36,10 @@ class TestCaseFeaturizerManager(unittest.TestCase):
         y = fm.TransformY(ys)
         xPy = x.ToArray()
         yPy = y.ToArray()
-        self.assertEqual(xPy[0][0], ([2, 0, 1], [1, 0]))
-        self.assertEqual(xPy[0][1], ([2, 1, 1], [0]))
-        self.assertEqual(xPy[0][2], ([2, 2, 1], [0]))
-        self.assertEqual(xPy[0][3], ([3, 0, 2], [3]))
-        self.assertEqual(xPy[0][4], ([3, 1, 2], [3, 2]))
-        self.assertEqual(xPy[0][5], ([3, 2, 2], [3]))
+        self.assertEqual(xPy[0][0], ([2, -1, 1], [0]))
+        self.assertEqual(xPy[0][1], ([2, 0, 1], [1]))
+        self.assertEqual(xPy[0][2], ([3, -1, 2], [3]))
+        self.assertEqual(xPy[0][3], ([3, 1, 2], [2]))
         self.assertEqual(yPy[0], [0, 0, 1, 2])
 
     def test_Transform_TransitionFeature(self): 
@@ -56,8 +54,6 @@ class TestCaseFeaturizerManager(unittest.TestCase):
         y = fm.TransformY(ys)
         xPy = x.ToArray()
         yPy = y.ToArray()
-        #print xPy
-        #print yPy
         self.assertEqual(xPy[0][0], ([1, 0, 1], [0]))
         self.assertEqual(xPy[0][1], ([1, 1, 2], [1]))
         self.assertEqual(xPy[0][2], ([2, 0, 1], [0]))
@@ -83,12 +79,10 @@ class TestCaseFeaturizerManager(unittest.TestCase):
         y = fm1.TransformY(ys)
         xPy = x.ToArray()
         yPy = y.ToArray()
-        self.assertEqual(xPy[0][0], ([2, 0, 1], [1, 0]))
-        self.assertEqual(xPy[0][1], ([2, 1, 1], [0]))
-        self.assertEqual(xPy[0][2], ([2, 2, 1], [0]))
-        self.assertEqual(xPy[0][3], ([3, 0, 2], [3]))
-        self.assertEqual(xPy[0][4], ([3, 1, 2], [3, 2]))
-        self.assertEqual(xPy[0][5], ([3, 2, 2], [3]))
+        self.assertEqual(xPy[0][0], ([2, -1, 1], [0]))
+        self.assertEqual(xPy[0][1], ([2, 0, 1], [1]))
+        self.assertEqual(xPy[0][2], ([3, -1, 2], [3]))
+        self.assertEqual(xPy[0][3], ([3, 1, 2], [2]))
         self.assertEqual(yPy[0], [0, 0, 1, 2])
 
 
