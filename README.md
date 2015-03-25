@@ -10,7 +10,6 @@ This implementation features:
 * Rich features. NGram, Transition, Regex(in progress), Dictionary(in progress), Contextual-Free-Grammar(cfg, in progress) features are built-in.
 * Extensible featurizers. By implementing self-defined featurizers, you can add any feature you need freely, e.g. a feature checking if two consecutive tags are the same.
 * API library. It can be embedded into your own code more easily and gracefully compared to calling a standalone binary.
-* Be easy to understand. It follows the theoretical derivation and uses the same mathematical symbols in [Log-Linear Models, MEMMs, and CRFs](http://www.cs.columbia.edu/~mcollins/crf.pdf) and [The Forward-Backward Algorithm](http://www.cs.columbia.edu/~mcollins/fb.pdf) by [Michael Collins](http://www.cs.columbia.edu/~mcollins/).
 
 ## Get Started
 
