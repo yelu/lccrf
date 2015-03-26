@@ -8,14 +8,14 @@ using std::wifstream;
 
 LCCRF::LCCRF(int featureCount, int labelCount):_weights(featureCount, 0.0)
 {
-	_featureCount = featureCount;
-	_tagCount = labelCount;
+    _featureCount = featureCount;
+    _tagCount = labelCount;
 }
 
 LCCRF::LCCRF()
 {
-	_featureCount = -1;
-	_tagCount = -1;
+    _featureCount = -1;
+    _tagCount = -1;
 }
 
 LCCRF::~LCCRF(void)
@@ -23,13 +23,13 @@ LCCRF::~LCCRF(void)
 }
 
 void LCCRF::Fit(const vector<XSampleType>& xs, 
-				const vector<YSampleType>& ys, 
-				int maxIteration, 
-				double learningRate, 
-				double l1)
+                const vector<YSampleType>& ys, 
+                int maxIteration, 
+                double learningRate, 
+                double l1)
 {
-	_xs = &xs;
-	_ys = &ys;
+    _xs = &xs;
+    _ys = &ys;
 
     // if no feature/tag count provided, iterate through training set to get it.
     if(_featureCount <= 0 || _featureCount <= 0)
@@ -40,44 +40,44 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
         _weights.swap(tmpWeights);
     }
 
-	SGDL1 sgd(*_xs, *_ys, _weights, _tagCount);
-	sgd.Run(learningRate, l1, maxIteration);
+    SGDL1 sgd(*_xs, *_ys, _weights, _tagCount);
+    sgd.Run(learningRate, l1, maxIteration);
 }
 
 void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l2)
 {
-	Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l2);
+    Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l2);
 }
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)
 {
     MultiArray<double, 3> edges(x.Length(), _tagCount, _tagCount, 0.0);
-	MultiArray<double, 2> nodes(x.Length(), _tagCount, 0.0);
-	//SGD::MakePhiMatrix(x, _weights, 1.0, graph);
-	FWBW::MakeEdgesAndNodes(x, _weights, edges, nodes);
+    MultiArray<double, 2> nodes(x.Length(), _tagCount, 0.0);
+    //SGD::MakePhiMatrix(x, _weights, 1.0, graph);
+    FWBW::MakeEdgesAndNodes(x, _weights, edges, nodes);
     vector<int> path(x.Length(), -1);
-	Viterbi::GetPath(edges, nodes, path);
-	y.Clear();
-	for(auto ite = path.begin(); ite != path.end(); ite++)
-	{
+    Viterbi::GetPath(edges, nodes, path);
+    y.Clear();
+    for(auto ite = path.begin(); ite != path.end(); ite++)
+    {
         y.AppendTag(*ite);
-	}
+    }
 }
 
 void LCCRF::Predict(XType& xs, YType& ys)
 {
-	const vector<XSampleType>& rawXs = xs.Raw();
-	for(auto ite = rawXs.begin(); ite != rawXs.end(); ite++)
-	{
-		YSampleType y;
-		Predict(*ite, y);
+    const vector<XSampleType>& rawXs = xs.Raw();
+    for(auto ite = rawXs.begin(); ite != rawXs.end(); ite++)
+    {
+        YSampleType y;
+        Predict(*ite, y);
         ys.Append(y);
-	}
+    }
 }
 
 vector<double>& LCCRF::GetWeights()
 {
-	return _weights;
+    return _weights;
 }
 
 /*
@@ -86,43 +86,43 @@ vector<double>& LCCRF::GetWeights()
    s2 : current state
 */
 double LCCRF::_Phi(int s1, int s2, int j,
-				  const XSampleType& x, 
-				  vector<double>& weights,
+                  const XSampleType& x, 
+                  vector<double>& weights,
                   list<pair<int, double>>* hitFeatures)
 {
-	double ret = 0.0;
-	for(auto ite = x.Raw().begin(); ite != x.Raw().end(); ite++)
-	{
-		auto featureID = ite->first;
-		auto positions = ite->second;
-		for(auto position = positions->begin(); position != positions->end(); position++)
-		{
-			if(j == position->j && s1 == position->s1 && s2 == position->s2)
-			{
-				ret += (weights[featureID]);
-				hitFeatures->push_back(pair<int, double>(featureID, weights[featureID]));
-			}
-		}
-	}
-	return ret;
+    double ret = 0.0;
+    for(auto ite = x.Raw().begin(); ite != x.Raw().end(); ite++)
+    {
+        auto featureID = ite->first;
+        auto positions = ite->second;
+        for(auto position = positions->begin(); position != positions->end(); position++)
+        {
+            if(j == position->j && s1 == position->s1 && s2 == position->s2)
+            {
+                ret += (weights[featureID]);
+                hitFeatures->push_back(pair<int, double>(featureID, weights[featureID]));
+            }
+        }
+    }
+    return ret;
 }
 
 pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x, 
-	                                                     const YSampleType& y)
+                                                         const YSampleType& y)
 {
-	int preState = -1;
-	double score = 0.0;
-	pair<list<list<pair<int, double>>>, double> res;
+    int preState = -1;
+    double score = 0.0;
+    pair<list<list<pair<int, double>>>, double> res;
     for(int j = 0; j < x.Length(); j++)
-	{
-		if(y.Tags()[j] >= _tagCount)
-		{
-			return res;
-		}
+    {
+        if(y.Tags()[j] >= _tagCount)
+        {
+            return res;
+        }
         res.first.push_back(list<pair<int, double>>());
         score += _Phi(preState, y.Tags()[j], j, x, _weights, &(res.first.back()));
-		preState = y.Tags()[j];
-	}
+        preState = y.Tags()[j];
+    }
     res.second = score;
     return res;
 }

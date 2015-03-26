@@ -16,30 +16,30 @@ using std::list;
 class SGDL1
 {
 public:
-	SGDL1(const vector<XSampleType>& xs,
-		  const vector<YSampleType>& ys,
-		  vector<double>& initialWeights,
-		  int labelCount) :
-		  _xs(xs),
-		  _ys(ys),
-		  _weights(initialWeights),
-		  _labelCount(labelCount)
-	{
-		_iterationCount = 0;
-	}
+    SGDL1(const vector<XSampleType>& xs,
+          const vector<YSampleType>& ys,
+          vector<double>& initialWeights,
+          int labelCount) :
+          _xs(xs),
+          _ys(ys),
+          _weights(initialWeights),
+          _labelCount(labelCount)
+    {
+        _iterationCount = 0;
+    }
 
-	const vector<double>& Run(double learningRate, double l1, int maxIteration = 20);
+    const vector<double>& Run(double learningRate, double l1, int maxIteration = 20);
 
-	double UpdateWeights(const XSampleType& x, const YSampleType& y, vector<double>& qs, double u);
+    double UpdateWeights(const XSampleType& x, const YSampleType& y, vector<double>& qs, double u);
 
-	virtual ~SGDL1(void){}
+    virtual ~SGDL1(void){}
 
 private:
-	const vector<XSampleType>& _xs;
-	const vector<YSampleType>& _ys;
-	vector<double>& _weights;
-	int _labelCount;
-	double _l1;
-	double _learningRate;
-	int _iterationCount;
+    const vector<XSampleType>& _xs;
+    const vector<YSampleType>& _ys;
+    vector<double>& _weights;
+    int _labelCount;
+    double _l1;
+    double _learningRate;
+    int _iterationCount;
 };

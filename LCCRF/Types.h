@@ -25,84 +25,84 @@ using std::shared_ptr;
 class XSampleType
 {
 public:
-	struct Position
-	{
-		Position(int _j, int _s1, int _s2)
-		{
-			j = _j;
-			s1 = _s1;
-			s2 = _s2;
-		}
+    struct Position
+    {
+        Position(int _j, int _s1, int _s2)
+        {
+            j = _j;
+            s1 = _s1;
+            s2 = _s2;
+        }
 
-		int j;
-		int s1;
-		int s2;
+        int j;
+        int s1;
+        int s2;
 
-		struct Compare
-		{
-			const bool operator()(const Position& pos1, const Position& pos2) const
-			{
-				if(pos1.j != pos2.j) {return pos1.j < pos2.j;}
-				if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s1;}
-				return pos1.s2 < pos2.s2;
-			}
-		};
+        struct Compare
+        {
+            const bool operator()(const Position& pos1, const Position& pos2) const
+            {
+                if(pos1.j != pos2.j) {return pos1.j < pos2.j;}
+                if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s1;}
+                return pos1.s2 < pos2.s2;
+            }
+        };
 
         struct Equal
-		{
-			const bool operator()(const Position& pos1, const Position& pos2) const
-			{
-				return (pos1.j == pos2.j && pos1.s1 == pos2.s1 && pos1.s2 == pos2.s2);
-			}
-		};
+        {
+            const bool operator()(const Position& pos1, const Position& pos2) const
+            {
+                return (pos1.j == pos2.j && pos1.s1 == pos2.s1 && pos1.s2 == pos2.s2);
+            }
+        };
 
-		struct Hash
-		{
-			size_t operator()(const Position& k) const
-			{
-				uint32_t res  = 0;
-				MurmurHash3_x86_32(&k, sizeof(Position), 47, &res);
-				return (size_t)res;
-			}
-		};
-	};
+        struct Hash
+        {
+            size_t operator()(const Position& k) const
+            {
+                uint32_t res  = 0;
+                MurmurHash3_x86_32(&k, sizeof(Position), 47, &res);
+                return (size_t)res;
+            }
+        };
+    };
 
     typedef std::unordered_set<Position, Position::Hash, Position::Equal> PositionSet;
-	typedef std::unordered_map<int, shared_ptr<PositionSet>> FeaturesContainer;
+    typedef std::unordered_map<int, shared_ptr<PositionSet>> FeaturesContainer;
 
-	// export to cython.
-	XSampleType(void)
-	{
-		_length = 0;
-	}
+    // export to cython.
+    XSampleType(void)
+    {
+        _length = 0;
+    }
 
     XSampleType(int length)
     {
         _length = length;
     }
 
-	double GetFeatureValue(int j, int s1, int s2, int featureID) const;
+    double GetFeatureValue(int j, int s1, int s2, int featureID) const;
 
-	//export to cython.
-	void SetFeature(int j, int s1, int s2, int featureID);
+    //export to cython.
+    void SetFeature(int j, int s1, int s2, int featureID);
 
     int Length() const
     {
         return _length;
     }
 
-	void SetLength(int length)
-	{
-		_length = length;
-	}
+    void SetLength(int length)
+    {
+        _length = length;
+    }
 
-	const FeaturesContainer& Raw() const
+    const FeaturesContainer& Raw() const
     {
         return _features;
     }
 
 private:
-	FeaturesContainer _features;
+    FeaturesContainer _features;
     int _length;
 };
 
@@ -110,21 +110,21 @@ class YSampleType
 {
 public:
 
-	YSampleType()
-	{
-	}
+    YSampleType()
+    {
+    }
 
-	int Length() const;
+    int Length() const;
 
-	const std::vector<int>& Tags() const;
+    const std::vector<int>& Tags() const;
 
-	void Clear();
+    void Clear();
 
-	// export to python.
+    // export to python.
     // set ith tag to be j
-	void SetTag(int i, int j);
+    void SetTag(int i, int j);
 
-	void AppendTag(int tag)
+    void AppendTag(int tag)
     {
         _tags.push_back(tag);
     }
@@ -135,20 +135,20 @@ public:
     }
 
 private:
-	std::vector<int> _tags;
+    std::vector<int> _tags;
 };
 
 class XType
 {
 public:
-	XType()
-	{
-	}
+    XType()
+    {
+    }
 
-	// export to cython.
-	void SetFeature(int i, int j, int s1, int s2, int featureID);
+    // export to cython.
+    void SetFeature(int i, int j, int s1, int s2, int featureID);
 
-	const vector<XSampleType>& Raw();
+    const vector<XSampleType>& Raw();
 
     // export to cython.
     void ToArray(list<list<std::pair<list<int>, list<int>>>>& res)
@@ -157,24 +157,24 @@ public:
         {
             auto x = i->Raw();
             list<pair<list<int>, list<int>>> xOut;
-			map<list<int>, list<int>> fs;
+            map<list<int>, list<int>> fs;
             for(auto j = x.begin(); j != x.end(); j++)
             {
-				auto position = j->second->begin();
-				for(; position != j->second->end(); position++)
-				{
-					list<int> pos;
-					pos.push_back(position->j);
-					pos.push_back(position->s1);
-					pos.push_back(position->s2);
-					fs[pos].push_back(j->first);
-				}
+                auto position = j->second->begin();
+                for(; position != j->second->end(); position++)
+                {
+                    list<int> pos;
+                    pos.push_back(position->j);
+                    pos.push_back(position->s1);
+                    pos.push_back(position->s2);
+                    fs[pos].push_back(j->first);
+                }
             }
-			for(auto j = fs.begin(); j != fs.end(); j++)
-			{
-				list<int> position;
-				xOut.push_back(pair<list<int>, list<int>>(j->first, j->second));
-			}
+            for(auto j = fs.begin(); j != fs.end(); j++)
+            {
+                list<int> position;
+                xOut.push_back(pair<list<int>, list<int>>(j->first, j->second));
+            }
             res.push_back(xOut);
         } 
     }
@@ -188,18 +188,18 @@ public:
     static int GetFeatureCount(const vector<XSampleType>& xs);
 
 private:
-	vector<XSampleType> _xs;
+    vector<XSampleType> _xs;
 };
 
 class YType
 {
 public:
-	YType()
-	{
-	}
+    YType()
+    {
+    }
 
-	// export to cython.
-	void SetTag(int i, int j, int tag);
+    // export to cython.
+    void SetTag(int i, int j, int tag);
 
     // export to cython.
     void ToArray(list<list<int>>& res)
@@ -227,5 +227,5 @@ public:
     static int GetTagCount(const vector<YSampleType>& ys);
 
 private:
-	vector<YSampleType> _ys;
+    vector<YSampleType> _ys;
 };

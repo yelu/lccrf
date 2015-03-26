@@ -88,31 +88,31 @@ public:
     double NormalizeInPlace()
     {
         double sum = 0.0;
-	    for(int i = 0; i < _d1; i++)
-	    {
+        for(int i = 0; i < _d1; i++)
+        {
             sum += _pData[i];
-	    }
-	    for(int i = 0; i < _d1; i++)
-	    {
-		    _pData[i] /= sum;
-	    }
-	    return sum;
+        }
+        for(int i = 0; i < _d1; i++)
+        {
+            _pData[i] /= sum;
+        }
+        return sum;
     }
 
     void LogInPlace()
     {
         for(int i = 0; i < _d1; i++)
-	    {
+        {
             _pData[i] = std::log(_pData[i]);
-	    }
+        }
     }
 
     void ExpInPlace()
     {
         for(int i = 0; i < _d1; i++)
-	    {
+        {
             _pData[i] = std::exp(_pData[i]);
-	    }
+        }
     }
 
 private:
@@ -211,13 +211,13 @@ public:
         return _d2;
     }
 
-	void ExpInPlace()
-	{
-		for (int i = 0; i < _d1 * _d2; i++)
-		{
-			_pData[i] = std::exp(_pData[i]);
-		}
-	}
+    void ExpInPlace()
+    {
+        for (int i = 0; i < _d1 * _d2; i++)
+        {
+            _pData[i] = std::exp(_pData[i]);
+        }
+    }
 
 private:
      bool _ownership;

@@ -17,31 +17,15 @@ class CRFTagger:
     def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
         self.fm.AddFeaturizer(name, featurizer, shift, unigram, bigram)
     
-    def SaveXYToFile(self, x, y):
-        xArray = x.to_array()
-        yArray = y.to_array()
-        with open('x', 'w') as f:
-            for idx, i in enumerate(xArray):
-                for j, features in i:
-                    for feature in features:
-                        feature_tuple = map(str, [idx,] + j + [feature,])
-                        print >> f, "\t".join(feature_tuple)
-        
-        with open('y', 'w') as f:
-            for idx, i in enumerate(yArray):
-                for j, t in enumerate(i):
-                    print >> f, "\t".join(map(str, [idx, j, t]))
-    
     def Fit(self, xs, ys, \
-            maxIteration = 1, learningRate = 0.001, variance = 0.001):
+            maxIteration = 1, \
+            learningRate = 0.001, \
+            variance = 0.001):
         self.fm.Fit(xs, ys)
         log.debug("fm.fit finished.")
         x = self.fm.TransformX(xs)
         y = self.fm.TransformY(ys)
         log.debug("fm.Transform finished.")
-        #self.SaveXYToFile(x, y)
-        #print >> sys.stderr, x.ToArray()
-        #print >> sys.stderr, y.ToArray()
         self.crf = LCCRFPy(self.fm.FeatureCount, self.fm.TagCount)
         self.crf.Fit(x, y, maxIteration, learningRate, variance)
         log.debug("Fit finished.")
@@ -55,6 +39,20 @@ class CRFTagger:
         for y in ys:
             ysWithOriginalTag.append(map(lambda x:self.fm._idToTag[x], y))
         return ysWithOriginalTag
+
+    @staticmethod
+    def Serialize(obj, directory):
+        FeaturizerManager.Serialize(obj.fm, directory)
+        if obj.crf != None:
+            obj.crf.Save(directory + "/lccrf.weights.txt")
+
+    @staticmethod
+    def Deserialize(directory):
+        tagger = CRFTagger()
+        tagger.fm = FeaturizerManager.Deserialize(directory)
+        tagger.crf = LCCRFPy()
+        tagger.crf.Load(directory + "/lccrf.weights.txt")
+        return tagger
         
     def ReadableFeaturesAndWeights(self):
         res = []
