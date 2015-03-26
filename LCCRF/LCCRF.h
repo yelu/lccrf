@@ -6,7 +6,6 @@
 #include <string>
 #include "Types.h"
 #include "FWBW.h"
-#include "SGD.h"
 using std::list;
 using std::function;
 using std::pair;
