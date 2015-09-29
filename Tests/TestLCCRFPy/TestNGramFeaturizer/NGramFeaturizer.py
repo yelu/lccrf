@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import pickle
 
 class NGramFeaturizer(object):
     def __init__(self, ngramFile, n, addBosEos = False):
@@ -15,11 +16,11 @@ class NGramFeaturizer(object):
         return self._features
 
     @staticmethod
-    def SelectNGramToFile(docs, dstNGramFile, n, addBosEos = False):
-        with open(dstNGramFile, 'w') as outFile:
+    def SelectNGramToFile(docsFile, dstNGramFile, n, addBosEos = False):
+        with open(docsFile, 'r') as inFile, open(dstNGramFile, 'w') as outFile:
             ngramSet = set()
-            for doc in docs:
-                words = doc
+            for line in inFile:
+                words = list(line.strip().split())
                 if addBosEos:
                     words.insert(0, "BOS")
                     words.append("EOS")

@@ -24,9 +24,9 @@ DEP_INCPATH=
 .PHONY:test
 test:
 	cd ../../LCCRFPy/ && python Setup.py build && python Setup.py install
-	$(PYTHON) TestLCCRFPy.py
-	$(PYTHON) TestNGramFeaturizer.py
-	$(PYTHON) TestFeaturizerManager.py
+	#$(PYTHON) TestLCCRFPy.py
+	#$(PYTHON) TestNGramFeaturizer.py
+	#$(PYTHON) TestFeaturizerManager.py
 	$(PYTHON) TestCRFTagger.py
 
 .PHONY:clean

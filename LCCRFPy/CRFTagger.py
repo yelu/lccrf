@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env python
 
 import os,sys
+from collections import defaultdict
 from log import *
 from LCCRFPy import *
 from FeaturizerManager import FeaturizerManager
@@ -13,47 +14,130 @@ class CRFTagger:
     def __init__(self):
         self.fm = FeaturizerManager()
         self.crf = None
+        self.weights = {}
 
-    def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
-        self.fm.AddFeaturizer(name, featurizer, shift, unigram, bigram)
-    
-    def Fit(self, xs, ys, \
+    def Train(self, docs, tags, modelDir, \
             maxIteration = 1, \
             learningRate = 0.001, \
             variance = 0.001):
-        self.fm.Fit(xs, ys)
+        if not os.path.exists(modelDir):
+            os.makedirs(modelDir)
+
+        # prepare featurizers.
+        unigramFile = os.path.join(modelDir, "unigram.txt")
+        bigramFile = os.path.join(modelDir, "bigram.txt")
+        trigramFile = os.path.join(modelDir, "trigram.txt")
+        NGramFeaturizer.SelectNGramToFile(docs, unigramFile, 1)
+        NGramFeaturizer.SelectNGramToFile(docs, bigramFile, 2)
+        NGramFeaturizer.SelectNGramToFile(docs, trigramFile, 3)
+
+        unigramFeaturizer = NGramFeaturizer(unigramFile, 1)
+        bigramFeaturizer = NGramFeaturizer(bigramFile, 2)
+        trigramFeaturizer = NGramFeaturizer(trigramFile, 3)
+        
+        self.fm.AddFeaturizer("unigram", unigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        self.fm.AddFeaturizer("bigram", bigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        #self.fm.AddFeaturizer("trigram", trigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        self.fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        
+        self.fm.Fit(docs, tags)
         log.debug("fm.fit finished.")
-        x = self.fm.TransformX(xs)
-        y = self.fm.TransformY(ys)
-        log.debug("fm.Transform finished.")
+        
+        featureFile = os.path.join(modelDir, "features.bin")
+        self.fm.Dump(featureFile)
+
+        # train crf model.
+        x = self.fm.FeaturizeX(docs)
+        y = self.fm.FeaturizeY(tags)
         self.crf = LCCRFPy(self.fm.FeatureCount, self.fm.TagCount)
         self.crf.Fit(x, y, maxIteration, learningRate, variance)
-        log.debug("Fit finished.")
+        log.debug("lccrf train finished.")
+        modelFile = os.path.join(modelDir, "weights.txt")
+        self.crf.Save(modelFile)
         return
-        
-    def Transform(self, xs):
-        xInner = self.fm.TransformX(xs)        
-        yInner = self.crf.Predict(xInner)
-        ys = yInner.ToArray()
-        ysWithOriginalTag = []
-        for y in ys:
-            ysWithOriginalTag.append(map(lambda x:self.fm._idToTag[x], y))
-        return ysWithOriginalTag
 
-    @staticmethod
-    def Serialize(obj, directory):
-        FeaturizerManager.Serialize(obj.fm, directory)
-        if obj.crf != None:
-            obj.crf.Save(directory + "/lccrf.weights.txt")
+    def Load(self, modelDir):
+        featureFile = os.path.join(modelDir, "features.bin")
+        self.fm = FeaturizerManager.Load(featureFile)
 
-    @staticmethod
-    def Deserialize(directory):
-        tagger = CRFTagger()
-        tagger.fm = FeaturizerManager.Deserialize(directory)
-        tagger.crf = LCCRFPy()
-        tagger.crf.Load(directory + "/lccrf.weights.txt")
-        return tagger
+        modelFile = os.path.join(modelDir, "weights.txt")
+        with open(modelFile, 'r') as f:
+            next(f)
+            for line in f:
+                fields = line.strip().split()
+                if len(fields) != 2:
+                    continue
+                self.weights[int(fields[0])] = float(fields[1])
+
+        # prepare featurizers.
+        unigramFile = os.path.join(modelDir, "unigram.txt")
+        bigramFile = os.path.join(modelDir, "bigram.txt")
+        trigramFile = os.path.join(modelDir, "trigram.txt")
+
+        unigramFeaturizer = NGramFeaturizer(unigramFile, 1)
+        bigramFeaturizer = NGramFeaturizer(bigramFile, 2)
+        trigramFeaturizer = NGramFeaturizer(trigramFile, 3)
         
+        self.fm.AddFeaturizer("unigram", unigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        self.fm.AddFeaturizer("bigram", bigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        #self.fm.AddFeaturizer("trigram", trigramFeaturizer, shift = 0, unigram = True, bigram = False)
+        self.fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+
+    def Predict(self, xs):
+        res = []
+        for x in xs:
+            xFeatures = self.fm.FeaturizeXPy([x])[0]
+            edges, nodes = self.MakeEdgesAndNodes(xFeatures, self.weights)
+            yIDs = self.VeterbiDecode(edges, nodes, len(x), self.fm.TagCount)
+            yWithOriginalTag = map(lambda x:self.fm._idToTag[x], yIDs)
+            res.append(yWithOriginalTag)
+        return res
+
+    def MakeEdgesAndNodes(self, xFeatures, weights):
+        edges = defaultdict(lambda : 0.0)
+        nodes = defaultdict(lambda : 0.0)
+        for feature in xFeatures:
+            pos, preTag, curTag, featureID = feature[0], feature[1], feature[2], feature[3]
+            if preTag >= 0:
+                key = (pos, preTag, curTag)
+                edges[key] += weights[featureID]
+            else:
+                key = (pos, curTag)
+                nodes[key] += weights[featureID]
+        return (edges, nodes)
+
+    def VeterbiDecode(self, edges, nodes, nStep, nState):
+        phi = [0.0] * nState
+        for i in range(nState):
+            phi[i] = nodes[(0, i)]
+
+        newPhi = [float('-inf')] * nState
+
+        backtraceMatrix = defaultdict(lambda : -1)
+        for j in range(1, nStep):
+            for s1 in range(0, nState):
+                for s2 in range(0, nState):
+                    d = phi[s2] + edges[(j, s2, s1)] + nodes[(j, s1)]
+                    if d > newPhi[s1]:
+                        backtraceMatrix[(j, s1)] = s2
+                        newPhi[s1] = d
+            phi, newPhi = newPhi, phi
+        
+        # find the optimal path
+        maxJ = -1
+        res = [-1] * nStep
+        maxPath = float('-inf')
+        for s in range(0, nState):
+            if phi[s] > maxPath:
+                maxPath = phi[s]
+                maxJ = s
+        
+        res[nStep - 1] = maxJ
+        for j in range(nStep - 2, -1, -1):
+            res[j] = backtraceMatrix[(j + 1, res[j + 1])]
+
+        return res
+
     def ReadableFeaturesAndWeights(self):
         res = []
         if self.crf != None:
@@ -82,7 +166,7 @@ class CRFTagger:
         return res
         
     def Test(self, xs, ys):
-        predictedTags = self.Transform(xs)
+        predictedTags = self.Predict(xs)
         stat = {}
         totalTags = 0
         rightTag = 0

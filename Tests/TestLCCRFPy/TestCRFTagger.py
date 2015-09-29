@@ -18,40 +18,30 @@ class TestCRFTagger(unittest.TestCase):
     def test_Fit(self):
         filePath = './data/testset.tsv'
         trainXs, trainYs = self.ParseInput(filePath)
-        print trainXs
-        print trainYs
         
         tagger = CRFTagger()
-        tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
-        tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
-        #tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
-        tagger.Fit(trainXs, trainYs, \
+        modelDir = "./output/crftagger"
+        tagger.Train(trainXs, trainYs, modelDir, \
                    maxIteration = 1000,\
                    learningRate = 0.05, \
                    variance = 0.0008)
+        tagger.SaveReadableFeaturesAndWeights("./output/crftagger/tagger.model")
         print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                     tagger.fm.TagCount)
-        tagger.SaveReadableFeaturesAndWeights("./tagger.model")
-        self.assertEqual(tagger.fm.FeatureCount, 119)
-        #tagger.Save('./tagger.model')
+        self.assertEqual(tagger.fm.FeatureCount, 134)
 
     def test_Transform(self):
         filePath = './data/testset.tsv'
         trainXs, trainYs = self.ParseInput(filePath)
         
+        modelDir = "./output/crftagger"
         tagger = CRFTagger()
-        tagger.AddFeaturizer("ngram1", NGramFeaturizer(1), shift = 0, unigram = True, bigram = False)
-        tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), shift = 0, unigram = True, bigram = False)
-        tagger.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
-        tagger.Fit(trainXs, trainYs, \
-                   maxIteration = 1000,\
-                   learningRate = 0.05, \
-                   variance = 0.0008)
+        tagger.Load(modelDir)
         print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
                                                                     tagger.fm.TagCount)
         xs = ["what is the weather in shang hai".split(),
               "what is the weather in a b c".split()]
-        ys = tagger.Transform(xs)
+        ys = tagger.Predict(xs)
         print ys
 
         #test on training set.

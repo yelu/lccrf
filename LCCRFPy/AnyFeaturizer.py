@@ -8,12 +8,9 @@ class AnyFeaturizer(object):
     def GetFeatures(self):
         return self._features
         
-    def Fit(self, doc):
-        return self.Transform(doc)
-
-    def Transform(self, doc):
+    def Featurize(self, words):
         res = []
-        for i in range(0, len(doc)):
+        for i in range(0, len(words)):
             res.append((i, i, ('')))
         return res
 

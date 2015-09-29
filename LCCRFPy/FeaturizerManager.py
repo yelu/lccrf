@@ -17,8 +17,8 @@ class FeaturizerManager(object):
         self._idToTag = {}
     
     def AddFeaturizer(self, name, featurizer, shift = 0, unigram = True, bigram = True):
-        self._featurizers[name] = {"unigram" : unigram, "bigram" : bigram, "shift" : shift, \
-                                   "instance":featurizer, "type" : type(featurizer)}
+        self._featurizers[name] = {"unigram" : unigram, "bigram" : bigram, \
+                                   "shift" : shift, "instance": featurizer}
     
     def Fit(self, xs, ys):
         xys = zip(xs, ys)
@@ -36,7 +36,7 @@ class FeaturizerManager(object):
                         self._tags[tag] = self._nextTagId
                         self._nextTagId += 1
                 # 1. extract features on X.
-                features = featurizer.Fit(x)
+                features = featurizer.Featurize(x)
                 # matching features on X to Y
                 for feature in features:
                     start, end = feature[0] - shift, feature[1] - shift
@@ -61,7 +61,7 @@ class FeaturizerManager(object):
         # swap key and value in self._tags to reconstruct self._idToTag.
         self._idToTag = {value:key for key, value in self._tags.items()}
 
-    def TransformY(self, ys):
+    def FeaturizeY(self, ys):
         yInner = Y()
         for i, y in enumerate(ys):
             yInner.Append(YSample())
@@ -70,7 +70,7 @@ class FeaturizerManager(object):
             log.debug("transforming y ... [%d/%d] " % (i + 1, len(ys)))
         return yInner
         
-    def TransformX(self, xs):
+    def FeaturizeX(self, xs):
         xInner = X()
         for i, x in enumerate(xs):
             xInner.Append(XSample(len(x)))
@@ -78,7 +78,7 @@ class FeaturizerManager(object):
                 name = key
                 featurizer = value["instance"]
                 shift = value["shift"]
-                features = featurizer.Transform(x)
+                features = featurizer.Featurize(x)
                 for feature in features:
                     start, end = feature[0] - shift, feature[1] - shift
                     if start < 0 or start >= len(x) or \
@@ -102,6 +102,38 @@ class FeaturizerManager(object):
 
             log.debug("transforming x ... [%d/%d] " % (i + 1, len(xs)))
         return xInner
+
+    def FeaturizeXPy(self, xs):
+        res = []
+        for i, x in enumerate(xs):
+            res.append([])
+            for key, value in self._featurizers.items():
+                name = key
+                featurizer = value["instance"]
+                shift = value["shift"]
+                features = featurizer.Featurize(x)
+                for feature in features:
+                    start, end = feature[0] - shift, feature[1] - shift
+                    if start < 0 or start >= len(x) or \
+                       end < 0 or end > len(x):
+                        continue
+                    featureOfX = (name, shift, feature[-1])
+                    if featureOfX not in self._features:
+                        continue
+                    featuresOfY = self._features[featureOfX]
+                    for featureOfY, featureId in featuresOfY.items():
+                        # if it is unigram
+                        if featureOfY[0] == "unigram":
+                            prevTag = -1
+                            currTag = featureOfY[1][0]
+                            res[-1].append([end, prevTag, self._tags[currTag], featureId])
+
+                        # if it is bigram
+                        if featureOfY[0] == "bigram" and end - 1 >= 0:
+                            prevTag, currTag = featureOfY[1]
+                            res[-1].append([end, self._tags[prevTag], self._tags[currTag], featureId])
+
+        return res
         
     @property
     def FeatureCount(self):
@@ -118,50 +150,16 @@ class FeaturizerManager(object):
                 allFeatures[id] = (featureOfX, featureOfY)
         return allFeatures
 
+    def Dump(self, featureFile):
+        backupFeaturizers = self._featurizers
+        with open(featureFile, 'w') as f:
+            self._featurizers = {}
+            pickle.dump(self, f)
+        self._featurizers = backupFeaturizers
+
     @staticmethod
-    def Serialize(obj, directory):
-        # serialize featurizers.
-        for name, featurizer in obj._featurizers.items():
-            instance = featurizer["instance"]
-            # if featurizer don't have a serialize method.
-            # use pickle to serialize it. file name is name of
-            # the featurizer.
-            fileDir = os.path.join(directory, name)
-            if not os.path.exists(fileDir):
-                os.makedirs(fileDir)
-            if "Serialize" not in dir(instance):
-                filePath = os.path.join(fileDir, name + ".bin")
-                with open(filePath, 'w') as f:
-                    pickle.dump(instance, f)
-            else:
-                getattr(instance, "Serialize")(instance, fileDir)
-        
-        # remove featurizer instance and pickle the fm. then recover it.
-        featurizersBackup = {}
-        for name, featurizer in obj._featurizers.items():
-            featurizersBackup[name] = featurizer["instance"]
-            featurizer["instance"] = None
-
-        with open(os.path.join(directory, "fm.bin"), 'w') as f:
-            pickle.dump(obj, f)
-
-        for name, featurizer in obj._featurizers.items():
-            featurizer["instance"] = featurizersBackup[name]
-   
-    @staticmethod
-    def Deserialize(directory):
-        fm = FeaturizerManager()
-        with open(os.path.join(directory, "fm.bin"), 'r') as f:
-            fm = pickle.load(f)
-
-        # deserialize featurizers.
-        for name, featurizer in fm._featurizers.items():
-            fileDir = os.path.join(directory, name)
-            if "Deserialize" in dir(featurizer["type"]):
-                featurizer["instance"] = getattr(featurizer["type"], "Deserialize")(fileDir)
-            else:
-                with open(os.path.join(fileDir, name + ".bin")) as f:
-                    featurizer["instance"] = pickle.load(f)
-
+    def Load(featureFile):
+        with open(featureFile, 'r') as f:
+            fm = pickle.load(f) 
         return fm
 
