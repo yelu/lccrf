@@ -3,7 +3,10 @@
 import os,sys
 from collections import defaultdict
 from log import *
-from LCCRFPy import *
+try:
+    from LCCRFPy import *
+except:
+    pass
 from FeaturizerManager import FeaturizerManager
 from NGramFeaturizer import NGramFeaturizer
 from AnyFeaturizer import AnyFeaturizer

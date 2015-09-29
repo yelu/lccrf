@@ -3,9 +3,11 @@
 import os
 import sys
 import json
-import pickle
 from log import *
-from LCCRFPy import X,Y,XSample,YSample
+try:
+    from LCCRFPy import X,Y,XSample,YSample
+except:
+    pass
 
 class FeaturizerManager(object):
     def __init__(self):
@@ -151,15 +153,31 @@ class FeaturizerManager(object):
         return allFeatures
 
     def Dump(self, featureFile):
-        backupFeaturizers = self._featurizers
         with open(featureFile, 'w') as f:
-            self._featurizers = {}
-            pickle.dump(self, f)
-        self._featurizers = backupFeaturizers
+            print >> f, self._nextFeatureId
+            print >> f, self._nextTagId
+            print >> f, self._tags
+            print >> f, self._idToTag
+            for featureOfX, featuresOfY in self._features.items():
+                for featureOfY, id in featuresOfY.items():
+                    print >> f, (id, featureOfX, featureOfY)
 
     @staticmethod
     def Load(featureFile):
         with open(featureFile, 'r') as f:
-            fm = pickle.load(f) 
-        return fm
+            fm = FeaturizerManager()
+            fm._nextFeatureId = int(f.readline().strip())
+            fm._nextTagId = int(f.readline().strip())
+            fm._tags = eval(f.readline().strip())
+            fm._idToTag = eval(f.readline().strip())
+            for line in f:
+                line = line.strip()
+                if len(line) == 0:
+                    continue
+                id, featureX, featureY = eval(line)
+                if featureX not in fm._features:
+                    fm._features[featureX] = {}
+                fm._features[featureX][featureY] = id
+                    
+            return fm
 
