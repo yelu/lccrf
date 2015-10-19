@@ -2,6 +2,7 @@
 
 import os,sys
 from CRFTagger import *
+from CRFTaggerFeaturizer import CRFTaggerFeaturizer
 import unittest
 import re
 import json
@@ -16,19 +17,29 @@ class TestCRFTagger(unittest.TestCase):
         pass
 
     def test_Fit(self):
-        filePath = './data/testset.tsv'
+        filePath = './train.tsv'
         trainXs, trainYs = self.ParseInput(filePath)
         
-        tagger = CRFTagger()
+        # 1. instantiate a CRFTagger and add three featurizers.
+        featurizer = CRFTaggerFeaturizer()
+        # add unigram(on x) featurizer : current word together with current tag.
+        featurizer.AddFeaturizer("1gram", NGramFeaturizer(1), shift = 0, uniTag = True, biTag = False)
+        # add bigram(on x) featurizer : current bi-word together with current tag.
+        featurizer.AddFeaturizer("2gram", NGramFeaturizer(2), shift = 0, uniTag = True, biTag = False)
+        # add any featurizer : trigger a feature at any position of x, 
+        # the final feature depends purely on transitions of
+        featurizer.AddFeaturizer("any", AnyFeaturizer(), shift = 0, uniTag = False, biTag = True)
+
+        tagger = CRFTagger(featurizer)
         modelDir = "./output/crftagger"
-        tagger.Train(trainXs, trainYs, modelDir, \
+        tagger.Train(trainXs, trainYs, \
                    maxIteration = 1000,\
                    learningRate = 0.05, \
                    variance = 0.0008)
-        tagger.SaveReadableFeaturesAndWeights("./output/crftagger/tagger.model")
-        print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
-                                                                    tagger.fm.TagCount)
-        self.assertEqual(tagger.fm.FeatureCount, 134)
+        #tagger.SaveReadableFeaturesAndWeights("./output/crftagger/tagger.model")
+        #print >> sys.stderr, "Feature Count : %d    Tag Count : %d" % (tagger.fm.FeatureCount, \
+        #                                                            tagger.fm.TagCount)
+        #self.assertEqual(tagger.fm.FeatureCount, 134)
 
     def test_Transform(self):
         filePath = './data/testset.tsv'
@@ -85,5 +96,5 @@ class TestCRFTagger(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
     #test = TestCRFTagger()
-    #test.setUp()
+    #test.test_Fit()
     

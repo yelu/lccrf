@@ -14,49 +14,32 @@ import json
 
 class CRFTagger:
 
-    def __init__(self):
-        self.fm = FeaturizerManager()
-        self.crf = None
+    def __init__(self, crfFeaturizer, tmpDir = "./"):
+        self.featurizer = crfFeaturizer
+        self.tmpDir = tmpDir
+        if not os.path.exists(tmpDir):
+            os.makedirs(tmpDir)
         self.weights = {}
 
-    def Train(self, docs, tags, modelDir, \
+    def Train(self, queries, tags, \
             maxIteration = 1, \
             learningRate = 0.001, \
             variance = 0.001):
-        if not os.path.exists(modelDir):
-            os.makedirs(modelDir)
 
-        # prepare featurizers.
-        unigramFile = os.path.join(modelDir, "unigram.txt")
-        bigramFile = os.path.join(modelDir, "bigram.txt")
-        trigramFile = os.path.join(modelDir, "trigram.txt")
-        NGramFeaturizer.SelectNGramToFile(docs, unigramFile, 1)
-        NGramFeaturizer.SelectNGramToFile(docs, bigramFile, 2)
-        NGramFeaturizer.SelectNGramToFile(docs, trigramFile, 3)
-
-        unigramFeaturizer = NGramFeaturizer(unigramFile, 1)
-        bigramFeaturizer = NGramFeaturizer(bigramFile, 2)
-        trigramFeaturizer = NGramFeaturizer(trigramFile, 3)
-        
-        self.fm.AddFeaturizer("unigram", unigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        self.fm.AddFeaturizer("bigram", bigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        #self.fm.AddFeaturizer("trigram", trigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        self.fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
-        
-        self.fm.Fit(docs, tags)
-        log.debug("fm.fit finished.")
-        
-        featureFile = os.path.join(modelDir, "features.bin")
-        self.fm.Dump(featureFile)
+        self.featurizer.Fit(queries, tags)
+        log.debug("feature extracted.")
+                
+        queriesBinFile = os.path.join(self.tmpDir, "queries.lccrf.bin")
+        with open(queriesBinFile, 'w') as f:
+            print >> f, "%d    %d" % (len(self.featurizer.Tags()), self.featurizer.Dim())
+            print >> f, ""
+            featurizedQueries = self.featurizer.Featurize(queries, tags)
+            for q in featurizedQueries:
+                for feat in q:
+                    print >> f, " ".join([str(x) for x in list(feat)])
+                print >> f, ""
 
         # train crf model.
-        x = self.fm.FeaturizeX(docs)
-        y = self.fm.FeaturizeY(tags)
-        self.crf = LCCRFPy(self.fm.FeatureCount, self.fm.TagCount)
-        self.crf.Fit(x, y, maxIteration, learningRate, variance)
-        log.debug("lccrf train finished.")
-        modelFile = os.path.join(modelDir, "weights.txt")
-        self.crf.Save(modelFile)
         return
 
     def Load(self, modelDir):

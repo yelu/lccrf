@@ -4,7 +4,7 @@ from Cython.Build import cythonize
 
 setup(
 	name = 'LCCRFPy',
-    py_modules=['log', 'AnyFeaturizer', 'CRFTagger', 'FeaturizerManager', 'NGramFeaturizer'],
+    py_modules=['log', 'AnyFeaturizer', 'CRFTagger', 'CRFTaggerFeaturizer', 'NGramFeaturizer'],
 	ext_modules=cythonize(
 	[
 		Extension(

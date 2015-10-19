@@ -1,16 +1,33 @@
 #!/usr/bin/env python
-import pickle
 
 class AnyFeaturizer(object):
     def __init__(self):
-        self._features = set([''])
-    
+        pass
+
+    def Dim(self):
+        return 1
+
     def GetFeatures(self):
         return self._features
-        
-    def Featurize(self, words):
+    
+    def Fit(self, queries):
+        pass
+
+    def Featurize(self, queries, idShift):
         res = []
-        for i in range(0, len(words)):
-            res.append((i, i, ('')))
+        for query in queries:
+            features = []
+            for i in range(0, len(query)):
+                features.append((i, i, idShift))
+            res.append(features)
         return res
+
+    def Serialize(self, dstFile):
+        pass
+
+    @staticmethod
+    def Deserialize(srcFile):
+        featurizer = AnyFeaturizer()
+        return featurizer
+
 

@@ -1,8 +1,0 @@
-a b
-b c
-what is
-is the
-the weather
-weather in
-in beijing
-beijing ?
