@@ -1,7 +1,7 @@
 #include <memory>
 #include <fstream>
 using std::ifstream;
-#include "../../LCCRF/LCCRF.h"
+#include "../lib/LCCRF.h"
 
 int main(int argc, char* argv[])
 {

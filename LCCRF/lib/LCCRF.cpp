@@ -44,9 +44,10 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
     sgd.Run(learningRate, l1, maxIteration);
 }
 
-void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l2)
+void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l1)
 {
-    Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l2);
+	LOG_DEBUG("queries : %d, iter : %d step : %f l1 : %f", xs.Raw().size(), maxIteration, learningRate, l1);
+    Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l1);
 }
 
 void LCCRF::Predict(const XSampleType& x, YSampleType& y)

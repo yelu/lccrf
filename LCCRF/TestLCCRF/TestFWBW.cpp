@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include <memory>
 #define private public
-#include "../../LCCRF/FWBW.h"
+#include "../lib/FWBW.h"
 
 class FWBWTestSuite : public ::testing::Test
 {

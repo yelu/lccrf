@@ -1,20 +1,10 @@
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Build import cythonize
+#from Cython.Build import cythonize
 
 setup(
 	name = 'LCCRFPy',
     py_modules=['log', 'AnyFeaturizer', 'CRFTagger', 'CRFTaggerFeaturizer', 'NGramFeaturizer'],
-	ext_modules=cythonize(
-	[
-		Extension(
-			"LCCRFPy", 
-			['LCCRFPy.pyx'], 
-			language="c++", 
-            extra_compile_args=["-std=c++11"],
-            include_dirs=['../LCCRF'],			
-			)
-	]),
 )
 
 #config for windows.

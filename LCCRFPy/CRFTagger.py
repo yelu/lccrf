@@ -3,79 +3,88 @@
 import os,sys
 from collections import defaultdict
 from log import *
-try:
-    from LCCRFPy import *
-except:
-    pass
-from FeaturizerManager import FeaturizerManager
-from NGramFeaturizer import NGramFeaturizer
+from CRFTaggerFeaturizer import CRFTaggerFeaturizer
 from AnyFeaturizer import AnyFeaturizer
 import json
 
 class CRFTagger:
 
-    def __init__(self, crfFeaturizer, tmpDir = "./"):
+    def __init__(self, crfFeaturizer = None, tmpDir = "./", lccrfBin = "./lccrf.exe"):
         self.featurizer = crfFeaturizer
         self.tmpDir = tmpDir
         if not os.path.exists(tmpDir):
             os.makedirs(tmpDir)
         self.weights = {}
+        self.lccrfBin = lccrfBin
 
-    def Train(self, queries, tags, \
+    def Train(self, queries, tags, modelDir = "./", \
             maxIteration = 1, \
             learningRate = 0.001, \
             variance = 0.001):
-
+        
+        if not os.path.exists(modelDir):
+            os.makedirs(modelDir)
+            
         self.featurizer.Fit(queries, tags)
+        self.featurizer.Serialize(os.path.join(modelDir, 'features.bin'))
         log.debug("feature extracted.")
                 
         queriesBinFile = os.path.join(self.tmpDir, "queries.lccrf.bin")
         with open(queriesBinFile, 'w') as f:
-            print >> f, "%d    %d" % (len(self.featurizer.Tags()), self.featurizer.Dim())
+            print >> f, "%d    %d" % (len(self.featurizer.Features()), len(self.featurizer.Tags()))
             print >> f, ""
-            featurizedQueries = self.featurizer.Featurize(queries, tags)
-            for q in featurizedQueries:
+            featurizedQueries = self.featurizer.Featurize(queries)
+            for i, q in enumerate(featurizedQueries):
+                # save tags.
+                print >> f, len(tags[i])
+                print >> f, " ".join([str(self.featurizer._tags[x]) for x in tags[i]])
+                # save features.
+                print >> f, len(q)
                 for feat in q:
                     print >> f, " ".join([str(x) for x in list(feat)])
                 print >> f, ""
 
+            with open('x.txt', 'w') as f1:
+                for i, q in enumerate(featurizedQueries):
+                    for feat in q:
+                        print >> f1, " ".join([str(i)] + [str(x) for x in list(feat)])
+
         # train crf model.
+        cmd = "\"%s\" -d \"%s\" -i %s -s %s -l %s -m \"%s\" >%s 2>&1" % \
+               (self.lccrfBin, queriesBinFile, maxIteration, learningRate, variance, \
+                os.path.join(modelDir, 'weights.txt'), \
+                os.path.join(self.tmpDir, 'train_lccrf.log'))
+        
+        import commands
+        log.info(cmd)
+        (status, output) = commands.getstatusoutput(cmd)
+        log.info("%s return with %s"% (cmd, status))
+        if status:
+            raise RuntimeError, "%s failed. [ret:%s][%s]."%(cmd, status, output)
         return
 
-    def Load(self, modelDir):
-        featureFile = os.path.join(modelDir, "features.bin")
-        self.fm = FeaturizerManager.Load(featureFile)
-
+    @staticmethod
+    def Deserialize(modelDir):
         modelFile = os.path.join(modelDir, "weights.txt")
+        tagger = CRFTagger()
         with open(modelFile, 'r') as f:
             next(f)
             for line in f:
                 fields = line.strip().split()
                 if len(fields) != 2:
                     continue
-                self.weights[int(fields[0])] = float(fields[1])
+                tagger.weights[int(fields[0])] = float(fields[1])
 
-        # prepare featurizers.
-        unigramFile = os.path.join(modelDir, "unigram.txt")
-        bigramFile = os.path.join(modelDir, "bigram.txt")
-        trigramFile = os.path.join(modelDir, "trigram.txt")
-
-        unigramFeaturizer = NGramFeaturizer(unigramFile, 1)
-        bigramFeaturizer = NGramFeaturizer(bigramFile, 2)
-        trigramFeaturizer = NGramFeaturizer(trigramFile, 3)
-        
-        self.fm.AddFeaturizer("unigram", unigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        self.fm.AddFeaturizer("bigram", bigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        #self.fm.AddFeaturizer("trigram", trigramFeaturizer, shift = 0, unigram = True, bigram = False)
-        self.fm.AddFeaturizer("any", AnyFeaturizer(), shift = 0, unigram = False, bigram = True)
+        tagger.featurizer = CRFTaggerFeaturizer.Deserialize(os.path.join(modelDir, "features.bin"))
+        return tagger
 
     def Predict(self, xs):
         res = []
         for x in xs:
-            xFeatures = self.fm.FeaturizeXPy([x])[0]
+            xFeatures = self.featurizer.Featurize([x])[0]
             edges, nodes = self.MakeEdgesAndNodes(xFeatures, self.weights)
-            yIDs = self.VeterbiDecode(edges, nodes, len(x), self.fm.TagCount)
-            yWithOriginalTag = map(lambda x:self.fm._idToTag[x], yIDs)
+            yIDs = self.VeterbiDecode(edges, nodes, len(x), len(self.featurizer.Tags()))
+            yWithOriginalTag = map(lambda x:self.featurizer._idToTag[x], yIDs)
             res.append(yWithOriginalTag)
         return res
 
@@ -124,23 +133,7 @@ class CRFTagger:
 
         return res
 
-    def ReadableFeaturesAndWeights(self):
-        res = []
-        if self.crf != None:
-            weights = self.crf.GetWeights()
-        else:
-            weights = [0.0] * self.fm.FeatureCount
-        readableFeatures = self.fm.ReadableFeatures()
-        for key, value in readableFeatures.items():
-            res.append([key, value, weights[key]])
-        return res
     
-    def SaveReadableFeaturesAndWeights(self, filePath):
-        featureWeight = self.ReadableFeaturesAndWeights()
-        with open(filePath, 'w') as f:
-            for featureId, featureName, weight in featureWeight:
-                print >> f, "%s\t%s\t%f" % (featureId, featureName, weight)
-     
     def Debug(self, x):
         x, y = self.fm.Transform([x])
         debugInfo = self.crf.debug(x[0], y[0])
@@ -188,4 +181,17 @@ class CRFTagger:
         else:
             stat["accuracy"] = float(rightTag) / float(totalTags)
         return stat
-        
+
+    def ReadableFeaturesAndWeights(self):
+        res = []
+        features = self.featurizer.Features()
+        for key, value in features.items():
+            res.append((key, value, self.weights[key]))
+        return res
+    
+    def SaveReadableFeaturesAndWeights(self, filePath):
+        featureWeight = self.ReadableFeaturesAndWeights()
+        with open(filePath, 'w') as f:
+            for featureId, featureName, weight in featureWeight:
+                print >> f, "%s\t%s\t%f" % (featureId, featureName, weight)
+ 

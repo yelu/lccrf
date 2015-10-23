@@ -17,5 +17,6 @@ install:
 
 # command to run tests
 script:
+  - pwd=`pwd` && export PYTHONPATH=${pwd}/LCCRF/LCCRFPy:${PYTHONPATH}
   - cd ./Tests/TestLCCRFPy/ && make clean && make test
 
