@@ -26,7 +26,7 @@ all:py_module
 
 .PHONY:py_module
 py_module:
-	cd ../LCCRF && ${MAKE}
+	cd ../LCCRF && cmake . && ${MAKE}
 	cp ../LCCRF/output/lccrf.exe .
 
 .PHONY:clean
