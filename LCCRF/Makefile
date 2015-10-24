@@ -30,81 +30,37 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake.exe
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake.exe -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
-# The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/ccmake.exe
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cygdrive/d/personal/LCCRF/LCCRF
+CMAKE_SOURCE_DIR = /home/luye/datadisk/mycode/LCCRF/LCCRF
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cygdrive/d/personal/LCCRF/LCCRF
+CMAKE_BINARY_DIR = /home/luye/datadisk/mycode/LCCRF/LCCRF
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake.exe -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running interactive CMake command-line interface..."
+	/usr/bin/cmake -i .
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
 
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake.exe -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake.exe -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake.exe -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: install/local
-.PHONY : install/local/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake.exe -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-.PHONY : install/strip/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-.PHONY : list_install_components/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake.exe -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -113,9 +69,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/d/personal/LCCRF/LCCRF/CMakeFiles /cygdrive/d/personal/LCCRF/LCCRF/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luye/datadisk/mycode/LCCRF/LCCRF/CMakeFiles /home/luye/datadisk/mycode/LCCRF/LCCRF/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/d/personal/LCCRF/LCCRF/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luye/datadisk/mycode/LCCRF/LCCRF/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -154,6 +110,43 @@ lccrf: cmake_check_build_system
 lccrf/fast:
 	$(MAKE) -f CMakeFiles/lccrf.dir/build.make CMakeFiles/lccrf.dir/build
 .PHONY : lccrf/fast
+
+#=============================================================================
+# Target rules for targets named lccrf.exe
+
+# Build rule for target.
+lccrf.exe: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lccrf.exe
+.PHONY : lccrf.exe
+
+# fast build rule for target.
+lccrf.exe/fast:
+	$(MAKE) -f CMakeFiles/lccrf.exe.dir/build.make CMakeFiles/lccrf.exe.dir/build
+.PHONY : lccrf.exe/fast
+
+console/main.o: console/main.cpp.o
+.PHONY : console/main.o
+
+# target to build an object file
+console/main.cpp.o:
+	$(MAKE) -f CMakeFiles/lccrf.exe.dir/build.make CMakeFiles/lccrf.exe.dir/console/main.cpp.o
+.PHONY : console/main.cpp.o
+
+console/main.i: console/main.cpp.i
+.PHONY : console/main.i
+
+# target to preprocess a source file
+console/main.cpp.i:
+	$(MAKE) -f CMakeFiles/lccrf.exe.dir/build.make CMakeFiles/lccrf.exe.dir/console/main.cpp.i
+.PHONY : console/main.cpp.i
+
+console/main.s: console/main.cpp.s
+.PHONY : console/main.s
+
+# target to generate assembly for a file
+console/main.cpp.s:
+	$(MAKE) -f CMakeFiles/lccrf.exe.dir/build.make CMakeFiles/lccrf.exe.dir/console/main.cpp.s
+.PHONY : console/main.cpp.s
 
 lib/FWBW.o: lib/FWBW.cpp.o
 .PHONY : lib/FWBW.o
@@ -306,12 +299,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... install"
-	@echo "... install/local"
-	@echo "... install/strip"
 	@echo "... lccrf"
-	@echo "... list_install_components"
+	@echo "... lccrf.exe"
 	@echo "... rebuild_cache"
+	@echo "... console/main.o"
+	@echo "... console/main.i"
+	@echo "... console/main.s"
 	@echo "... lib/FWBW.o"
 	@echo "... lib/FWBW.i"
 	@echo "... lib/FWBW.s"

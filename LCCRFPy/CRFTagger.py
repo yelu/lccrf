@@ -9,13 +9,13 @@ import json
 
 class CRFTagger:
 
-    def __init__(self, crfFeaturizer = None, tmpDir = "./", lccrfBin = "./lccrf.exe"):
+    def __init__(self, crfFeaturizer = None, tmpDir = "./"):
         self.featurizer = crfFeaturizer
         self.tmpDir = tmpDir
         if not os.path.exists(tmpDir):
             os.makedirs(tmpDir)
         self.weights = {}
-        self.lccrfBin = lccrfBin
+        self.lccrfBin = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lccrf.exe')
 
     def Train(self, queries, tags, modelDir = "./", \
             maxIteration = 1, \

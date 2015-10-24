@@ -26,13 +26,13 @@ all:py_module
 
 .PHONY:py_module
 py_module:
-	$(PYTHON) Setup.py build
-	cp ./build/lib.*/LCCRFPy.so .
+	cd ../LCCRF && ${MAKE}
+	cp ../LCCRF/output/lccrf.exe .
 
 .PHONY:clean
 clean:
-	rm -f ./LCCRFPy.so
-	rm -rf ./build
+	cd ../LCCRF && ${MAKE} clean
+	rm lccrf.exe
 	rm -f ./*.pyc
 
 .PHONY:dist

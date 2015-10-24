@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include "tclap/CmdLine.h"
-#include "../lib/lccrf.h"
+#include "../lib/LCCRF.h"
 
 int main(int argc, char** argv)
 {
