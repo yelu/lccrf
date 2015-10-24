@@ -50,8 +50,6 @@ class TestCRFTagger(unittest.TestCase):
         modelDir = "./"
         tagger = CRFTagger.Deserialize(modelDir)
         
-        tagger.SaveReadableFeaturesAndWeights('./features.txt')
-        
         xs = ["what is the weather in shang hai".split(),
               "what is the weather in a b c".split()]
         ys = tagger.Predict(xs)

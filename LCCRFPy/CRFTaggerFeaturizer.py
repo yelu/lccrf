@@ -61,9 +61,8 @@ class CRFTaggerFeaturizer(object):
                             self._nextFeatureId += 1
 
     def Featurize(self, queries, tags = None):
-        res = []
         for i, x in enumerate(queries):
-            res.append([])
+            res =[]
             for item in self._featurizers:
                 name, featurizer, shift = item["name"], item["instance"], item["shift"]
                 featuresOfX = featurizer.Featurize([x], 0)[0]
@@ -82,16 +81,16 @@ class CRFTaggerFeaturizer(object):
                             prevTag = -1
                             currTag = featureOfY[1][0]
                             if not tags or self._tags[tags[i][end]] == currTag:
-                                res[-1].append((end, prevTag, currTag, featureId))
+                                res.append((end, prevTag, currTag, featureId))
 
                         # if it is bigram
                         if featureOfY[0] == "biTag" and end - 1 >= 0:
                             prevTag, currTag = featureOfY[1]
                             if not tags or (self._tags[tags[i][end]] == currTag and \
                                             self._tags[tags[i][end - 1]] == prevTag):
-                                res[-1].append((end, prevTag, currTag, featureId))
+                                res.append((end, prevTag, currTag, featureId))
 
-        return res
+            yield res
         
     def Tags(self):
         return self._tags
@@ -102,6 +101,9 @@ class CRFTaggerFeaturizer(object):
             for featureOfY, id in featuresOfY.items():
                 allFeatures[id] = (featureOfX, featureOfY)
         return allFeatures
+
+    def FeatureCount(self):
+        return self._nextFeatureId
 
     def Serialize(self, dstFile):
         with open(dstFile, 'w') as f:

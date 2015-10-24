@@ -29,9 +29,10 @@ class CRFTagger:
         self.featurizer.Serialize(os.path.join(modelDir, 'features.bin'))
         log.debug("feature extracted.")
                 
+        log.debug("featurize data...")
         queriesBinFile = os.path.join(self.tmpDir, "queries.lccrf.bin")
         with open(queriesBinFile, 'w') as f:
-            print >> f, "%d    %d" % (len(self.featurizer.Features()), len(self.featurizer.Tags()))
+            print >> f, "%d    %d" % (self.featurizer.FeatureCount(), len(self.featurizer.Tags()))
             print >> f, ""
             featurizedQueries = self.featurizer.Featurize(queries)
             for i, q in enumerate(featurizedQueries):
@@ -43,11 +44,7 @@ class CRFTagger:
                 for feat in q:
                     print >> f, " ".join([str(x) for x in list(feat)])
                 print >> f, ""
-
-            with open('x.txt', 'w') as f1:
-                for i, q in enumerate(featurizedQueries):
-                    for feat in q:
-                        print >> f1, " ".join([str(i)] + [str(x) for x in list(feat)])
+        log.debug("data featurized.")
 
         # train crf model.
         cmd = "\"%s\" -d \"%s\" -i %s -s %s -l %s -m \"%s\" >%s 2>&1" % \
@@ -80,10 +77,9 @@ class CRFTagger:
 
     def Predict(self, xs):
         res = []
-        for x in xs:
-            xFeatures = self.featurizer.Featurize([x])[0]
+        for i, xFeatures in enumerate(self.featurizer.Featurize(xs)):
             edges, nodes = self.MakeEdgesAndNodes(xFeatures, self.weights)
-            yIDs = self.VeterbiDecode(edges, nodes, len(x), len(self.featurizer.Tags()))
+            yIDs = self.VeterbiDecode(edges, nodes, len(xs[i]), len(self.featurizer.Tags()))
             yWithOriginalTag = map(lambda x:self.featurizer._idToTag[x], yIDs)
             res.append(yWithOriginalTag)
         return res
