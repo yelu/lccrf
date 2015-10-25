@@ -28,16 +28,16 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
 
         // one iteration(epoch) finished, check it converged.
         double improvementRatio = (objective - lastObjective) / std::abs(objective);
-        LOG_DEBUG("Iteration:%d, loss:%f, improvement ratio:%f", i, objective, improvementRatio);
-        if (std::abs(improvementRatio) < 1e-6)
+        LOG("Iteration:%d, loss:%f, improvement ratio:%f", i, objective, improvementRatio);
+        if (std::abs(improvementRatio) < 1e-3)
         {
-            LOG_DEBUG("Converged.");
+            LOG("Converged.");
             break;
         }
         lastObjective = objective;
     }
 
-    LOG_DEBUG("total iterations = %d\n", _iterationCount);
+    LOG("total iterations = %d\n", _iterationCount);
     return _weights;
 }
 
