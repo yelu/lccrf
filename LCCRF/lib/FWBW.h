@@ -15,27 +15,27 @@ public:
     typedef vector<vector<double>> Matrix2;
     typedef vector<vector<vector<double>>> Matrix3;
 
-    FWBW(const XSampleType& x,
+    FWBW(const X& x,
          const vector<double>& weights,
          int sCount);
     virtual ~FWBW(void);
 
-    double GetModelExpectation(const XSampleType::PositionSet&);
+    double GetModelExpectation(const X::PositionSet&);
     double GetLogNorm();
 
     static void VectorDivide(const MultiArray<double, 1, 100>& v1, 
         const MultiArray<double, 1, 100>& v2, 
         MultiArray<double, 1, 100>& res);
 
-    static void MakeEdgesAndNodes(const XSampleType& x,
+    static void MakeEdgesAndNodes(const X& x,
                                   const vector<double>& weights,
                                   MultiArray<double, 3>& edges,
                                   MultiArray<double, 2>& nodes);
 
-    double CalcNodesExpectation(const XSampleType::PositionSet& positions);
-    double CalcEdgesExpectation(const XSampleType::PositionSet& positions);
-    double CalcLikelihood(const XSampleType& x, const YSampleType& y);
-    double CalcGradient(const XSampleType& x, const YSampleType& y, int k);
+    double CalcNodesExpectation(const X::PositionSet& positions);
+    double CalcEdgesExpectation(const X::PositionSet& positions);
+    double CalcLikelihood(const X& x, const Y& y);
+    double CalcGradient(const X& x, const Y& y, int k);
 
 private:
     void _CalculateAlphaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 100>&);

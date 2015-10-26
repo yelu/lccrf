@@ -7,7 +7,7 @@ class FWBWTestSuite : public ::testing::Test
 {
 protected:
 
-	static void MakeDocument(XSampleType& x, YSampleType& y)
+	static void MakeDocument(X& x, Y& y)
 	{
 		x.SetFeature(0, -1, 0, 0);
 		x.SetFeature(1, 0, 1, 1);
@@ -42,13 +42,13 @@ protected:
 	}
 
 	static FWBW* fwbw;
-	static XSampleType x;
-	static YSampleType y;
+	static X x;
+	static Y y;
 };
 
 FWBW* FWBWTestSuite::fwbw;
-XSampleType FWBWTestSuite::x;
-YSampleType FWBWTestSuite::y;
+X FWBWTestSuite::x;
+Y FWBWTestSuite::y;
 
 TEST_F(FWBWTestSuite, TestLearn)
 {

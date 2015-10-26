@@ -1,6 +1,6 @@
 #include "Types.h"
 
-double XSampleType::GetFeatureValue(int j, int s1, int s2, int featureID) const 
+double X::GetFeatureValue(int j, int s1, int s2, int featureID) const 
 {
     Position pos(j, s1, s2);
     auto ite = _features.find(featureID);
@@ -11,7 +11,7 @@ double XSampleType::GetFeatureValue(int j, int s1, int s2, int featureID) const
     return 1;
 }
 
-void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
+void X::SetFeature(int j, int s1, int s2, int featureID)
 {
     Position pos(j, s1, s2);
     if(_features.count(featureID) == 0)
@@ -21,22 +21,22 @@ void XSampleType::SetFeature(int j, int s1, int s2, int featureID)
     _features[featureID]->insert(pos);
 }
 
-int YSampleType::Length() const 
+int Y::Length() const 
 {
     return (int)_tags.size();
 }
 
-const std::vector<int>& YSampleType::Tags() const
+const std::vector<int>& Y::Tags() const
 {
     return _tags;
 }
 
-void YSampleType::Clear()
+void Y::Clear()
 {
     _tags.clear();
 }
 
-void YSampleType::SetTag(int i, int tag)
+void Y::SetTag(int i, int tag)
 {
     if(i >= (int)_tags.size())
     {
@@ -45,32 +45,32 @@ void YSampleType::SetTag(int i, int tag)
     _tags[i] = tag;
 }
 
-void XType::SetFeature(int i, int j, int s1, int s2, int featureID)
+void XList::SetFeature(int i, int j, int s1, int s2, int featureID)
 {
     int ite = (int)(_xs.size());
     for(; ite < i + 1; ++ite)
     {
-        XSampleType x;
+        X x;
         _xs.push_back(x);
     }
     _xs.back().SetFeature(j, s1, s2, featureID);
 }
 
-const vector<XSampleType>& XType::Raw()
+const vector<X>& XList::Raw()
 {
     return _xs;
 }
 
-void XType::Append(XSampleType& x)
+void XList::Append(X& x)
 {
     _xs.push_back(x);
 }
 
-XSampleType& XType::At(int i)
+X& XList::At(int i)
 {
     for(int ite = (int)_xs.size(); ite < i + 1; ite++)
     {
-        XSampleType x;
+        X x;
         _xs.push_back(x);
     }
     if(-1 == i)
@@ -80,7 +80,7 @@ XSampleType& XType::At(int i)
     return _xs[i];
 }
 
-int XType::GetFeatureCount(const vector<XSampleType>& xs)
+int XList::GetFeatureCount(const vector<X>& xs)
 {
     std::unordered_set<int> features;
     for(auto x = xs.begin(); x != xs.end(); x++)
@@ -93,11 +93,11 @@ int XType::GetFeatureCount(const vector<XSampleType>& xs)
     return features.size();
 }
 
-void YType::SetTag(int i, int j, int tag)
+void YList::SetTag(int i, int j, int tag)
 {
     for(int ite = (int)_ys.size(); ite < i + 1; ite++)
     {
-        YSampleType y;
+        Y y;
         _ys.push_back(y);
     }
     // -1 is the last.
@@ -105,16 +105,16 @@ void YType::SetTag(int i, int j, int tag)
     _ys[i].SetTag(j, tag);
 }
 
-void YType::Append(YSampleType& y)
+void YList::Append(Y& y)
 {
     _ys.push_back(y);
 }
 
-YSampleType& YType::At(int i)
+Y& YList::At(int i)
 {
     for(int ite = (int)_ys.size(); ite < i + 1; ite++)
     {
-        YSampleType y;
+        Y y;
         _ys.push_back(y);
     }
     if(-1 == i)
@@ -124,12 +124,12 @@ YSampleType& YType::At(int i)
     return _ys[i];
 }
 
-const vector<YSampleType>& YType::Raw() const
+const vector<Y>& YList::Raw() const
 {
     return _ys;
 }
 
-int YType::GetTagCount(const vector<YSampleType>& ys)
+int YList::GetTagCount(const vector<Y>& ys)
 {
     std::unordered_set<int> tags;
     for(auto y = ys.begin(); y != ys.end(); y++)

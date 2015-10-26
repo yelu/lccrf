@@ -3,7 +3,7 @@
 #include <cassert>
 #include <limits>
 
-FWBW::FWBW(const XSampleType& x,
+FWBW::FWBW(const X& x,
     const vector<double>& weights,
     int sCount) :
     _jCount(x.Length()),
@@ -82,20 +82,20 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
     }
 }
 
-void FWBW::MakeEdgesAndNodes(const XSampleType& x,
+void FWBW::MakeEdgesAndNodes(const X& x,
                              const vector<double>& weights,
                              MultiArray<double, 3>& edges,
                              MultiArray<double, 2>& nodes)
 {
-    XSampleType::FeaturesContainer::const_iterator ite = x.Raw().begin();
+    X::FeaturesContainer::const_iterator ite = x.Raw().begin();
     for (; ite != x.Raw().end(); ++ite)
     {
-        const XSampleType::PositionSet& positions = *(ite->second);
+        const X::PositionSet& positions = *(ite->second);
         int featureID = ite->first;
-        XSampleType::PositionSet::const_iterator position = positions.begin();
+        X::PositionSet::const_iterator position = positions.begin();
         for (; position != positions.end(); ++position)
         {
-            const XSampleType::Position& p = *position;
+            const X::Position& p = *position;
             // if it is a bigram feature(on labels), update edges.
             if (p.s1 >= 0)
             {
@@ -109,7 +109,7 @@ void FWBW::MakeEdgesAndNodes(const XSampleType& x,
     }
 }
 
-double FWBW::CalcNodesExpectation(const XSampleType::PositionSet& positions)
+double FWBW::CalcNodesExpectation(const X::PositionSet& positions)
 {
     double res = 0.0;
     auto position = positions.begin();
@@ -130,7 +130,7 @@ double FWBW::CalcNodesExpectation(const XSampleType::PositionSet& positions)
     return res;
 }
 
-double FWBW::CalcEdgesExpectation(const XSampleType::PositionSet& positions)
+double FWBW::CalcEdgesExpectation(const X::PositionSet& positions)
 {
     double res = 0.0;
     auto position = positions.begin();
@@ -150,7 +150,7 @@ double FWBW::CalcEdgesExpectation(const XSampleType::PositionSet& positions)
     return res;
 }
 
-double FWBW::CalcLikelihood(const XSampleType& x, const YSampleType& y)
+double FWBW::CalcLikelihood(const X& x, const Y& y)
 {
     double logOfTaggedPath = 0.0; // log
     for (int j = 0; j < y.Length(); j++)
@@ -165,7 +165,7 @@ double FWBW::CalcLikelihood(const XSampleType& x, const YSampleType& y)
     return logOfTaggedPath - _logNorm;
 }
 
-double FWBW::CalcGradient(const XSampleType& x,  const YSampleType& y, int k)
+double FWBW::CalcGradient(const X& x,  const Y& y, int k)
 {
     double empirical = 0.0; // linear
     double expected = 0.0; // linear

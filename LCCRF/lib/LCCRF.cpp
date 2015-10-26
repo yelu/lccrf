@@ -22,8 +22,8 @@ LCCRF::~LCCRF(void)
 {
 }
 
-void LCCRF::Fit(const vector<XSampleType>& xs, 
-                const vector<YSampleType>& ys, 
+void LCCRF::Fit(const vector<X>& xs, 
+                const vector<Y>& ys, 
                 int maxIteration, 
                 double learningRate, 
                 double l1)
@@ -34,8 +34,8 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
     // if no feature/tag count provided, iterate through training set to get it.
     if(_featureCount <= 0 || _featureCount <= 0)
     {
-        _featureCount = XType::GetFeatureCount(*_xs);
-        _tagCount = YType::GetTagCount(*_ys);
+        _featureCount = XList::GetFeatureCount(*_xs);
+        _tagCount = YList::GetTagCount(*_ys);
         std::vector<double> tmpWeights(_featureCount, 0.0);
         _weights.swap(tmpWeights);
     }
@@ -44,13 +44,13 @@ void LCCRF::Fit(const vector<XSampleType>& xs,
     sgd.Run(learningRate, l1, maxIteration);
 }
 
-void LCCRF::Fit(XType& xs, YType& ys, int maxIteration, double learningRate, double l1)
+void LCCRF::Fit(XList& xs, YList& ys, int maxIteration, double learningRate, double l1)
 {
 	LOG_DEBUG("queries : %d, iter : %d step : %f l1 : %f", xs.Raw().size(), maxIteration, learningRate, l1);
     Fit(xs.Raw(), ys.Raw(), maxIteration, learningRate, l1);
 }
 
-void LCCRF::Predict(const XSampleType& x, YSampleType& y)
+void LCCRF::Predict(const X& x, Y& y)
 {
     MultiArray<double, 3> edges(x.Length(), _tagCount, _tagCount, 0.0);
     MultiArray<double, 2> nodes(x.Length(), _tagCount, 0.0);
@@ -65,12 +65,12 @@ void LCCRF::Predict(const XSampleType& x, YSampleType& y)
     }
 }
 
-void LCCRF::Predict(XType& xs, YType& ys)
+void LCCRF::Predict(XList& xs, YList& ys)
 {
-    const vector<XSampleType>& rawXs = xs.Raw();
+    const vector<X>& rawXs = xs.Raw();
     for(auto ite = rawXs.begin(); ite != rawXs.end(); ite++)
     {
-        YSampleType y;
+        Y y;
         Predict(*ite, y);
         ys.Append(y);
     }
@@ -87,7 +87,7 @@ vector<double>& LCCRF::GetWeights()
    s2 : current state
 */
 double LCCRF::_Phi(int s1, int s2, int j,
-                  const XSampleType& x, 
+                  const X& x, 
                   vector<double>& weights,
                   list<pair<int, double>>* hitFeatures)
 {
@@ -108,8 +108,8 @@ double LCCRF::_Phi(int s1, int s2, int j,
     return ret;
 }
 
-pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const XSampleType& x, 
-                                                         const YSampleType& y)
+pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const X& x, 
+                                                         const Y& y)
 {
     int preState = -1;
     double score = 0.0;

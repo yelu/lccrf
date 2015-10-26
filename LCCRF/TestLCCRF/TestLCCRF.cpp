@@ -3,9 +3,9 @@
 #define private public
 #include "../lib/LCCRF.h"
 
-void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
+void MakeDocument(vector<X>& xs, vector<Y>& ys)
 {
-	XSampleType x(2);
+	X x(2);
 	
 	x.SetFeature(0, -1, 0, 0);
 	x.SetFeature(1, 0, 1, 1);
@@ -15,7 +15,7 @@ void MakeDocument(vector<XSampleType>& xs, vector<YSampleType>& ys)
 
 	xs.push_back(x);
 
-	YSampleType y;
+	Y y;
 	y.SetTag(0, 0);
 	y.SetTag(1, 1);
 
@@ -36,13 +36,13 @@ protected:
 	}
 
 	static LCCRF* lccrf;
-	static vector<XSampleType> xs;
-	static vector<YSampleType> ys;
+	static vector<X> xs;
+	static vector<Y> ys;
 };
 
 LCCRF* LCCRFTestSuite::lccrf;
-vector<XSampleType> LCCRFTestSuite::xs;
-vector<YSampleType> LCCRFTestSuite::ys;
+vector<X> LCCRFTestSuite::xs;
+vector<Y> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
@@ -150,7 +150,7 @@ TEST_F(LCCRFTestSuite, TestPredict)
 {
 	//lccrf->Fit(xs, ys, 100000, 0.01, 0.1);
 
-	YSampleType res;
+	Y res;
 	lccrf->Predict(xs.front(), res);
 }
 

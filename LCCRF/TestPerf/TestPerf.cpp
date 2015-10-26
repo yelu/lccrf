@@ -5,8 +5,8 @@ using std::ifstream;
 
 int main(int argc, char* argv[])
 {
-	XType x;
-	YType y;
+	XList x;
+	YList y;
 	std::set<int> features;
 	std::set<int> tags;
 

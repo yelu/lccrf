@@ -16,8 +16,8 @@ using std::list;
 class SGDL1
 {
 public:
-    SGDL1(const vector<XSampleType>& xs,
-          const vector<YSampleType>& ys,
+    SGDL1(const vector<X>& xs,
+          const vector<Y>& ys,
           vector<double>& initialWeights,
           int labelCount) :
           _xs(xs),
@@ -30,13 +30,13 @@ public:
 
     const vector<double>& Run(double learningRate, double l1, int maxIteration = 20);
 
-    double UpdateWeights(const XSampleType& x, const YSampleType& y, vector<double>& qs, double u);
+    double UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u);
 
     virtual ~SGDL1(void){}
 
 private:
-    const vector<XSampleType>& _xs;
-    const vector<YSampleType>& _ys;
+    const vector<X>& _xs;
+    const vector<Y>& _ys;
     vector<double>& _weights;
     int _labelCount;
     double _l1;

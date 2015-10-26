@@ -35,11 +35,11 @@ int main(int argc, char** argv)
 		LCCRF lccrf(fcount, tcount);
 		int xFeatureCount = 0;
 		int yLength = 0;
-		XType x;
-		YType y;
+		XList x;
+		YList y;
 		while (infile >> yLength)
 		{	
-			YSampleType ySample;
+			Y ySample;
 			for (int i = 0; i < yLength; i++)
 			{
 				int tag = 0;
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 			y.Append(ySample);
 
 			infile >> xFeatureCount;
-			XSampleType xSample(yLength);
+			X xSample(yLength);
 			for (int i = 0; i < xFeatureCount; i++)
 			{
 				int pos, preTag, curTag, fid;

@@ -28,26 +28,26 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
 
         // one iteration(epoch) finished, check it converged.
         double improvementRatio = (objective - lastObjective) / std::abs(objective);
-        LOG_DEBUG("Iteration:%d, loss:%f, improvement ratio:%f", i, objective, improvementRatio);
+        LOG("Iteration:%d, loss:%f, improvement ratio:%f", i, objective, improvementRatio);
         if (std::abs(improvementRatio) < 1e-6)
         {
-            LOG_DEBUG("Converged.");
+            LOG("Converged.");
             break;
         }
         lastObjective = objective;
     }
 
-    LOG_DEBUG("total iterations = %d\n", _iterationCount);
+    LOG("total iterations = %d\n", _iterationCount);
     return _weights;
 }
 
-double SGDL1::UpdateWeights(const XSampleType& x, const YSampleType& y, vector<double>& qs, double u)
+double SGDL1::UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u)
 {
     // save weights which has been changed.
     std::list<std::pair<int, double>> changedWeights;
     // skip updating the i-th feature if the feature is not triggered in x. 
     // Since the derivative will be zero.
-    const XSampleType::FeaturesContainer& featureSet = x.Raw();
+    const X::FeaturesContainer& featureSet = x.Raw();
     // For every x sample, forward-backward can be reused to save time.
     FWBW fwbw(x, _weights, _labelCount);
 

@@ -22,7 +22,7 @@ using std::unordered_map;
 using std::unordered_set;
 using std::shared_ptr;
 
-class XSampleType
+class X
 {
 public:
     struct Position
@@ -71,12 +71,12 @@ public:
     typedef std::unordered_map<int, shared_ptr<PositionSet>> FeaturesContainer;
 
     // export to cython.
-    XSampleType(void)
+    X(void)
     {
         _length = 0;
     }
 
-    XSampleType(int length)
+    X(int length)
     {
         _length = length;
     }
@@ -106,11 +106,11 @@ private:
     int _length;
 };
 
-class YSampleType
+class Y
 {
 public:
 
-    YSampleType()
+    Y()
     {
     }
 
@@ -138,17 +138,17 @@ private:
     std::vector<int> _tags;
 };
 
-class XType
+class XList
 {
 public:
-    XType()
+    XList()
     {
     }
 
     // export to cython.
     void SetFeature(int i, int j, int s1, int s2, int featureID);
 
-    const vector<XSampleType>& Raw();
+    const vector<X>& Raw();
 
     // export to cython.
     void ToArray(list<list<std::pair<list<int>, list<int>>>>& res)
@@ -180,21 +180,21 @@ public:
     }
 
     // export to cython.
-    XSampleType& At(int i);
+    X& At(int i);
 
     // export to cython.
-    void Append(XSampleType& x);
+    void Append(X& x);
 
-    static int GetFeatureCount(const vector<XSampleType>& xs);
+    static int GetFeatureCount(const vector<X>& xs);
 
 private:
-    vector<XSampleType> _xs;
+    vector<X> _xs;
 };
 
-class YType
+class YList
 {
 public:
-    YType()
+    YList()
     {
     }
 
@@ -217,15 +217,15 @@ public:
     }
 
     // export to cython.
-    void Append(YSampleType& y);
+    void Append(Y& y);
 
     // export to cython.
-    YSampleType& At(int i);
+    Y& At(int i);
 
-    const vector<YSampleType>& Raw() const;
+    const vector<Y>& Raw() const;
 
-    static int GetTagCount(const vector<YSampleType>& ys);
+    static int GetTagCount(const vector<Y>& ys);
 
 private:
-    vector<YSampleType> _ys;
+    vector<Y> _ys;
 };
