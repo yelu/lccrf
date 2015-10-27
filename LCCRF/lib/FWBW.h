@@ -35,7 +35,7 @@ public:
     double CalcNodesExpectation(const int& s2, const X::PositionSet& positions);
     double CalcEdgesExpectation(const int& s1, const int& s2, const X::PositionSet& positions);
     double CalcLikelihood(const X& x, const Y& y);
-    double CalcGradient(const X& x, const Y& y, int k);
+    double CalcGradient(const X& x, const Y& y, int k, bool isCommon);
 
 private:
     void _CalculateAlphaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 100>&);

@@ -55,7 +55,7 @@ double SGDL1::UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u
     for (auto f = featureSet.begin(); f != featureSet.end(); f++)
     {
         int fid = f->first.id;
-        double delta = fwbw.CalcGradient(x, y, fid);
+        double delta = fwbw.CalcGradient(x, y, fid, false);
         double newWeight = _weights[fid] + _learningRate * delta;
         double newWeightWithPenalty = newWeight;
         if (newWeight > 0)
@@ -73,7 +73,7 @@ double SGDL1::UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u
 	for (auto f = x.commonFeatures.begin(); f != x.commonFeatures.end(); f++)
 	{
 		int fid = f->first.id;
-		double delta = fwbw.CalcGradient(x, y, fid);
+		double delta = fwbw.CalcGradient(x, y, fid, true);
 		double newWeight = _weights[fid] + _learningRate * delta;
 		double newWeightWithPenalty = newWeight;
 		if (newWeight > 0)

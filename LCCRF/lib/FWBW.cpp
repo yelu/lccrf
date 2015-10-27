@@ -194,13 +194,19 @@ double FWBW::CalcLikelihood(const X& x, const Y& y)
     return logOfTaggedPath - _logNorm;
 }
 
-double FWBW::CalcGradient(const X& x, const Y& y, int k)
+double FWBW::CalcGradient(const X& x, const Y& y, int k, bool isCommon)
 {
 	X::Feature feat(k, 0, 0);
-    auto pair = x.Raw().find(feat);
-	if (pair == x.Raw().end())
+	X::FeaturesContainer::const_iterator pair;
+	if (!isCommon)
 	{
-		return 0.0;
+		pair = x.Raw().find(feat);
+		if (pair == x.Raw().end()) { return 0.0; }
+	}
+	else
+	{
+		pair = x.commonFeatures.find(feat);
+		if (pair == x.commonFeatures.end()) { return 0.0; }
 	}
 
 	double empirical = 0.0; // linear
