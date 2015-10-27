@@ -94,11 +94,11 @@ double LCCRF::_Phi(int s1, int s2, int j,
     double ret = 0.0;
     for(auto ite = x.Raw().begin(); ite != x.Raw().end(); ite++)
     {
-        auto featureID = ite->first;
+        auto featureID = ite->first.id;
         auto positions = ite->second;
         for(auto position = positions->begin(); position != positions->end(); position++)
         {
-            if(j == position->j && s1 == position->s1 && s2 == position->s2)
+            if(j == *position && s1 == ite->first.s1 && s2 == ite->first.s2)
             {
                 ret += (weights[featureID]);
                 hitFeatures->push_back(pair<int, double>(featureID, weights[featureID]));

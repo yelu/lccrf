@@ -25,50 +25,40 @@ using std::shared_ptr;
 class X
 {
 public:
-    struct Position
+    struct Feature
     {
-        Position(int _j, int _s1, int _s2)
+		Feature(int _id, int _s1, int _s2)
         {
-            j = _j;
+            id = _id;
             s1 = _s1;
             s2 = _s2;
         }
 
-        int j;
+        int id;
         int s1;
         int s2;
 
-        struct Compare
-        {
-            const bool operator()(const Position& pos1, const Position& pos2) const
-            {
-                if(pos1.j != pos2.j) {return pos1.j < pos2.j;}
-                if(pos1.s1 != pos2.s1) {return pos1.s1 < pos2.s1;}
-                return pos1.s2 < pos2.s2;
-            }
-        };
-
         struct Equal
         {
-            const bool operator()(const Position& pos1, const Position& pos2) const
+			const bool operator()(const Feature& feat1, const Feature& feat2) const
             {
-                return (pos1.j == pos2.j && pos1.s1 == pos2.s1 && pos1.s2 == pos2.s2);
+				return feat1.id == feat2.id;
             }
         };
 
         struct Hash
         {
-            size_t operator()(const Position& k) const
+            size_t operator()(const Feature& k) const
             {
                 uint32_t res  = 0;
-                MurmurHash3_x86_32(&k, sizeof(Position), 47, &res);
+                MurmurHash3_x86_32(&k.id, sizeof(int), 47, &res);
                 return (size_t)res;
             }
         };
     };
 
-    typedef std::unordered_set<Position, Position::Hash, Position::Equal> PositionSet;
-    typedef std::unordered_map<int, shared_ptr<PositionSet>> FeaturesContainer;
+    typedef std::unordered_set<int> PositionSet;
+    typedef std::unordered_map<Feature, shared_ptr<PositionSet>, Feature::Hash, Feature::Equal> FeaturesContainer;
 
     // export to cython.
     X(void)
@@ -79,12 +69,23 @@ public:
     X(int length)
     {
         _length = length;
+		for (int i = 0; i < _length; i++)
+		{
+			allUnigramPositions.insert(i);
+		}
+		for (int i = 1; i < _length; i++)
+		{
+			allBigramPositions.insert(i);
+		}
     }
 
     double GetFeatureValue(int j, int s1, int s2, int featureID) const;
 
     //export to cython.
     void SetFeature(int j, int s1, int s2, int featureID);
+
+	//export to cython.
+	static void SetCommonFeature(int j, int s1, int s2, int featureID);
 
     int Length() const
     {
@@ -103,7 +104,13 @@ public:
 
 private:
     FeaturesContainer _features;
+
     int _length;
+public:
+	PositionSet allBigramPositions;
+	PositionSet allUnigramPositions;
+
+	static FeaturesContainer commonFeatures;
 };
 
 class Y
@@ -149,35 +156,6 @@ public:
     void SetFeature(int i, int j, int s1, int s2, int featureID);
 
     const vector<X>& Raw();
-
-    // export to cython.
-    void ToArray(list<list<std::pair<list<int>, list<int>>>>& res)
-    {
-        for(auto i = _xs.begin(); i != _xs.end(); i++)
-        {
-            auto x = i->Raw();
-            list<pair<list<int>, list<int>>> xOut;
-            map<list<int>, list<int>> fs;
-            for(auto j = x.begin(); j != x.end(); j++)
-            {
-                auto position = j->second->begin();
-                for(; position != j->second->end(); position++)
-                {
-                    list<int> pos;
-                    pos.push_back(position->j);
-                    pos.push_back(position->s1);
-                    pos.push_back(position->s2);
-                    fs[pos].push_back(j->first);
-                }
-            }
-            for(auto j = fs.begin(); j != fs.end(); j++)
-            {
-                list<int> position;
-                xOut.push_back(pair<list<int>, list<int>>(j->first, j->second));
-            }
-            res.push_back(xOut);
-        } 
-    }
 
     // export to cython.
     X& At(int i);

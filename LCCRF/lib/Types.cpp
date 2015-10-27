@@ -1,10 +1,12 @@
 #include "Types.h"
 
+X::FeaturesContainer X::commonFeatures;
+
 double X::GetFeatureValue(int j, int s1, int s2, int featureID) const 
 {
-    Position pos(j, s1, s2);
-    auto ite = _features.find(featureID);
-    if(ite == _features.end() || ite->second->count(pos) == 0)
+    Feature feat(featureID, s1, s2);
+	auto ite = _features.find(feat);
+    if(ite == _features.end() || ite->second->count(j) == 0)
     {
         return 0;
     }
@@ -13,12 +15,22 @@ double X::GetFeatureValue(int j, int s1, int s2, int featureID) const
 
 void X::SetFeature(int j, int s1, int s2, int featureID)
 {
-    Position pos(j, s1, s2);
-    if(_features.count(featureID) == 0)
+	Feature feat(featureID, s1, s2);
+    if(_features.count(feat) == 0)
     {
-        _features[featureID] = shared_ptr<PositionSet>(new PositionSet());
+        _features[feat] = shared_ptr<PositionSet>(new PositionSet());
     }
-    _features[featureID]->insert(pos);
+    _features[feat]->insert(j);
+}
+
+void X::SetCommonFeature(int j, int s1, int s2, int featureID)
+{
+	Feature feat(featureID, s1, s2);
+	if (X::commonFeatures.count(feat) == 0)
+	{
+		commonFeatures[feat] = shared_ptr<PositionSet>(new PositionSet());
+	}
+	commonFeatures[feat]->insert(j);
 }
 
 int Y::Length() const 
@@ -87,7 +99,7 @@ int XList::GetFeatureCount(const vector<X>& xs)
     {
         for(auto feature = x->Raw().begin(); feature != x->Raw().end(); feature++)
         {
-            features.insert(feature->first);
+            features.insert(feature->first.id);
         }
     }
     return features.size();

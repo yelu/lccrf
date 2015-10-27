@@ -45,15 +45,16 @@ double SGDL1::UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u
 {
     // save weights which has been changed.
     std::list<std::pair<int, double>> changedWeights;
-    // skip updating the i-th feature if the feature is not triggered in x. 
-    // Since the derivative will be zero.
-    const X::FeaturesContainer& featureSet = x.Raw();
+
     // For every x sample, forward-backward can be reused to save time.
     FWBW fwbw(x, _weights, _labelCount);
 
+	// skip updating the i-th feature if the feature is not triggered in x. 
+	// Since the derivative will be zero.
+	const X::FeaturesContainer& featureSet = x.Raw();
     for (auto f = featureSet.begin(); f != featureSet.end(); f++)
     {
-        int fid = f->first;
+        int fid = f->first.id;
         double delta = fwbw.CalcGradient(x, y, fid);
         double newWeight = _weights[fid] + _learningRate * delta;
         double newWeightWithPenalty = newWeight;
@@ -68,6 +69,25 @@ double SGDL1::UpdateWeights(const X& x, const Y& y, vector<double>& qs, double u
         qs[fid] += (newWeightWithPenalty - newWeight);
         changedWeights.push_back(std::pair<int, double>(fid, newWeightWithPenalty));
     }
+
+	for (auto f = x.commonFeatures.begin(); f != x.commonFeatures.end(); f++)
+	{
+		int fid = f->first.id;
+		double delta = fwbw.CalcGradient(x, y, fid);
+		double newWeight = _weights[fid] + _learningRate * delta;
+		double newWeightWithPenalty = newWeight;
+		if (newWeight > 0)
+		{
+			newWeightWithPenalty = std::fmax(0.0, newWeight - u - qs[fid]);
+		}
+		else
+		{
+			newWeightWithPenalty = std::fmin(0.0, newWeight + u - qs[fid]);
+		}
+		qs[fid] += (newWeightWithPenalty - newWeight);
+		changedWeights.push_back(std::pair<int, double>(fid, newWeightWithPenalty));
+	}
+
     // update changed weights to _weights.
     for (auto ite = changedWeights.begin(); ite != changedWeights.end(); ite++)
     {

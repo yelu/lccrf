@@ -82,41 +82,73 @@ void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<do
     }
 }
 
+void FWBW::_UpdateEdgesAndNodes(const X::FeaturesContainer& features,
+					      const X& x,
+						  const vector<double>& weights,
+						  MultiArray<double, 3>& edges,
+	                      MultiArray<double, 2>& nodes)
+{
+	X::FeaturesContainer::const_iterator ite = features.begin();
+	for (; ite != features.end(); ++ite)
+	{
+		const X::PositionSet& positions = _GetRightPositionSet(x, ite);
+
+		int featureID = ite->first.id;
+		X::PositionSet::const_iterator p = positions.begin();
+		for (; p != positions.end(); ++p)
+		{
+			// if it is a bigram feature(on labels), update edges.
+			if (ite->first.s1 >= 0)
+			{
+				edges(*p, ite->first.s1, ite->first.s2) += weights[featureID];
+			}
+			else
+			{
+				nodes(*p, ite->first.s2) += weights[featureID];
+			}
+		}
+	}
+}
+
+const X::PositionSet& FWBW::_GetRightPositionSet(const X&x, const X::FeaturesContainer::const_iterator& ite)
+{
+	const X::PositionSet* positions = NULL;
+	if (-1 == *(ite->second->begin()))
+	{
+		if (ite->first.s1 < 0)
+		{
+			positions = &x.allUnigramPositions;
+		}
+		else
+		{
+			positions = &x.allBigramPositions;
+		}
+	}
+	else
+	{
+		positions = ite->second.get();
+	}
+	return *(positions);
+}
+
 void FWBW::MakeEdgesAndNodes(const X& x,
                              const vector<double>& weights,
                              MultiArray<double, 3>& edges,
                              MultiArray<double, 2>& nodes)
 {
-    X::FeaturesContainer::const_iterator ite = x.Raw().begin();
-    for (; ite != x.Raw().end(); ++ite)
-    {
-        const X::PositionSet& positions = *(ite->second);
-        int featureID = ite->first;
-        X::PositionSet::const_iterator position = positions.begin();
-        for (; position != positions.end(); ++position)
-        {
-            const X::Position& p = *position;
-            // if it is a bigram feature(on labels), update edges.
-            if (p.s1 >= 0)
-            {
-                edges(p.j, p.s1, p.s2) += weights[featureID];
-            }
-            else
-            {
-                nodes(p.j, p.s2) += weights[featureID];
-            }
-        }
-    }
+	_UpdateEdgesAndNodes(x.Raw(), x, weights, edges, nodes);
+
+	_UpdateEdgesAndNodes(x.commonFeatures, x, weights, edges, nodes);
+
 }
 
-double FWBW::CalcNodesExpectation(const X::PositionSet& positions)
+double FWBW::CalcNodesExpectation(const int& s2, const X::PositionSet& positions)
 {
     double res = 0.0;
     auto position = positions.begin();
     for(; position != positions.end(); position++)
     {
-        int j = position->j;
-        int s2 = position->s2;
+        int j = *position;
         double forward = _alphaMatrix(j, s2);
         double backward = _betaMatrix(j, s2);
         double probability = 0.0;
@@ -130,16 +162,13 @@ double FWBW::CalcNodesExpectation(const X::PositionSet& positions)
     return res;
 }
 
-double FWBW::CalcEdgesExpectation(const X::PositionSet& positions)
+double FWBW::CalcEdgesExpectation(const int& s1, const int& s2, const X::PositionSet& positions)
 {
     double res = 0.0;
     auto position = positions.begin();
     for (; position != positions.end(); position++)
     {
-        int j = position->j;
-        int s1 = position->s1;
-        int s2 = position->s2;
-
+        int j = *position;   
         assert(j - 1 >= 0);
         double forward = _alphaMatrix(j - 1, s1);
         double backword = _betaMatrix(j, s2);
@@ -165,41 +194,46 @@ double FWBW::CalcLikelihood(const X& x, const Y& y)
     return logOfTaggedPath - _logNorm;
 }
 
-double FWBW::CalcGradient(const X& x,  const Y& y, int k)
+double FWBW::CalcGradient(const X& x, const Y& y, int k)
 {
-    double empirical = 0.0; // linear
-    double expected = 0.0; // linear
+	X::Feature feat(k, 0, 0);
+    auto pair = x.Raw().find(feat);
+	if (pair == x.Raw().end())
+	{
+		return 0.0;
+	}
 
-    auto positions = x.Raw().find(k);
+	double empirical = 0.0; // linear
+	double expected = 0.0; // linear
+
     bool isBigram = true;
-    if (positions->second->begin()->s1 < 0)
+    if (pair->first.s1 < 0)
     {
         isBigram = false;
     }
-    if (positions != x.Raw().end())
+	int s1 = pair->first.s1;
+	int s2 = pair->first.s2;
+
+	const X::PositionSet& positions = _GetRightPositionSet(x, pair);
+
+	for (auto p = positions.begin(); p != positions.end(); ++p)
+	{
+		int j = *p;
+		if ((!isBigram && y.Tags()[j] == s2) ||
+			(isBigram && y.Tags()[j - 1] == s1 && y.Tags()[j] == s2))
+		{
+			empirical += 1.0;
+		}
+	}
+
+    // get expected under model distribution.
+    if (isBigram)
     {
-        // get empirical.
-        auto position = positions->second->begin();
-        for (; position != positions->second->end(); ++position)
-        {
-            int j = position->j;
-            int s1 = position->s1;
-            int s2 = position->s2;
-            if ((!isBigram && y.Tags()[j] == s2) ||
-                (isBigram && y.Tags()[j - 1] == s1 && y.Tags()[j] == s2))
-            {
-                empirical += 1.0;
-            }
-        }
-        // get expected under model distribution.
-        if (isBigram)
-        {
-            expected = CalcEdgesExpectation(*(positions->second));
-        }
-        else
-        {
-            expected = CalcNodesExpectation(*(positions->second));
-        }
+		expected = CalcEdgesExpectation(s1, s2, positions);
+    }
+    else
+    {
+		expected = CalcNodesExpectation(s2, positions);
     }
 
     //LOG_DEBUG("emperical:%f expeted:%f", res1, res2);

@@ -91,6 +91,7 @@
     <ClInclude Include="MultiArray.h" />
     <ClInclude Include="MurmurHash3.h" />
     <ClInclude Include="SGDL1.h" />
+    <ClInclude Include="Str.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Viterbi.h" />
   </ItemGroup>

@@ -62,5 +62,8 @@
     <ClInclude Include="Viterbi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Str.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

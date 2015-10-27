@@ -109,6 +109,7 @@
     <ClInclude Include="tclap\ZshCompletionOutput.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\queries.lccrf.bin" />
     <None Include="tclap\Makefile.am" />
     <None Include="tclap\Makefile.in" />
   </ItemGroup>

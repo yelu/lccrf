@@ -16,6 +16,9 @@
     <Filter Include="Source Files\tclap">
       <UniqueIdentifier>{3cd3be7e-6a24-4b8e-b66d-7376efff98fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{4babd8ca-c2b5-4ef9-b457-52cc729b94d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tclap\Arg.h">
@@ -97,6 +100,9 @@
     </None>
     <None Include="tclap\Makefile.in">
       <Filter>Source Files\tclap</Filter>
+    </None>
+    <None Include="data\queries.lccrf.bin">
+      <Filter>data</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

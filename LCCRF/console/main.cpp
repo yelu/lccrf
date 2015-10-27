@@ -4,6 +4,7 @@
 #include <fstream>
 #include "tclap/CmdLine.h"
 #include "../lib/LCCRF.h"
+#include "../lib/Str.h"
 
 int main(int argc, char** argv)
 {
@@ -27,39 +28,73 @@ int main(int argc, char** argv)
 		cmd.parse(argc, argv);
 
 		std::ifstream infile(trainingData.getValue());
+
 		// read feature and tag counts.
 		int fcount = 0;
 		int tcount = 0;
-		infile >> fcount >> tcount;
-
+		std::string line;
+		std::getline(infile, line);
+		std::istringstream iss(line);
+		iss >> fcount >> tcount;
 		LCCRF lccrf(fcount, tcount);
-		int xFeatureCount = 0;
-		int yLength = 0;
-		XList x;
-		YList y;
-		while (infile >> yLength)
-		{	
-			Y ySample;
-			for (int i = 0; i < yLength; i++)
-			{
-				int tag = 0;
-				infile >> tag;
-				ySample.AppendTag(tag);
-			}
-			y.Append(ySample);
 
-			infile >> xFeatureCount;
-			X xSample(yLength);
-			for (int i = 0; i < xFeatureCount; i++)
+		// get common features.
+		std::getline(infile, line);
+		while (std::getline(infile, line) && !line.empty())
+		{
+			vector<string> tokens;
+			split(line, ' ', tokens);
+			vector<string> feats;
+			split(tokens[0], ',', feats);
+			vector<string> poses;
+			split(tokens[1], ',', poses);
+			
+			for (auto ite = poses.begin(); ite != poses.end(); ite++)
 			{
-				int pos, preTag, curTag, fid;
-				infile >> pos >> preTag >> curTag >> fid;
-				xSample.SetFeature(pos, preTag, curTag, fid);
+				X::SetCommonFeature(atoi(ite->c_str()),
+					atoi(feats[1].c_str()),
+					atoi(feats[2].c_str()),
+					atoi(feats[0].c_str()));
 			}
-			x.Append(xSample);
 		}
 
-		lccrf.Fit(x, y, maxIteration.getValue(), learningRate.getValue(), variance.getValue());
+		XList xList;
+		YList yList;
+		
+		while (std::getline(infile, line))
+		{
+			vector<string> tags;
+			split(line, ',', tags);
+			Y y;
+			for (auto ite = tags.begin(); ite != tags.end(); ite++)
+			{
+				int tag = atoi(ite->c_str());
+				y.AppendTag(tag);
+			}
+			yList.Append(y);
+
+			X x(tags.size());
+			while (std::getline(infile, line) && !line.empty())
+			{
+				vector<string> tokens;
+				split(line, ' ', tokens);
+				vector<string> feats;
+				split(tokens[0], ',', feats);
+				vector<string> poses;
+				split(tokens[1], ',', poses);
+
+				for (auto ite = poses.begin(); ite != poses.end(); ite++)
+				{
+					x.SetFeature(atoi(ite->c_str()),
+						atoi(feats[1].c_str()),
+						atoi(feats[2].c_str()),
+						atoi(feats[0].c_str()));
+				}
+			}
+			xList.Append(x);
+		}
+
+		lccrf.Fit(xList, yList, maxIteration.getValue(), learningRate.getValue(), variance.getValue());
 		lccrf.Save(modelPath.getValue());
 		return 0;
 	}
