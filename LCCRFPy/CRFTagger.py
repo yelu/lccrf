@@ -31,19 +31,8 @@ class CRFTagger:
                 
         log.debug("featurize data...")
         queriesBinFile = os.path.join(self.tmpDir, "queries.lccrf.bin")
-        with open(queriesBinFile, 'w') as f:
-            print >> f, "%d    %d" % (self.featurizer.FeatureCount(), len(self.featurizer.Tags()))
-            print >> f, ""
-            featurizedQueries = self.featurizer.Featurize(queries)
-            for i, q in enumerate(featurizedQueries):
-                # save tags.
-                print >> f, len(tags[i])
-                print >> f, " ".join([str(self.featurizer._tags[x]) for x in tags[i]])
-                # save features.
-                print >> f, len(q)
-                for feat in q:
-                    print >> f, " ".join([str(x) for x in list(feat)])
-                print >> f, ""
+        featurizedQueries = self.featurizer.Featurize(queries)
+        self.SaveQueries(featurizedQueries, tags, queriesBinFile)
         log.debug("data featurized.")
 
         # train crf model.
@@ -59,6 +48,50 @@ class CRFTagger:
         if status:
             raise RuntimeError, "%s failed. [ret:%s][%s]."%(cmd, status, output)
         return
+
+    def SaveQueries(self, featurizedQueries, tags, queriesBinFile):
+        commonFeats = set()
+        with open(queriesBinFile + ".tmp", 'w') as f:
+            for i, q in enumerate(featurizedQueries):
+                featPos = {}
+                for feat in q:
+                    pos, preTag, curTag, id, t = feat
+                    key =  (id, preTag, curTag)
+                    if t == "AnyFeaturizer" and preTag >= 0:
+                        commonFeats.add(key)
+                        continue
+                    if key not in featPos:
+                        featPos[key] = set()
+                    featPos[key].add(pos)
+                for k, v in featPos.items():
+                    featStr = ""
+                    featStr = "%s %s" % (",".join([str(x) for x in list(k)]), \
+                                         ",".join([str(x) for x in list(v)]))
+                    f.write(featStr + "|")         
+                print >> f, ""
+
+        # remove common feats in all queries.
+        with open(queriesBinFile + '.tmp', 'r') as inFile, \
+            open(queriesBinFile, 'w') as outFile:
+            print >> outFile, "%d %d" % (self.featurizer.FeatureCount(), len(self.featurizer.Tags()))
+            print >> outFile, ""
+
+            #print common features.
+            commonFeats = sorted(commonFeats)
+            for item in commonFeats:
+                print >> outFile, "%d,%d,%d -1" % (item[0], item[1], item[2])
+            print >> outFile, ""
+
+            for i, line in enumerate(inFile):
+                print >> outFile, ",".join([str(self.featurizer._tags[x]) for x in tags[i]])
+                feats = line.strip().strip("|").split('|')
+                feats = sorted(feats, key = lambda x:x.strip().split()[-1])
+                for feat in feats:
+                    if feat in commonFeats:
+                        continue
+                    print >> outFile, feat
+                print >> outFile, ""
+
 
     @staticmethod
     def Deserialize(modelDir):

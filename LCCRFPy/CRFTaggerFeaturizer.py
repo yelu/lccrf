@@ -81,14 +81,14 @@ class CRFTaggerFeaturizer(object):
                             prevTag = -1
                             currTag = featureOfY[1][0]
                             if not tags or self._tags[tags[i][end]] == currTag:
-                                res.append((end, prevTag, currTag, featureId))
+                                res.append((end, prevTag, currTag, featureId, featurizer.__class__.__name__))
 
                         # if it is bigram
                         if featureOfY[0] == "biTag" and end - 1 >= 0:
                             prevTag, currTag = featureOfY[1]
                             if not tags or (self._tags[tags[i][end]] == currTag and \
                                             self._tags[tags[i][end - 1]] == prevTag):
-                                res.append((end, prevTag, currTag, featureId))
+                                res.append((end, prevTag, currTag, featureId, featurizer.__class__.__name__))
 
             yield res
         
