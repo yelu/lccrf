@@ -21,5 +21,8 @@
     <ClCompile Include="TestFWBW.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestCFGParser\TestCFGParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

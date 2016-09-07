@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -77,6 +77,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CFGParser.cpp" />
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="MurmurHash3.cpp" />
@@ -85,11 +86,16 @@
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CFGParser.h" />
     <ClInclude Include="FWBW.h" />
     <ClInclude Include="LCCRF.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MultiArray.h" />
     <ClInclude Include="MurmurHash3.h" />
+    <ClInclude Include="RapidXml\rapidxml.hpp" />
+    <ClInclude Include="RapidXml\rapidxml_iterators.hpp" />
+    <ClInclude Include="RapidXml\rapidxml_print.hpp" />
+    <ClInclude Include="RapidXml\rapidxml_utils.hpp" />
     <ClInclude Include="SGDL1.h" />
     <ClInclude Include="Str.h" />
     <ClInclude Include="Types.h" />
