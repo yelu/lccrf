@@ -79,11 +79,4 @@ TEST_F(FWBWTestSuite, TestLearn)
 	EXPECT_NEAR(3.718281, fwbw->_betaScales[1], 1e-4);
 }
 
-/*
-int main(int argc, char* argv[])
-{
-	testing::InitGoogleTest(&argc, argv);
-	int ret = RUN_ALL_TESTS();
-	return ret;
-}
-*/
+

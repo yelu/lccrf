@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="TestCFGParser\TestCFGParser.cpp" />
     <ClCompile Include="TestFWBW.cpp" />
     <ClCompile Include="TestLCCRF.cpp" />

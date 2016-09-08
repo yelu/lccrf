@@ -46,7 +46,7 @@ vector<Y> LCCRFTestSuite::ys;
 
 TEST_F(LCCRFTestSuite, TestLearn)
 {
-	lccrf->Fit(xs, ys, 10000, 0.01, 0.01);
+	lccrf->Fit(xs, ys, 10000, 0.01, 0.1);
 	EXPECT_NEAR(0, lccrf->_weights[0], 1e-2);
 	EXPECT_NEAR(3.27, lccrf->_weights[1], 1e-2);
 	EXPECT_NEAR(0, lccrf->_weights[2], 1e-2);
@@ -65,11 +65,3 @@ TEST_F(LCCRFTestSuite, TestPredict)
 	lccrf->Predict(xs.front(), res);
 }
 
-/*
-int main(int argc, char* argv[])
-{
-	testing::InitGoogleTest(&argc, argv);
-	int ret = RUN_ALL_TESTS();
-	return ret;
-}
-*/

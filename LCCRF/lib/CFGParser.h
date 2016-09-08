@@ -9,6 +9,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <regex>
 #include "Log.h"
 #include "MurmurHash3.h"
 #include "RapidXml\rapidxml.hpp"
@@ -23,12 +24,13 @@ using std::string;
 using std::unordered_map;
 using std::unordered_set;
 using std::shared_ptr;
+using std::regex;
 using namespace rapidxml;
 
 class Matcher
 {
 public:
-	virtual list<int> Match(std::vector<string>& tokenizedQuery, int start) = 0;
+	virtual set<int> Match(std::vector<string>& tokenizedQuery, int start) = 0;
 	virtual void Aggregate(shared_ptr<Matcher> childMatcher) {};
 };
 
@@ -39,9 +41,21 @@ public:
 	{
 	}
 
-	list<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(std::vector<string>& tokenizedQuery, int start);
 private:
 	string _content;
+};
+
+class RegexMatcher : public Matcher
+{
+public:
+	RegexMatcher(const char* str) :_regex(str)
+	{
+	}
+
+	set<int> Match(std::vector<string>& tokenizedQuery, int start);
+private:
+	regex _regex;
 };
 
 class SequenceMatcher : public Matcher
@@ -57,11 +71,11 @@ public:
 		_matchers.push_back(childMatcher);
 	}
 
-	list<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(std::vector<string>& tokenizedQuery, int start);
 private:
 	vector<shared_ptr<Matcher>> _matchers;
 
-	std::list<int> _Match(std::vector<string>& tokenizedQuery,
+	set<int> _Match(std::vector<string>& tokenizedQuery,
 		int qStart,
 		int mStart);
 };
@@ -79,7 +93,7 @@ public:
 		_matchers.push_back(childMatcher);
 	}
 
-	list<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(std::vector<string>& tokenizedQuery, int start);
 private:
 	vector<shared_ptr<Matcher>> _matchers;
 };
@@ -96,7 +110,7 @@ public:
 		_matcher = childMatcher;
 	}
 
-	list<int> Match(vector<string>& tokenizedQuery, int start);
+	set<int> Match(vector<string>& tokenizedQuery, int start);
 private:
 	shared_ptr<Matcher> _matcher;
 };
@@ -120,7 +134,7 @@ public:
 	{
 	}
 
-	list<int> Match(vector<string>& tokenizedQuery, int start);
+	set<int> Match(vector<string>& tokenizedQuery, int start);
 private:
 	shared_ptr<Matcher> _matcher;
 	map<string, Rule>& _rules;
@@ -133,7 +147,24 @@ public:
 	int Start;
 	int End;
 	string RuleName;
+
+	Match(int s, int e, const string& name) :Start(s), End(e), RuleName(name) {}
+
+	struct Comparator
+	{
+		bool operator()(const Match& m1, const Match& m2) const
+		{
+			if (m1.Start != m2.Start)
+				return m1.Start < m2.Start;
+			else
+				return m1.End < m2.End;
+		}
+	};
 };
+
+
+
+
 
 class CFGParser
 {
@@ -142,11 +173,12 @@ public:
 
 	void LoadXml(const string& path);
 
-	vector<Match> Parse(vector<string>& tokenizedQuery, int start);
+	vector<Match> Parse(string& query);
 
 	shared_ptr<Matcher> _ParseNode(const xml_node<>* node);
 
 private:
 	map<string, Rule> _rules;
+	map<string, Rule> _publicRules;
 };
 
