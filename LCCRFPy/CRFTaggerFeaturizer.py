@@ -3,21 +3,44 @@
 import os
 import sys
 import json
+import argparse
+import importlib
 from log import *
 
-class CRFTaggerFeaturizer(object):
+class CRFTaggerFeaturizer(object, pipelineFile, output):
     def __init__(self):
-        self._featurizers = []
-        self._features = {}
-        self._nextFeatureId = 0
-        self._nextTagId = 0
-        self._tags = {}
-        self._idToTag = {}
-    
-    def AddFeaturizer(self, name, featurizer, shift = 0, uniTag = True, biTag = True):
-        self._featurizers.append({"name" : name, "uniTag" : uniTag, "biTag" : biTag, \
-                                   "shift" : shift, "instance": featurizer})
-    
+        self._pipelineFile = pipelineFile
+        self._output = None
+        self._variables = {}
+        self._processors = []
+        with open(pipelineFile) as f:
+            for line in f:
+                line = line.strip()
+                if len(line) == 0 or line[0] == "#":
+                    continue
+                processorName = line.split()[0]
+                processorClass = getattr(importlib.import_module("LCCRFPy"), \
+                                         processorName)
+                argParser = processorClass.GetArgParser()
+                args = argParser.parse_args(line.split()[1:])
+                processor = processorClass(args)
+                processor.args = args
+                self._processors.append(processor)
+
+    def Process(self, query):
+        query = query.strip()
+        self._variables['query'] = [query]
+        ret = None
+        for processor in self._processors:
+            input = []
+            for item in processor.args.input.split(','):
+                input += self._variables[item]
+            self._variables[processor.args[output]] = processor.process(input)
+        if self._output != None:
+            return self._variables[self._output]
+        else:
+            return []
+
     def Fit(self, queries, tags):
         # collect all tags for future use.
         for tag in tags:
@@ -91,10 +114,10 @@ class CRFTaggerFeaturizer(object):
                                 res.append((end, prevTag, currTag, featureId, featurizer.__class__.__name__))
 
             yield res
-        
+
     def Tags(self):
         return self._tags
-        
+
     def Features(self):
         allFeatures = {}
         for featureOfX, featuresOfY in self._features.items():
@@ -157,6 +180,5 @@ class CRFTaggerFeaturizer(object):
                 if featureX not in f._features:
                     f._features[featureX] = {}
                 f._features[featureX][featureY] = id
-                    
-            return f
 
+            return f

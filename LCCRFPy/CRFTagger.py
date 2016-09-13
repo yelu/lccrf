@@ -4,7 +4,6 @@ import os,sys
 from collections import defaultdict
 from log import *
 from CRFTaggerFeaturizer import CRFTaggerFeaturizer
-from AnyFeaturizer import AnyFeaturizer
 import json
 
 class CRFTagger:
@@ -21,14 +20,14 @@ class CRFTagger:
             maxIteration = 1, \
             learningRate = 0.001, \
             variance = 0.001):
-        
+
         if not os.path.exists(modelDir):
             os.makedirs(modelDir)
-            
+
         self.featurizer.Fit(queries, tags)
         self.featurizer.Serialize(os.path.join(modelDir, 'features.bin'))
         log.debug("feature extracted.")
-                
+
         log.debug("featurize data...")
         queriesBinFile = os.path.join(self.tmpDir, "queries.lccrf.bin")
         featurizedQueries = self.featurizer.Featurize(queries)
@@ -40,7 +39,7 @@ class CRFTagger:
                (self.lccrfBin, queriesBinFile, maxIteration, learningRate, variance, \
                 os.path.join(modelDir, 'weights.txt'), \
                 os.path.join(self.tmpDir, 'train_lccrf.log'))
-        
+
         import commands
         log.info(cmd)
         (status, output) = commands.getstatusoutput(cmd)
@@ -67,7 +66,7 @@ class CRFTagger:
                     featStr = ""
                     featStr = "%s %s" % (",".join([str(x) for x in list(k)]), \
                                          ",".join([str(x) for x in list(v)]))
-                    f.write(featStr + "|")         
+                    f.write(featStr + "|")
                 print >> f, ""
 
         # remove common feats in all queries.
@@ -146,7 +145,7 @@ class CRFTagger:
                         backtraceMatrix[(j, s1)] = s2
                         newPhi[s1] = d
             phi, newPhi = newPhi, phi
-        
+
         # find the optimal path
         maxJ = -1
         res = [-1] * nStep
@@ -155,14 +154,14 @@ class CRFTagger:
             if phi[s] > maxPath:
                 maxPath = phi[s]
                 maxJ = s
-        
+
         res[nStep - 1] = maxJ
         for j in range(nStep - 2, -1, -1):
             res[j] = backtraceMatrix[(j + 1, res[j + 1])]
 
         return res
 
-    
+
     def Debug(self, x):
         x, y = self.fm.Transform([x])
         debugInfo = self.crf.debug(x[0], y[0])
@@ -172,7 +171,7 @@ class CRFTagger:
             for feature in step:
                 res["path"]["position %s"%idx]["features"].append((self.readable_features[feature[0]], feature[1]))
         return res
-        
+
     def Test(self, xs, ys):
         predictedTags = self.Predict(xs)
         stat = {}
@@ -217,10 +216,9 @@ class CRFTagger:
         for key, value in features.items():
             res.append((key, value, self.weights[key]))
         return res
-    
+
     def SaveReadableFeaturesAndWeights(self, filePath):
         featureWeight = self.ReadableFeaturesAndWeights()
         with open(filePath, 'w') as f:
             for featureId, featureName, weight in featureWeight:
                 print >> f, "%s\t%s\t%f" % (featureId, featureName, weight)
- 
