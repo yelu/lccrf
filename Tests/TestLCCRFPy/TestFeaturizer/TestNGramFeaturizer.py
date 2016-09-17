@@ -16,6 +16,7 @@ class TestCaseNGramFeaturizer(unittest.TestCase):
     def test_GenerateNGrams(self):
         queryFile = "./query.txt"
         ngramFile = "./2gram.txt"
+        grammarFile = './en-us.datetime.grammar.xml'
         featurizer = NGramFeaturizer.GenerateNGrams(queryFile, 0, ngramFile, 2, False)
         ngramCount = len(open(ngramFile).readlines())
         self.assertEqual(ngramCount, 8)

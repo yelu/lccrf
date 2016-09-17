@@ -24,8 +24,7 @@ DEP_INCPATH=
 .PHONY:test
 test:
 	cd TestCRFTagger && $(PYTHON) TestCRFTagger.py;cd ..
-	cd TestNGramFeaturizer && $(PYTHON) TestNGramFeaturizer.py;cd ..
-	cd TestCRFTaggerFeaturizer && $(PYTHON) TestCRFTaggerFeaturizer.py;cd ..
+	cd TestFeaturizer && $(PYTHON) TestNGramFeaturizer.py;cd ..
 
 .PHONY:clean
 clean:
