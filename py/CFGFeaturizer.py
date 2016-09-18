@@ -6,7 +6,7 @@ from LCCRFPy import CFGParserPy
 class CFGFeaturizer(object):
     def __init__(self, args, cwd):
         self.args = args
-        self.input = self.args.input.strip().split(',')
+        self.inputs = self.args.input.strip().split(',')
         self.output = self.args.output
         self._cfgParser = CFGParserPy()
         grammarFile = os.path.join(cwd, self.args.grammarFile)

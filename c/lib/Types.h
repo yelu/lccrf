@@ -97,7 +97,7 @@ public:
     // set ith tag to be j
 	void SetTag(int i, int tag)
 	{
-		if (i >= (int)Tags.size())
+		if (i >= Tags.size())
 		{
 			Tags.resize(i + 1);
 		}

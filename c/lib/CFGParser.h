@@ -32,7 +32,7 @@ using namespace rapidxml;
 class MatcherBase
 {
 public:
-	virtual set<int> Match(std::vector<string>& tokenizedQuery, int start) = 0;
+	virtual set<int> Match(const std::vector<string>& tokenizedQuery, int start) = 0;
 	virtual void Aggregate(shared_ptr<MatcherBase> childMatcher) {};
 };
 
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	set<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(const std::vector<string>& tokenizedQuery, int start);
 private:
 	vector<string> _tokenizedItem;
 };
@@ -62,7 +62,7 @@ public:
 	{
 	}
 
-	set<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(const std::vector<string>& tokenizedQuery, int start);
 private:
 	regex _regex;
 };
@@ -80,11 +80,11 @@ public:
 		_matchers.push_back(childMatcher);
 	}
 
-	set<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(const std::vector<string>& tokenizedQuery, int start);
 private:
 	vector<shared_ptr<MatcherBase>> _matchers;
 
-	set<int> _Match(std::vector<string>& tokenizedQuery,
+	set<int> _Match(const std::vector<string>& tokenizedQuery,
 		int qStart,
 		int mStart);
 };
@@ -102,7 +102,7 @@ public:
 		_matchers.push_back(childMatcher);
 	}
 
-	set<int> Match(std::vector<string>& tokenizedQuery, int start);
+	set<int> Match(const std::vector<string>& tokenizedQuery, int start);
 private:
 	vector<shared_ptr<MatcherBase>> _matchers;
 };
@@ -119,7 +119,7 @@ public:
 		_matcher = childMatcher;
 	}
 
-	set<int> Match(vector<string>& tokenizedQuery, int start);
+	set<int> Match(const vector<string>& tokenizedQuery, int start);
 private:
 	shared_ptr<MatcherBase> _matcher;
 };
@@ -143,7 +143,7 @@ public:
 	{
 	}
 
-	set<int> Match(vector<string>& tokenizedQuery, int start);
+	set<int> Match(const vector<string>& tokenizedQuery, int start);
 private:
 	shared_ptr<MatcherBase> _matcher;
 	map<string, Rule>& _rules;
@@ -171,7 +171,7 @@ public:
 	CFGParser() {}
 
 	void LoadXml(const string& path);
-	map<string, vector<pair<int, int>>> Parse(string& query);
+	map<string, vector<pair<int, int>>> Parse(const vector<string>& tokenizedQuery);
 	shared_ptr<MatcherBase> _ParseNode(const xml_node<>* node);
 
 private:

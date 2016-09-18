@@ -76,7 +76,7 @@ void LCCRF::_GenerateLCCRFFeatures(const vector<X>& xs, const vector<Y>& ys)
 	{
 		_lccrfFeatures.AddSample(*iteX, *iteY);
 	}
-    LOG("%d features, %d labels.", _lccrfFeatures.FeatureCount(), _lccrfFeatures.LabelCount());
+    LOG("%zu features, %zu labels.", _lccrfFeatures.FeatureCount(), _lccrfFeatures.LabelCount());
 }
 
 Y LCCRF::Predict(const X& x)
@@ -155,7 +155,7 @@ pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const X& x,
     int preState = -1;
     double score = 0.0;
     pair<list<list<pair<int, double>>>, double> res;
-    for(int j = 0; j < x.Length(); j++)
+    for(size_t j = 0; j < x.Length(); j++)
     {
         if(y.Tags[j] >= _lccrfFeatures.LabelCount())
         {
@@ -171,7 +171,7 @@ pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const X& x,
 
 void LCCRF::Save(const string& path)
 {
-    LOG("Save weights to %s. %d features, %d labels.", 
+    LOG("Save weights to %s. %zu features, %zu labels.", 
               path.c_str(), 
               _lccrfFeatures.FeatureCount(),
               _lccrfFeatures.LabelCount());
@@ -236,7 +236,7 @@ void LCCRF::Load(const string& path)
 		}
     }
     ifs.close();
-    LOG("Loaded from %s. %d features, %d labels.", 
+    LOG("Load from %s. %zu features, %zu labels.", 
               path.c_str(), 
               _lccrfFeatures.FeatureCount(),
               _lccrfFeatures.LabelCount());
