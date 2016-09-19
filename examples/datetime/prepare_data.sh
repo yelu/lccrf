@@ -7,4 +7,5 @@ cat '\\suzhost-18\d$\Old\threshold\es-es\MT\calendar\data\slot.train.tsv' | grep
 cat '\\suzhost-18\d$\Old\threshold\es-es\MT\reminder\20150113\data\slot.train.tsv' | grep 'time>' | awk 'BEGIN{FS=OFS="\t"}{print $5}' > reminder.time
 cat '\\suzhost-18\d$\Old\threshold\es-es\MT\reminder\20150113\data\slot.train.tsv' | grep 'date>' | awk 'BEGIN{FS=OFS="\t"}{print $5}' > reminder.date
 
-cat alarm.* calendar.* reminder.* | python clean_data.py > train.tsv
+cat alarm.* calendar.* reminder.* | python retag.py > train.tsv
+shuf train.tsv > train.shuffled.tsv && mv train.shuffled.tsv train.tsv

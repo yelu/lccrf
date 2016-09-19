@@ -21,7 +21,7 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
         {
             sumLogLikelihood += UpdateWeights(*xIte, *yIte, qs, u);
             cnt += 1;
-            if(cnt % 1000 == 0)
+            if(cnt % 10000 == 0)
             {
                 LOG("%d training samples processed", cnt);
             }

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <rule name="YearMonthDay" scope="public">
+      <sequence>
+        <reference rule = "Weekday" optional="true"/>
+        <reference rule = "MonthDay"/>
+        <reference rule = "Year"/>
+      </sequence>
+    </rule>
+  
+    <rule name="MonthDay" scope="public">
+        <sequence>
+            <reference rule = "Month"/>
+            <reference rule = "Day"/>
+        </sequence>
+    </rule>
+
+    <rule name="Weekday" scope="private">
+        <one-of>
+            <string>monday</string>
+            <string>tuesday</string>
+            <string>wednesday</string>
+            <string>thursday</string>
+            <string>friday</string>
+            <string>saturday</string>
+            <string>sunday</string>
+        </one-of>
+    </rule>
+    
+    <rule name="Month" scope="private">
+        <one-of>
+            <string>january</string>
+            <string>february</string>
+            <string>march</string>
+            <string>april</string>
+            <string>may</string>
+            <string>june</string>
+            <string>july</string>
+            <string>august</string>
+            <string>september</string>
+            <string>october</string>
+            <string>november</string>
+            <string>december</string>
+        </one-of>
+    </rule>
+
+    <rule name="Day" scope="private">
+      <one-of>
+        <string>1</string>
+        <string>2</string>
+        <string>3</string>
+        <string>4</string>
+        <string>5</string>
+        <string>6</string>
+        <string>7</string>
+        <string>8</string>
+        <string>9</string>
+        <string>10</string>
+        <string>11</string>
+        <string>12</string>
+        <string>13</string>
+        <string>14</string>
+        <string>15</string>
+        <string>16</string>
+        <string>17</string>
+        <string>18</string>
+        <string>19</string>
+        <string>20</string>
+        <string>21</string>
+        <string>22</string>
+        <string>23</string>
+        <string>24</string>
+        <string>25</string>
+        <string>26</string>
+        <string>27</string>
+        <string>28</string>
+        <string>29</string>
+        <string>30</string>
+        <string>31</string>
+      </one-of>
+    </rule>
+
+  <rule name="Year" scope="private">
+    <regex> [0-9]{4} </regex>
+  </rule>
+</root>

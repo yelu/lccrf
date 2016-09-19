@@ -32,11 +32,11 @@ class Query:
 
 if __name__ == "__main__":
 
+    idx = 1
     for line in sys.stdin:
         line = line.strip()
         if len(line) == 0:
-            continue
-        idx = 1
+            continue     
         try:
             q = Query(line)
             hasDateTime = False
@@ -52,6 +52,6 @@ if __name__ == "__main__":
             if hasDateTime:
                 qStr = Query.ToString(q).lower()
                 print "%s\t%s" % (idx, qStr)
-                idx = idx + 1
+                idx += 1
         except:
             print "Badline : %s" % line

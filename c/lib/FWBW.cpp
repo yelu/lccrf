@@ -105,7 +105,7 @@ void FWBW::MakeEdgesAndNodes(const X& x,
 	}
 
 	// update edges.
-	for (size_t i = 1; i < x.Length(); i++)
+	for (int i = 1; i < x.Length(); i++)
 	{
 		for (auto tranFeature = lccrfFeatures.TransitionFeatures.begin();
 		tranFeature != lccrfFeatures.TransitionFeatures.end(); tranFeature++)
