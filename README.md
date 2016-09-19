@@ -3,13 +3,13 @@
 LCCRF
 =====
 
-A practical Linear Chain Conditional Random Field(LC CRF) Library implemented in C++. Python interface provided.
+A practical Linear Chain Conditional Random Field(LCCRF) Library implemented in C++, with python driver provided.
 
-The implementation features:
+This implementation features:
 
 * Rich features. NGram, Transition, Regex, Contextual-Free-Grammar(cfg) features are built-in.
 * API library. It can be embedded into your own code more easily and gracefully compared to calling a standalone binary.
-* Fast. The core is implemented with C++, thus has good training performance.
+* Fast. The core is written in C++, thus has good training performance.
 
 ## Get Started
 
@@ -20,7 +20,9 @@ The implementation features:
     // In case you are using ubuntu 14.04, here is a tested instruction:
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt-get install g++-4.9
+    sudo apt-get install gcc-4.9 g++-4.9
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
 
 2.cython
 
