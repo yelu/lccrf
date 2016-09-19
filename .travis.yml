@@ -17,7 +17,7 @@ install:
   - cd ./py/
   - export CC=/usr/bin/gcc
   - python Setup.py build
-  - sudo python Setup.py install
+  - python Setup.py install
   - cd ..
 
 # command to run tests
