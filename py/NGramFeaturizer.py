@@ -5,7 +5,7 @@ import argparse
 class NGramFeaturizer(object):
     def __init__(self, args, cwd):
         self.args = args
-        self.input = self.args.input.strip().split(',')
+        self.inputs = self.args.input.strip().split(',')
         self.output = self.args.output
         self._ngrams = {}
         ngramFile = os.path.join(cwd, self.args.ngramFile)
@@ -28,11 +28,10 @@ class NGramFeaturizer(object):
         return argParser
 
     @staticmethod
-    def GenerateNGrams(queries, ngramFile, n, addBosEos = False):
+    def GenerateNGrams(tokenizedQueries, ngramFile, n, addBosEos = False):
         nGrams = {}
         nextID = 0
-        for query in queries:
-            tokenizedQuery = query.strip().split()
+        for tokenizedQuery in tokenizedQueries:
             if len(tokenizedQuery) == 0 : continue
             if addBosEos:
                 tokenizedQuery.insert(0, "BOS")
@@ -54,8 +53,7 @@ class NGramFeaturizer(object):
         output = self.Featurize(query)
         return output
 
-    def Featurize(self, query):
-        tokenizedQuery = query.split()
+    def Featurize(self, tokenizedQuery):
         features = []
         if self.args.addBosEos:
             tokenizedQuery.insert(0, "BOS")

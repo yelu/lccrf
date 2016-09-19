@@ -36,7 +36,7 @@ cdef extern from "CFGParser.h":
     cdef cppclass CFGParser:
         CFGParser() except +
         void LoadXml(const string&)
-        map[string, vector[pair[int, int]]] Parse(string&)
+        map[string, vector[pair[int, int]]] Parse(const vector[string]&)
 
 cdef class CFGParserPy:
     cdef CFGParser c_cfgparser
@@ -44,6 +44,6 @@ cdef class CFGParserPy:
         self.c_cfgparser = CFGParser()
     def LoadXml(self, filePath):
         self.c_cfgparser.LoadXml(filePath)
-    def Parse(self, query):
-        cdef map[string, vector[pair[int, int]]] res = self.c_cfgparser.Parse(query)
+    def Parse(self, tokenizedQuery):
+        cdef map[string, vector[pair[int, int]]] res = self.c_cfgparser.Parse(tokenizedQuery)
         return res

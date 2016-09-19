@@ -23,9 +23,10 @@ CFGParser CFGParserTestSuite::parser;
 
 TEST_F(CFGParserTestSuite, TestMatch)
 {
-	parser.LoadXml("../TestLCCRF/TestCFGParser/en-us.datetime.grammar.xml");
+	parser.LoadXml("../TestLCCRF/TestCFGParser/cfg.xml");
 	string query = "thursday september 8 2016";
-	auto ret = parser.Parse(query);
+	vector<string> tokenizeQuery = split(query);
+	auto ret = parser.Parse(tokenizeQuery);
 	EXPECT_EQ(ret.size(), 2);
 	
 	EXPECT_EQ(ret["MonthDay"][0].first, 1);

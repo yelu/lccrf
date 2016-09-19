@@ -37,13 +37,12 @@ public:
         int pos;
     };
     
-    // export to cython.
-    X(size_t i)
+    X(int i)
     {
         _length = i;
     }
 
-	X(const std::vector<pair<int, int>>& x, size_t i)
+	X(const std::vector<pair<int, int>>& x, int i)
 	{
 		_length = i;
 		for (auto f = x.begin(); f != x.end(); f++)
@@ -62,7 +61,7 @@ public:
 		Features[xFeatureID]->insert(position);
 	}
 
-    size_t Length() const
+    int Length() const
     {
         return _length;
     }
@@ -76,14 +75,14 @@ public:
 
 private:
 
-    size_t _length;
+    int _length;
 };
 
 class Y
 {
 public:
 
-    Y(size_t length)
+    Y(int length)
     {
 		std::vector<int> tags(length, 0);
 		Tags.swap(tags);
@@ -93,11 +92,10 @@ public:
 
 	void Clear() { Tags.clear(); }
 
-    // export to python.
     // set ith tag to be j
 	void SetTag(int i, int tag)
 	{
-		if (i >= (int)Tags.size())
+		if (i >= (int)(Tags.size()))
 		{
 			Tags.resize(i + 1);
 		}
@@ -111,7 +109,6 @@ public:
 
 	std::vector<int> Tags;
 
-private:
 };
 
 
@@ -224,12 +221,12 @@ public:
 
 	}
 
-	size_t LabelCount() const
+	int LabelCount() const
 	{
 		return _labelCount;
 	}
 
-	size_t FeatureCount() const
+	int FeatureCount() const
 	{
 		return _featureCount;
 	}
@@ -276,6 +273,6 @@ public:
 	TransitionFeaturesType TransitionFeatures;
 
 private:
-	size_t _labelCount;
-	size_t _featureCount;
+	int _labelCount;
+	int _featureCount;
 };

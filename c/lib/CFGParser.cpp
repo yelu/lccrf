@@ -5,7 +5,7 @@
 #include <cstring>
 #include <stdexcept>
 
-set<int> StringMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> StringMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	set<int> ret;
 	if ((int)(tokenizedQuery.size()) - start < (int)(_tokenizedItem.size())) { return ret; }
@@ -21,7 +21,7 @@ set<int> StringMatcher::Match(std::vector<string>& tokenizedQuery, int start)
 	return ret;
 }
 
-set<int> RegexMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> RegexMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	set<int> ret;
 	string query;
@@ -58,13 +58,13 @@ set<int> RegexMatcher::Match(std::vector<string>& tokenizedQuery, int start)
 	return ret;
 }
 
-set<int> SequenceMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> SequenceMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	auto ret = _Match(tokenizedQuery, start, 0);
 	return ret;
 }
 
-set<int> SequenceMatcher::_Match(std::vector<string>& tokenizedQuery,
+set<int> SequenceMatcher::_Match(const std::vector<string>& tokenizedQuery,
 														int qStart, 
 														int mStart)
 {
@@ -84,7 +84,7 @@ set<int> SequenceMatcher::_Match(std::vector<string>& tokenizedQuery,
 	return ret;
 }
 
-set<int> OneOfMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> OneOfMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	set<int> ret;
 	for(auto matcher = _matchers.begin(); matcher != _matchers.end(); matcher++)
@@ -95,7 +95,7 @@ set<int> OneOfMatcher::Match(std::vector<string>& tokenizedQuery, int start)
 	return ret;
 }
 
-set<int> OptionalMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> OptionalMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	set<int> ret;
 	ret.insert(start);
@@ -104,7 +104,7 @@ set<int> OptionalMatcher::Match(std::vector<string>& tokenizedQuery, int start)
 	return ret;
 }
 
-set<int> RefMatcher::Match(std::vector<string>& tokenizedQuery, int start)
+set<int> RefMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {
 	if (!_matcher) { _matcher = _rules[_name].Matcher; }
 	auto ret = _matcher->Match(tokenizedQuery, start);
@@ -194,7 +194,6 @@ shared_ptr<MatcherBase> CFGParser::_ParseNode(const xml_node<>* node)
 		{
 			throw std::runtime_error("regex can't be empty");
 		}
-		
 		ret.reset(new RegexMatcher(pattern.c_str()));
 	}
 	else
@@ -215,16 +214,15 @@ shared_ptr<MatcherBase> CFGParser::_ParseNode(const xml_node<>* node)
 	return ret;
 }
 
-map<string, vector<pair<int, int>>> CFGParser::Parse(string& query)
+map<string, vector<pair<int, int>>> CFGParser::Parse(const vector<string>& tokenizedQuery)
 {
-	vector<string> tokenizedQuery = split(query);
 	map<string, vector<pair<int, int>>> matches;
 	for (size_t start = 0; start < tokenizedQuery.size(); start++)
 	{
 		for(auto rule = _publicRules.begin(); rule != _publicRules.end(); rule++)
 		{
 			if (!rule->second.IsPublic) { continue; }
-			auto ends = rule->second.Matcher->Match(tokenizedQuery, start);
+			auto ends = rule->second.Matcher->Match(tokenizedQuery, (int)start);
 			for (auto end = ends.begin(); end != ends.end(); end++)
 			{
 				if (matches.count(rule->second.Name) == 0)

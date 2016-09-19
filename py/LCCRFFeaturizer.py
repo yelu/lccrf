@@ -61,29 +61,33 @@ class LCCRFFeaturizer(object):
                 processor = processorClass(args, os.path.dirname(pipelineFile))
                 self._processors.append(processor)
 
-    def Featurize(self, query, lock = False):
-        query = query.strip()
-        self._variables['query'] = [query]
+    def Featurize(self, tokenizedQuery, lock = False):
+        self._variables['query'] = [tokenizedQuery]
         ret = None
         for processor in self._processors:
             input = []
-            for item in processor.input:
+            for item in processor.inputs:
                 input += self._variables[item]
             self._variables[processor.output] = processor.Process(input)
         ret = []
-	print self._variables
+        #print self._variables
         if self._outputs != None:
             for output in self._outputs:
                 features = self._variables[output]
                 # allocate an id for features.
-                for feature in features:
-                    featureKey = (output, feature[-1])
+                for s,e,fid in features:
+                    # check if out of boundary
+                    if s < 0 or e > len(tokenizedQuery) or e <= s:
+                        continue
+                    featureKey = (output, fid)
                     if not lock:
                         if featureKey not in self._featureIDMap:
                             self._featureIDMap[featureKey] = self._nextId
                             self._nextId += 1
+                            if self._nextId > 2147483647:
+                                raise "Feature count exceeds limits 2^31-1"
                     if featureKey in self._featureIDMap:
-                        ret.append((feature[-2] - 1, self._featureIDMap[featureKey]))
+                        ret.append((e - 1, self._featureIDMap[featureKey]))
         return ret
 
     def Save(self, outDir):
@@ -91,10 +95,6 @@ class LCCRFFeaturizer(object):
         with open(os.path.join(outDir, "lccrf.features.txt"), 'w') as f:
             for feature in features:
                 print >> f, feature
-
-        # copy pipeline file
-        #pipelineFile = os.path.join(outDir, "lccrf.pipeline.txt")
-        # shutil.copy(self._pipelineFile, pipelineFile)
 
         # save pipeline.outputs
         outputsFile = os.path.join(outDir, "lccrf.pipeline.outputs.txt")

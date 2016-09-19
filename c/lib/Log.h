@@ -10,7 +10,7 @@
     {\
 		time_t rawtime; \
 		struct tm * timeinfo; \
-		char buffer [80]; \
+		char buffer [1024]; \
 		time (&rawtime); \
 		timeinfo = localtime (&rawtime); \
 		strftime (buffer, 80, "%y/%m/%d %H:%M:%S", timeinfo); \
@@ -22,7 +22,7 @@
     {\
 		time_t rawtime; \
 		struct tm * timeinfo; \
-		char buffer [80]; \
+		char buffer [1024]; \
 		time (&rawtime); \
 		timeinfo = localtime (&rawtime); \
 		strftime (buffer, 80, "%y/%m/%d %H:%M:%S", timeinfo); \

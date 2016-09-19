@@ -236,9 +236,7 @@ void LCCRF::Load(const string& path)
 		}
     }
     ifs.close();
-    LOG("Loaded from %s. %d features, %d labels.", 
-              path.c_str(), 
-              _lccrfFeatures.FeatureCount(),
-              _lccrfFeatures.LabelCount());
+    LOG("Load from %s. %d features, %d labels.", path.c_str(), 
+        _lccrfFeatures.FeatureCount(), _lccrfFeatures.LabelCount());
  
 }

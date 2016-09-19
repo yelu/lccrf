@@ -15,11 +15,18 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
         _iterationCount++;
         auto xIte = _xs.begin();
         auto yIte = _ys.begin();
+        int cnt = 0;
         // calculate gradients and log-likelihood for every training sample(aka, mini-batch=1).
         for (; xIte != _xs.end() && yIte != _ys.end(); xIte++, yIte++)
         {
             sumLogLikelihood += UpdateWeights(*xIte, *yIte, qs, u);
+            cnt += 1;
+            if(cnt % 10000 == 0)
+            {
+                LOG("%d training samples processed", cnt);
+            }
         }
+		LOG("%d training samples in total", cnt);
         double objective = sumLogLikelihood;
         for (auto w = _weights.begin(); w != _weights.end(); w++)
         {
@@ -28,10 +35,10 @@ const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteratio
 
         // one iteration(epoch) finished, check it converged.
         double improvementRatio = (objective - lastObjective) / std::abs(objective);
-        LOG_DEBUG("Iteration:%d, loss:%f, improve by:%f", i, objective, improvementRatio);
+        LOG("Iteration:%d, loss:%f, improve by:%f", i, objective, improvementRatio);
         if (std::abs(improvementRatio) < 1e-3)
         {
-            LOG_DEBUG("Converged.");
+            LOG("Converged.");
             break;
         }
         lastObjective = objective;

@@ -38,7 +38,7 @@ FWBW::~FWBW(void)
 {
 }
 
-void FWBW::_CalculateAlphaMatrix(MultiArray<double, 2>& alphaMatrix, MultiArray<double, 1, 100>& scales)
+void FWBW::_CalculateAlphaMatrix(MultiArray<double, 2>& alphaMatrix, MultiArray<double, 1, 10240>& scales)
 {
     // for the first token, there will only be nodes.
     for(int s = 0; s < _labelCount; s++)
@@ -60,7 +60,7 @@ void FWBW::_CalculateAlphaMatrix(MultiArray<double, 2>& alphaMatrix, MultiArray<
     }
 }
 
-void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<double, 1, 100>& scales)
+void FWBW::_CalculateBetaMatrix(MultiArray<double, 2>& betaMatrix, MultiArray<double, 1, 10240>& scales)
 {
     for(int s = 0; s < _labelCount; s++)
     {
@@ -105,7 +105,7 @@ void FWBW::MakeEdgesAndNodes(const X& x,
 	}
 
 	// update edges.
-	for (size_t i = 1; i < x.Length(); i++)
+	for (int i = 1; i < x.Length(); i++)
 	{
 		for (auto tranFeature = lccrfFeatures.TransitionFeatures.begin();
 		tranFeature != lccrfFeatures.TransitionFeatures.end(); tranFeature++)
@@ -203,9 +203,9 @@ double FWBW::GetLogNorm()
     return _logNorm;
 }
 
-void FWBW::VectorDivide(const MultiArray<double, 1, 100>& v1, 
-                        const MultiArray<double, 1, 100>& v2, 
-                        MultiArray<double, 1, 100>& res)
+void FWBW::VectorDivide(const MultiArray<double, 1, 10240>& v1, 
+                        const MultiArray<double, 1, 10240>& v2, 
+                        MultiArray<double, 1, 10240>& res)
 {
     for(int i = 0; i < res.Dim1(); i++)
     {

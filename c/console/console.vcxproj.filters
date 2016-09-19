@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tclap\Arg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\ArgException.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\ArgTraits.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\CmdLine.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\CmdLineInterface.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\CmdLineOutput.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\Constraint.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\DocBookOutput.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\HelpVisitor.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\IgnoreRestVisitor.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\MultiArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\MultiSwitchArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\OptionalUnlabeledTracker.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\StandardTraits.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\StdOutput.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\SwitchArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\UnlabeledMultiArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\UnlabeledValueArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\ValuesConstraint.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\ValueArg.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\VersionVisitor.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\Visitor.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\XorHandler.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+    <ClInclude Include="tclap\ZshCompletionOutput.h">
+      <Filter>tclap</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tclap\Makefile.am" />
+    <None Include="tclap\Makefile.in" />
+    <None Include="data\query.featurized.bin">
+      <Filter>data</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tclap">
+      <UniqueIdentifier>{3048cf30-00bf-4fbd-bd35-b0700070a9bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{7f285e52-76b5-467f-bdc2-66d0337989fe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
