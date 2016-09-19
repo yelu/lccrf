@@ -4,7 +4,7 @@
       <sequence>
         <reference rule = "Weekday" optional="true"/>
         <reference rule = "MonthDay"/>
-        <!--reference rule = "Year"/-->
+        <reference rule = "Year"/>
       </sequence>
     </rule>
   
@@ -80,7 +80,7 @@
       </one-of>
     </rule>
 
-  <!--rule name="Year" scope="private">
+  <rule name="Year" scope="private">
     <regex> [0-9]{4} </regex>
-  </rule-->
+  </rule>
 </root>

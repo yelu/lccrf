@@ -27,10 +27,10 @@ class TestCRFTagger(unittest.TestCase):
         #test on training set.
         stat = tagger.Evaluate(xs, ys)
         print json.dumps(stat, indent=4)
+        self.assertEqual(stat["accuracy"], 1.0)
 
-        xs = ["will it rain".split(),
-              "what is the weather in shanghai".split(),
-              "what is the weather in a b c d e f g".split()]
+        xs = ["wake me up at eight am".split(),
+              ]
         ys = []
         for x in xs:
             y = tagger.Predict(x)
