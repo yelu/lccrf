@@ -23,9 +23,9 @@ public:
 
     double GetLogNorm();
 
-    static void VectorDivide(const MultiArray<double, 1, 10240>& v1, 
-        const MultiArray<double, 1, 10240>& v2, 
-        MultiArray<double, 1, 10240>& res);
+    static void VectorDivide(const MultiArray<double, 1, 5120>& v1, 
+        const MultiArray<double, 1, 5120>& v2, 
+        MultiArray<double, 1, 5120>& res);
 
     static void MakeEdgesAndNodes(const X& x,
 								  const Y& y,
@@ -41,8 +41,8 @@ public:
 	double CalcGradient(const X& x, const Y& y, const LCCRFFeatures::TransitionFeature& feature);
 
 private:
-    void _CalculateAlphaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 10240>&);
-    void _CalculateBetaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 10240>&);
+    void _CalculateAlphaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 5120>&);
+    void _CalculateBetaMatrix(MultiArray<double, 2>&, MultiArray<double, 1, 5120>&);
 
 private:
 	const LCCRFFeatures& _lccrfFeatures;
@@ -52,9 +52,9 @@ private:
     MultiArray<double, 2> _nodes;
     MultiArray<double, 2> _alphaMatrix;
     MultiArray<double, 2> _betaMatrix;
-    MultiArray<double, 1, 10240> _alphaScales;    // used to avoid exp overflowed.
-    MultiArray<double, 1, 10240> _betaScales;     // used to avoid exp overflowed.
-    MultiArray<double, 1, 10240> _div;
+    MultiArray<double, 1, 5120> _alphaScales;    // used to avoid exp overflowed.
+    MultiArray<double, 1, 5120> _betaScales;     // used to avoid exp overflowed.
+    MultiArray<double, 1, 5120> _div;
     double _logNorm; // log
 };
 

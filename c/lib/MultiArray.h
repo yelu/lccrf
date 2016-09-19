@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-template <typename T, int Dim, int N = 10240>
+template <typename T, int Dim, int N = 5120>
 class MultiArray
 {
 };

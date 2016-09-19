@@ -47,7 +47,7 @@ LCCRFFeatures LCCRFTestSuite::lccrfFeatures;
 TEST_F(LCCRFTestSuite, TestFitAndPredict)
 {
 	// fit
-	lccrf->Fit(xs, ys, 10000, 0.1, 0.1);
+	lccrf->Fit(xs, ys, 1000, 0.1, 0.1);
 	EXPECT_NEAR(0.76578, lccrf->_weights[0], 1e-4);
 	EXPECT_NEAR(0.76578, lccrf->_weights[1], 1e-4);
 	EXPECT_NEAR(1.7396, lccrf->_weights[2], 1e-4);
