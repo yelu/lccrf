@@ -9,7 +9,7 @@ if __name__ == "__main__":
     xs, ys = CRFTagger.LoadTrainData(train_data)
     config = {"modelDir":"./model", "features":{"cfg":{"grammarFile":"./en-us.datetime.grammar.xml"}}}
     tagger = CRFTagger(config)
-    tagger.Train(xs, ys, maxIteration = 10, learningRate = 0.05, variance = 0.0008)
+    tagger.Train(xs, ys, maxIteration = 10, learningRate = 0.01, variance = 0.01)
 
     tagger = CRFTagger.Load(config["modelDir"])
 

@@ -41,7 +41,11 @@ if __name__ == "__main__":
             q = Query(line)
             hasDateTime = False
             for slot in q.slots:
-                if slot[0].endswith('time') or slot[0].endswith('date'):
+                if slot[0].endswith('time'):
+                    slot[0] = 'time'
+                    hasDateTime = True
+                elif slot[0].endswith('date'):
+                    slot[0] = 'date'
                     hasDateTime = True
                 else:
                     slot[0] = 'O'
