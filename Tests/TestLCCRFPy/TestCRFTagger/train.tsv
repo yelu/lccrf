@@ -1,14 +1,10 @@
-1	how much <weather_condition> rain </weather_condition> is expected in <absolute_location> hilton head </absolute_location> <date_range> today </date_range>
-2	do i need an <suitable_for> umbrella </suitable_for> <date_range> tomorrow </date_range>
-3	give me the <temperature_range> average high </temperature_range> temp for <absolute_location> dallas </absolute_location>
-4	what is the weather like and <absolute_location> kathmandu </absolute_location>
-5	weather <date_range> today </date_range> in <absolute_location> forth mill south carolina </absolute_location>
-6	<temperature_range> high </temperature_range> average for <absolute_location> west palm beach </absolute_location>
-7	is it <weather_condition> breezy </weather_condition> <date_range> today </date_range>
-8	will it <weather_condition> rain </weather_condition>
-9	what will the temperature be <date_range> tomorrow </date_range>
-10	what is the weather in <absolute_location> stuart florida </absolute_location>
-11	what is the weather in <absolute_location> mission viejo california </absolute_location>
-12	weather in <absolute_location> issaquah washington </absolute_location>
-13	weather in <absolute_location> jakarta </absolute_location>
-14	will it be too <weather_condition> cold </weather_condition> for a <suitable_for> sundress </suitable_for> on <date_range> wednesday </date_range>
+82999	at <time> twelve o'clock </time> 
+49091	how does <date> monday </date> look 
+25058	wake me up at <time> eight am </time> 
+26758	wake me up <time> in five minutes </time> 
+63736	<date> january twenty seventh </date> <time> ten fifteen a m </time> 
+4364	wake me up at <time> ten a . m . </time> <date> tomorrow </date> 
+59471	lynn county <date> february fifth </date> <time> eight thirty a m </time> 
+46575	what do i have <date> tomorrow </date> ? 
+27440	set my alarm for <time> eight thirty a m </time> 
+80611	remind me to mail fedex package <date> tomorrow </date> at <time> ten thirty a m </time>

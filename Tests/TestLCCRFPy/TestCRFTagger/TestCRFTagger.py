@@ -18,7 +18,7 @@ class TestCRFTagger(unittest.TestCase):
     def test_FitPredict(self):
         filePath = './train.tsv'
         xs, ys = CRFTagger.LoadTrainData(filePath)
-        config = {"modelDir":"./model", "features":{"cfg":{"grammarFile":"./en-us.datetime.grammar.xml"}}}
+        config = {"modelDir":"./model", "features":{"cfg":{"grammarFile":"./cfg.xml"}}}
         tagger = CRFTagger(config)
         tagger.Train(xs, ys, maxIteration = 1000, learningRate = 0.05, variance = 0.0008)
 

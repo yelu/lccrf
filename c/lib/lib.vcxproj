@@ -81,6 +81,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CFGParser.cpp" />
     <ClCompile Include="FWBW.cpp" />
     <ClCompile Include="LCCRF.cpp" />
     <ClCompile Include="MurmurHash3.cpp" />
@@ -89,6 +90,7 @@
     <ClCompile Include="Viterbi.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CFGParser.h" />
     <ClInclude Include="FWBW.h" />
     <ClInclude Include="LCCRF.h" />
     <ClInclude Include="Log.h" />

@@ -85,16 +85,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TestCFGParser\TestCFGParser.cpp" />
     <ClCompile Include="TestFWBW.cpp" />
     <ClCompile Include="TestLCCRF.cpp" />
+    <ClCompile Include="TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LCCRF\LCCRF.vcxproj">
-      <Project>{146717de-ba7f-404f-bd02-ed767f490e4f}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\lib\lib.vcxproj">
       <Project>{e777991d-06e5-47f8-a99f-331086f05875}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="TestCFGParser\cfg.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
