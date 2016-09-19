@@ -5,68 +5,45 @@ LCCRF
 
 A practical Linear Chain Conditional Random Field(LC CRF) Library implemented in C++. Python interface provided.
 
-This implementation features:
+The implementation features:
 
-* Rich features. NGram, Transition, Regex(in progress), Dictionary(in progress), Contextual-Free-Grammar(cfg, in progress) features are built-in.
-* Extensible featurizers. By implementing self-defined featurizers, you can add any feature you need freely, e.g. a feature checking if two consecutive tags are the same.
+* Rich features. NGram, Transition, Regex, Contextual-Free-Grammar(cfg) features are built-in.
 * API library. It can be embedded into your own code more easily and gracefully compared to calling a standalone binary.
+* Fast. The core is implemented with C++, thus has good training performance.
 
 ## Get Started
 
-### Installation
+**Prerequisites:**
 
-Prerequisites:
+1.gcc 4.9.0 or higher (with C++11 regex support)
+
+    // In case you are using ubuntu 14.04, here is a tested instruction:
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    sudo apt-get update
+    sudo apt-get install g++-4.9
+
+2.cython
+
+    sudo apt-get install cython
+
+
+**Install LCCRFPy:**
 
 ```bash
-# 1. gcc 4.8 or higher (with full C++11 support)
-# 2. cython
-sudo apt-get install cython
-```
-
-Install LCCRFPy:
-
-```bash
-cd ./LCCRFPy/
+cd ./py/
+export CC=/usr/bin/gcc  # This is to make sure you are using the right gcc version(>4.9.0)
 python Setup.py build
 sudo python Setup.py install
 ```
 
-### Hello World
+**Hello World**
 
-```python
-import os,sys
-from CRFTagger import *
+There is an example datetime tagger in "examples/datetime" for extracting date/time from input query.
 
-# training samples.
-trainXs = ["what is the weather in shang hai".split(),
-           "what is the weather in hong kong".split()]
-trainYs = [["O", "O", "O", "O", "O", "City", "City"],
-           ["O", "O", "O", "O", "O", "City", "City"],
-          ]
+To train such a tagger, run
 
-# 1. instantiate a CRFTagger and add three featurizers.
-tagger = CRFTagger()
-# add unigram(on x) featurizer : current word together with current tag.
-tagger.AddFeaturizer("ngram1", NGramFeaturizer(1),\
-                     shift = 0, unigram = True, bigram = False)
-# add bigram(on x) featurizer : current bi-word together with current tag.
-tagger.AddFeaturizer("ngram2", NGramFeaturizer(2), 
-                     shift = 0, unigram = True, bigram = False)
-# add any featurizer : trigger a feature at any position of x, 
-# the final feature depends purely on transitions of y.
-tagger.AddFeaturizer("any", AnyFeaturizer(), 
-                      shift = 0, unigram = False, bigram = True)
-# 2. train a crf model.
-tagger.Fit(trainXs, trainYs, \
-           maxIteration = 1000,\
-           learningRate = 0.05, \
-           variance = 0.0008)
-print "Features : %d    Tags : %d" % (tagger.fm.FeatureCount, \
-                                      tagger.fm.TagCount)
+    python train.py -d train.tsv -m ./model/
 
-# 3. inference on new data.
-xs = ["what is the weather in bei jing".split()]
-ys = tagger.Transform(xs)
-print ys
-```
+To decode using the model just trained, run
 
+    python decode.py -m ./model/

@@ -3,21 +3,26 @@ python:
   - "2.7"
 
 before_install:
-  # We need this line to have g++4.8 available in apt
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -qq
+  # We need this line to have g++4.9 available in apt
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
 
 # command to install dependencies
 install:
-  # We want to compile with g++ 4.8 when rather than the default g++
-  - sudo apt-get install -qq gcc-4.8 g++-4.8
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
+  # We want to compile with g++ 4.9 when rather than the default g++
+  - sudo apt-get install g++-4.9
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 90
   - pip install cython
+  - cd ./py/
+  - export CC=/usr/bin/gcc
+  - python Setup.py build
+  - sudo python Setup.py install
+  - cd ..
 
 # command to run tests
 script:
-  - cd ./LCCRFPy && make; cd ..
-  - pwd=`pwd` && export PYTHONPATH=${pwd}/LCCRFPy:${PYTHONPATH}
-  - cd ./Tests/TestLCCRFPy/ && make clean && make test
+  - cd ./Tests/TestLCCRFPy
+  - make clean && make test
+  
 

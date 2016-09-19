@@ -13,7 +13,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     xs, ys = CRFTagger.LoadTrainData(args.data)
-    config = {"modelDir":args.model, "features":{"cfg":{"grammarFile":"./en-us.datetime.grammar.xml"}}}
+    config = {"modelDir":args.model, "features":{"cfg":{"grammarFile":"./en-us.datetime.cfg.xml"}}}
     tagger = CRFTagger(config)
     tagger.Train(xs, ys, maxIteration = 10, learningRate = 0.01, variance = 0.01)
 
