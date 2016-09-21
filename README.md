@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/yelu/LCCRF.svg?branch=master)](https://travis-ci.org/yelu/LCCRF)
 
-LCCRF
+LC-CRF
 =====
 
-A practical Linear Chain Conditional Random Field(LCCRF) implemented in C++, with python driver provided.
+A practical Linear Chain Conditional Random Field(LC-CRF) implemented in C++, with python driver provided.
 
 This implementation features:
 
