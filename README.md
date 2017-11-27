@@ -1,49 +1,48 @@
-[![Build Status](https://travis-ci.org/yelu/LCCRF.svg?branch=master)](https://travis-ci.org/yelu/LCCRF)
-
-LC-CRF
+lccrf
 =====
 
-A practical Linear Chain Conditional Random Field(LC-CRF) implemented in C++, with python driver provided.
+A fast linear chain conditional random field(lccrf) implemention in C++. The resolver is l1-regularized sgd. Perceptron resolver is in progress.
 
-This implementation features:
+This distribution includes:
 
-* Rich feature templates. NGram, Transition, Regex, Contextual-Free-Grammar(cfg) features are built-in.
-* Speed. The core training component is well optimazied for fast training.
-* API library. It can be embedded into your own code more easily and gracefully, compared to calling a standalone binary.
+  * a api lib. It can be embedded into your own code easily and gracefully, compared to calling a standalone binary.
+  * a console exe. For detailed usage, see following sections.
 
 ## Get Started
 
-**Prerequisites:**
+**sample command**
 
-1.gcc 4.9.0 or higher (with C++11 regex support)
+lccrf.exe -d "data.txt" -m "model.bin" -i 10 -s 0.01 -l 0.01
 
-    // In case you are using ubuntu 14.04, here is an instruction:
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-    sudo apt-get update
-    sudo apt-get install gcc-4.9 g++-4.9
+**arguments**
 
-2.cython
+-d Data file to train the model. 
 
-    sudo apt-get install cython
+A blank line sperates query from query. Within each query, every line is a word token. Within each line, the first integer is the label id. The remaining integers are features triggered at current word token.
+
+    [label id] [f1] [f2] ...             <- query #0, word #0
+    [label id] [f1] [f2] [f3] ...        <- query #0, word #1
+                                         <- a blank line seperates query #0 and #1
+    [label id] [f1] [f2] [f3] ...        <- query #1, word #0
+    [label id] [f1] [f2] ...             <- query #1, word #1
+    [label id] [f1] [f2] [f3] [f4] ...   <- query $1, word #2
+    
+An example:
+        
+    0 0 1 2 3 4 5 6
+    0 7 8 9 10 11 12 13 14
+
+    0 15 16 17 18 19 4 20 21
+    0 22 23 24 25 26 27 28 12 29 30 31
+    0 32 33 34 35 36 37 38 39 40 41 42 43
+    5 44 45 46 47 48 49 50 51 52 53 54 55 6 56
+    2 57 58 59 60 61 62 63 64 13 65
 
 
-**Install LCCRFPy:**
+-m Target path to save the model file.
 
-```bash
-cd ./py/
-export CC=g++-4.9  # This is to make sure you are using the right gcc version(>4.9.0)
-python Setup.py build
-sudo python Setup.py install
-```
+-i Max iteration number. There will be an early stop if the loss improvment between too epoches is lower than a threshold.
 
-**Hello World**
+-s Learning step size.
 
-There is an example datetime tagger in "examples/datetime" for extracting date/time from input query.
-
-To train such a tagger, run
-
-    python train.py -d train.tsv -m ./model/
-
-To decode using the model just trained, run
-
-    python decode.py -m ./model/
+-l L1 regularization strength.

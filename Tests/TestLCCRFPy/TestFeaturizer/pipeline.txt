@@ -1,2 +1,0 @@
-NGramFeaturizer --input=query --output=ngrams --n=2 --ngramFile=./2gram.txt
-CFGFeaturizer --input=query --output=cfgs --grammarFile=./cfg.xml
