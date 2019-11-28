@@ -7,8 +7,8 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 ENDIF()
 
 #set(ENV{BOOST_ROOT} ${CMAKE_SOURCE_DIR}/../installed/boost/arm64-v8a CACHE PATH "boost root directory" FORCE)
-find_package(Boost REQUIRED COMPONENTS headers PATHS ${CMAKE_INSTALL_PREFIX}/../boost)
-message("Boost_LIBRARIES=${Boost_LIBRARIES}")
+find_package(Boost REQUIRED COMPONENTS program_options filesystem thread PATHS ${CMAKE_INSTALL_PREFIX}/../boost)
+message("Boost_FOUND=${Boost_FOUND} Boost_LIBRARIES=${Boost_LIBRARIES} Boost_INCLUDE_DIRS=${Boost_INCLUDE_DIRS}")
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/../spdlog)
 find_package(spdlog REQUIRED)
 
