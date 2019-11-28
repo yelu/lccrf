@@ -4,11 +4,10 @@
 #include <vector>
 #include <list>
 #include <limits>
-#include "Log.h"
-#include "Types.h"
-#include "FWBW.h"
 #include <cstring>
-
+#include "log.h"
+#include "types.h"
+#include "fwbw.h"
 using std::function;
 using std::vector;
 using std::list;

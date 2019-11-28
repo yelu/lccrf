@@ -11,9 +11,9 @@
 #include <unordered_set>
 #include <regex>
 #include <stdexcept>
-#include "Str.h"
-#include "Log.h"
-#include "MurmurHash3.h"
+#include "str.h"
+#include "log.h"
+#include "hash.h"
 #include "RapidXml/rapidxml.hpp"
 using std::wstring;
 using std::vector;

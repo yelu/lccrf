@@ -3,8 +3,8 @@
 #include <functional>
 #include <memory>
 #include <vector>
-#include "Types.h"
-#include "MultiArray.h"
+#include "types.h"
+#include "multi_array.h"
 using std::function;
 using std::shared_ptr;
 using std::vector;

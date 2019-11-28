@@ -1,9 +1,9 @@
-#include "LCCRF.h"
-#include "Viterbi.h"
-#include "SGDL1.h"
-#include "FWBW.h"
 #include <fstream>
-#include "../lib/Str.h"
+#include "lccrf.h"
+#include "viterbi.h"
+#include "sgdl1.h"
+#include "fwbw.h"
+#include "str.h"
 using std::ofstream;
 using std::ifstream;
 

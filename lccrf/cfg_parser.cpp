@@ -1,9 +1,9 @@
-#include "CFGParser.h"
-#include "Str.h"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <stdexcept>
+#include "cfg_parser.h"
+#include "str.h"
 
 set<int> StringMatcher::Match(const std::vector<string>& tokenizedQuery, int start)
 {

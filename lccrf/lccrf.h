@@ -4,8 +4,8 @@
 #include <functional>
 #include <cmath>
 #include <string>
-#include "Types.h"
-#include "FWBW.h"
+#include "types.h"
+#include "fwbw.h"
 using std::list;
 using std::function;
 using std::pair;

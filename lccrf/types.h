@@ -9,8 +9,8 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include "Log.h"
-#include "MurmurHash3.h"
+#include "log.h"
+#include "hash.h"
 using std::wstring;
 using std::vector;
 using std::set;

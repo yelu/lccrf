@@ -2,7 +2,7 @@
 
 #include<functional>
 #include<vector>
-#include "MultiArray.h"
+#include "multi_array.h"
 using std::function;
 using std::vector;
 

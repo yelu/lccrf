@@ -1,7 +1,7 @@
-#include "FWBW.h"
-#include "Log.h"
 #include <cassert>
 #include <limits>
+#include "fwbw.h"
+#include "log.h"
 
 FWBW::FWBW(const X& x,
 		   const Y& y,

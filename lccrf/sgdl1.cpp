@@ -1,4 +1,4 @@
-#include "SGDL1.h"
+#include "sgdl1.h"
 #include <boost/signals2.hpp>
 
 const vector<double>& SGDL1::Run(double learningRate, double l1, int maxIteration)

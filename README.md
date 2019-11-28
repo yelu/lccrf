@@ -8,6 +8,19 @@ This distribution includes:
   * a api lib. It can be embedded into your own code easily and gracefully, compared to calling a standalone binary.
   * a console exe. For detailed usage, see following sections.
 
+## Build
+
+### Windows
+
+```cmd
+cd superbuild
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=%cd%/../cmake/x64-windows.cmake
+cmake --build build
+
+cd ..
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=%cd%/cmake/x64-windows.cmake
+```
+
 ## Get Started
 
 **sample command**
