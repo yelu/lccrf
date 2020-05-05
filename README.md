@@ -13,12 +13,15 @@ This distribution includes:
 ### Windows
 
 ```cmd
+REM build dependent libraries
 cd superbuild
 cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=%cd%/../cmake/x64-windows.cmake
 cmake --build build
 
+REM build
 cd ..
 cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=%cd%/cmake/x64-windows.cmake
+cmake --build build
 ```
 
 ## Get Started
@@ -31,7 +34,7 @@ lccrf.exe -d "data.txt" -m "model.bin" -i 10 -s 0.01 -l 0.01
 
 -d Data file to train the model. 
 
-A blank line sperates query from query. Within each query, every line is a word token. Within each line, the first integer is the label id. The remaining integers are features triggered at current word token.
+A blank line sperates query from query. Within each query, each line is a word token. Within each line, the first integer is the label id and the remaining integers are features triggered at current word token.
 
     [label id] [f1] [f2] ...             <- query #0, word #0
     [label id] [f1] [f2] [f3] ...        <- query #0, word #1
