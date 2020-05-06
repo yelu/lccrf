@@ -8,6 +8,7 @@ using std::shared_ptr;
 using std::vector;
 
 class LCCRF;
+class Query;
 
 class Decoder
 {

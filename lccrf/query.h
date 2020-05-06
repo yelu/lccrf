@@ -9,7 +9,6 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include "log.h"
 #include "hash.h"
 using std::wstring;
 using std::vector;
@@ -24,7 +23,13 @@ using std::unordered_set;
 class Token
 {
 public:
-	Token() {}
+	Token() :_label(std::numeric_limits<uint16_t>::max()) {}
+
+	Token(const std::unordered_map<uint32_t, float>& features, uint16_t label):Token()
+	{
+		_features = features;
+		_label = label;
+	}
 
 	const std::unordered_map<uint32_t, float>& Features() const
 	{
@@ -72,7 +77,7 @@ public:
 		_tokens.resize(i);
     }
 
-	Query(Query&& q)
+	Query(Query&& q) noexcept
 	{
 		this->_tokens.swap(q._tokens);
 	}

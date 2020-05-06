@@ -1,18 +1,35 @@
 #include "spdlog/spdlog.h"
-#include <boost/signals2.hpp>
 #include "perceptron.h"
 #include "features.h"
 #include "lccrf.h"
 #include "query.h"
 
+PerceptronTrainer::PerceptronTrainer(
+    const vector<Query>& qs,
+    LCCRF& model) :
+    _qs(qs),
+    _model(model),
+    _weights(model.GetWeights()),
+    _learning_rate(0.001)
+{
+}
+
 uint32_t PerceptronTrainer::GetErrors(const Query& q, const vector<uint16_t> predicted)
 {
-    spdlog::error("token count is {0}, expected token count is {1}", q.Length(), predicted.size());
-    throw std::runtime_error("token count of q and expected mismatch");
+    if (q.Length() != predicted.size())
+    {
+        spdlog::error("token count is {0}, expected token count is {1}", q.Length(), predicted.size());
+        throw std::runtime_error("token count of q and expected mismatch");
+    }
 
     uint32_t error = 0;
     for (auto ite = 0; ite < predicted.size(); ite++)
     {
+        if (predicted[ite] >= _model.GetFeatures().LabelCount())
+        {
+            spdlog::error("invalid label predict[{0}]={1}", ite, predicted[ite]);
+            throw std::runtime_error("invalid label");
+        }
         if (q.GetToken(ite).GetLabel() != predicted[ite]) { error++; }
     }
 
@@ -21,7 +38,8 @@ uint32_t PerceptronTrainer::GetErrors(const Query& q, const vector<uint16_t> pre
 
 const vector<double>& PerceptronTrainer::Run(double learning_rate, int max_iter)
 {
-    double pre_loss = std::numeric_limits<double>::infinity();
+    const double early_stop_threshold = 1e-3;
+    double pre_loss = 1e20;
     _learning_rate = learning_rate;
 
     // initialize weights
@@ -47,11 +65,14 @@ const vector<double>& PerceptronTrainer::Run(double learning_rate, int max_iter)
         spdlog::info("{0}/{1} training samples processed", cnt, _qs.size());
 
         // one iteration(epoch) finished, check it converged.
-        double improvement_ratio = (loss - pre_loss) / std::abs(loss);
-        spdlog::info("iteration {0}/{1}, loss {2}, improved by {3}", i + 1, max_iter, loss, improvement_ratio * 100);
-        if (std::abs(improvement_ratio) < 1e-3)
+        double loss_diff = pre_loss - loss;
+        double loss_diff_percent = loss_diff / pre_loss;       
+        spdlog::info("#iteration {0}/{1}, loss {2}, diff {3} ({4}{5:.2f})", i + 1, max_iter, 
+            loss, loss_diff, loss_diff >= 0? "+" : "", loss_diff_percent);
+        if ((std::isnan(std::abs(loss_diff_percent)) && std::abs(pre_loss - loss) < early_stop_threshold) ||
+            std::abs(loss_diff_percent) < early_stop_threshold)
         {
-            LOG("converged, early stop.");
+            spdlog::info("converged, early stop.");
             break;
         }
         pre_loss = loss;

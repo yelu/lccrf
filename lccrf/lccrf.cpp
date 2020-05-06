@@ -2,38 +2,35 @@
 #include <spdlog/spdlog.h>
 #include "lccrf.h"
 #include "perceptron.h"
-#include "viterbi.h"
-#include "sgdl1.h"
-#include "fwbw.h"
+#include "decoder.h"
 #include "str.h"
 using std::ofstream;
 using std::ifstream;
 
 LCCRF::LCCRF()
 {
-
 }
 
 LCCRF::~LCCRF(void)
 {
 }
 
-void LCCRF::Fit(const vector<Query>& qs, 
+void LCCRF::Fit(vector<Query>& qs, 
                 int max_iter,  double learning_rate, double l1)
 {
 	// iterate through all queries to construct lccrf features.
 	_features.Clear();
 	_GenerateLCCRFFeatures(qs);
 
-	spdlog::info("queries : {0}, max iterations : {1}, step : {2}, l1 : {3}", qs.size(), max_iter, learning_rate, l1);
+	spdlog::info("#queries {0}, max iterations {1}, step {2}, l1 {3}", qs.size(), max_iter, learning_rate, l1);
 
-	std::vector<double> tmpWeights(_features.FeatureCount(), 0.0);
-	_weights.swap(tmpWeights);
+	std::vector<double> zero_weights(_features.FeatureCount(), 0.0);
+	_weights.swap(zero_weights);
     PerceptronTrainer trainer(qs, *this);
 	trainer.Run(learning_rate, max_iter);
 }
 
-void LCCRF::Fit(const std::string& dataFile, int max_iter, 
+void LCCRF::Fit(std::string& dataFile, int max_iter, 
 			    double learning_rate, double l1)
 {
 	std::ifstream infile(dataFile);
@@ -58,7 +55,7 @@ void LCCRF::Fit(const std::string& dataFile, int max_iter,
 		Token t;
 		vector<string> xids = split(line, ' ');
 		int label = atoi(xids[0].c_str());
-		if (label > UINT16_MAX)
+		if (label > (int)UINT16_MAX)
 		{
 			throw std::runtime_error("query label can not be bigger than UINT16_MAX");
 		}
@@ -79,139 +76,68 @@ void LCCRF::Fit(const std::string& dataFile, int max_iter,
 			}
 			t.AddFeature(xid, val);
 		}
-		q.AddToken(t);
-			
+		q.AddToken(t);			
 	}
 	if (q.Length() != 0)
 	{
 		qs.push_back(std::move(q));
 	}
 
+	if (qs.size() == 0)
+	{
+		spdlog::error("no query data found");
+		throw std::runtime_error("no query data found");
+	}
+
 	Fit(qs, max_iter, learning_rate, l1);
 }
 
-double LCCRF::GetWeight(uint16_t from_label, uint16_t to_label)
+double LCCRF::GetEdgeWeight(uint16_t from_label, uint16_t to_label)
 {
-	auto ite = _features.TransitionFeatures.find(TransitionFeature(from_label, to_label));
-	if (ite != _features.TransitionFeatures.end())
+	uint32_t id = 0.0;
+	if (_features.GetFeatureID(from_label, to_label, id))
 	{
-		return _weights[ite->second];
+		return _weights[id];
 	}
+
 	return 0.0;
 }
 
-double LCCRF::GetWeight(uint32_t id, uint16_t label)
+double LCCRF::GetNodeWeight(uint32_t xid, uint16_t label)
 {
-	auto label_ids = _features.UnigramFeatures.find(id);
-	if (label_ids == _features.UnigramFeatures.end())
+	uint32_t id = 0.0;
+	if (_features.GetFeatureID(xid, label, id))
 	{
-		return 0.0;
+		return _weights[id];
 	}
 
-	auto ite = label_ids->second->find(label);
-	if (ite == label_ids->second->end()) { return 0.0; }
-
-	return _weights[ite->second];
+	return 0.0;
 }
 
 void LCCRF::_GenerateLCCRFFeatures(vector<Query>& qs)
 {
 	for (auto ite = qs.begin(); ite != qs.end(); ite++)
 	{
-		_features.AddSample(*ite);
+		_features.CollectFromQuery(*ite);
 	}
     spdlog::info("{0} features, {1} labels", _features.FeatureCount(), _features.LabelCount());
 }
 
 std::vector<uint16_t> LCCRF::Predict(const Query& q)
 {
-	std::vector<uint16_t> res;
-    MultiArray<double, 3> edges(q.Length(), _features.LabelCount(), _features.LabelCount(), 0.0);
-    MultiArray<double, 2> nodes(q.Length(), _features.LabelCount(), 0.0);
-
-	// 
-    FWBW::MakeEdgesAndNodes(q, res, _features, _weights, edges, nodes);
-    vector<int> path(q.Length(), -1);
-    Viterbi::GetPath(edges, nodes, path);
-    y.Clear();
-    for(auto ite = path.begin(); ite != path.end(); ite++)
-    {
-        y.AppendTag(*ite);
-    }
-	return y;
+	Decoder decoder(*this);
+	std::vector<uint16_t> res = decoder.Decode(q);
+	return res;
 }
 
 std::vector<uint8_t> LCCRF::Predict(const std::vector<pair<int, int>>& x, int length)
 {
-	X xInner(x, length);
-	auto y = Predict(xInner);
-	return y.Tags;
-}
-
-/*
-   j  : current position
-   s1 : previous state
-   s2 : current state
-*/
-double LCCRF::_Phi(int s1, int s2, int j,
-                  const X& x, 
-				  const Y& y,
-				  const LCCRFFeatures& lccrfFeatures,
-                  vector<double>& weights,
-                  list<pair<int, double>>* hitFeatures)
-{
-    double ret = 0.0;
-
-	// hitted unigram features.
-    for(auto xIte = x.Features.begin(); xIte != x.Features.end(); xIte++)
-    {
-		if (xIte->second->count(j) > 0 && y.Tags[j] == s2)
-		{
-			LCCRFFeatures::UnigramFeature feature(xIte->first, s2);
-			int fid = lccrfFeatures.GetFeatureID(feature);
-			if (fid >= 0)
-			{
-				ret += weights[fid];
-				hitFeatures->push_back(pair<int, double>(fid, weights[fid]));
-			}
-		}
-    }
-
-	// hitted transition features.
-	LCCRFFeatures::TransitionFeature feature(s1, s2);
-	int fid = lccrfFeatures.GetFeatureID(feature);
-	if (fid >= 0 && j > 0 && y.Tags[j - 1] == s1 && y.Tags[j] == s2) 
-	{ 
-		ret += weights[fid];
-		hitFeatures->push_back(pair<int, double>(fid, weights[fid]));
-	}
-	
-    return ret;
-}
-
-pair<list<list<pair<int, double>>>, double> LCCRF::Debug(const X& x, 
-                                                         const Y& y)
-{
-    int preState = -1;
-    double score = 0.0;
-    pair<list<list<pair<int, double>>>, double> res;
-    for(int j = 0; j < x.Length(); j++)
-    {
-        if(y.Tags[j] >= _features.LabelCount())
-        {
-            return res;
-        }
-        res.first.push_back(list<pair<int, double>>());
-        score += _Phi(preState, y.Tags[j], j, x, y, _features, _weights, &(res.first.back()));
-        preState = y.Tags[j];
-    }
-    res.second = score;
-    return res;
+	throw std::runtime_error("LCCRF::Predict is not implemented");
 }
 
 void LCCRF::Save(const string& path)
 {
-    LOG("Save weights to %s. %d features, %d labels.", 
+    spdlog::info("Save weights to {0}. {1} features, {2} labels.", 
               path.c_str(), 
               _features.FeatureCount(),
               _features.LabelCount());
@@ -230,15 +156,19 @@ void LCCRF::Save(const string& path)
 				<< std::endl;
 		}
 	}
-	for (auto tranIte = _features.TransitionFeatures.begin();
-		 tranIte != _features.TransitionFeatures.end(); tranIte++)
+	for (uint16_t i = 0; i < (uint16_t)_features.LabelCount(); i++)
 	{
-		ofs << "T" << "\t"
-			<< tranIte->second << "\t"
-			<< tranIte->first.s1 << "\t"
-			<< tranIte->first.s2 << "\t"
-			<< _weights[tranIte->second]
-			<< std::endl;
+		for (uint16_t j = 0; j < (uint16_t)_features.LabelCount(); j++)
+		{
+			uint32_t id = 0;
+			_features.GetFeatureID(i, j, id);
+			ofs << "T" << "\t"
+				<< id << "\t"
+				<< i << "\t"
+				<< j << "\t"
+				<< _weights[id]
+				<< std::endl;
+		}
 	}
     ofs.close();
 }
@@ -247,14 +177,14 @@ void LCCRF::Load(const string& path)
 {
     _features.Clear();
     ifstream ifs(path.c_str());
-	int fCount = 0;
+	int fcnt = 0;
 	int lCount = 0;
-    ifs >> fCount >> lCount;
-	std::vector<double> newWeights(fCount, 0.0);
-	_weights.swap(newWeights);
+    ifs >> fcnt >> lCount;
+	std::vector<double> zero_weights(fcnt, 0.0);
+	_weights.swap(zero_weights);
 	string type;
-	int fID = 0;
-    while(ifs >> type >> fID)
+	uint32_t fid = 0;
+    while(ifs >> type >> fid)
     {
 		if (type == "U")
 		{
@@ -262,8 +192,8 @@ void LCCRF::Load(const string& path)
 			int label = 0;
 			double weight = 0.0;
 			ifs >> xid >> label >> weight;
-			_features.AddUnigramFeature(xid, label, fID);
-			_weights[fID] = weight;
+			_features.AddUnigramFeature(xid, label, &fid);
+			_weights[fid] = weight;
 		}
 		else if (type == "T")
 		{
@@ -271,12 +201,13 @@ void LCCRF::Load(const string& path)
 			int s2 = 0;
 			double weight = 0.0;
 			ifs >> s1 >> s2 >> weight;
-			_features.AddTransitionFeature(s1, s2, fID);
-			_weights[fID] = weight;
+			_features.AddTransitionFeature(s1, s2, &fid);
+			_weights[fid] = weight;
 		}
     }
     ifs.close();
-    LOG("Load from %s. %d features, %d labels.", path.c_str(), 
+    spdlog::info("Load from {0}. {1} features, {2} labels.", 
+		path.c_str(), 
         _features.FeatureCount(), _features.LabelCount());
  
 }

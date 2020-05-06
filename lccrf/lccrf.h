@@ -18,21 +18,18 @@ public:
     LCCRF();
     virtual ~LCCRF(void);
 
-    void Fit(const vector<Query>& xs, 
+    void Fit(vector<Query>& xs, 
              int maxIteration = 1, 
              double learningRate = 0.001, 
              double l1 = 0.001);
 
-	void Fit(const std::string& dataFile,
+	void Fit(std::string& dataFile,
 		    int maxIteration = 1,
 			double learningRate = 0.001,
 			double l1 = 0.001);
 
     std::vector<uint16_t> Predict(const Query& x);
 	std::vector<uint8_t> Predict(const std::vector<pair<int, int>>& x, int length);
-
-    pair<list<list<pair<int, double>>>, double> Debug(const X&, 
-                                                      const Y&);
 
     const vector<double>& GetWeights() const { return _weights; }
     vector<double>& GetWeights() { return this->_weights; }
@@ -45,21 +42,11 @@ public:
 	
 
 private:
-
-    static double _Phi(int s1, int s2, int j,
-                       const X& x, const Y& y,
-					   const LCCRFFeatures& lccrfFeatures,
-                       vector<double>& weights,
-                       list<pair<int, double>>* hitFeatures);
-
 	void _GenerateLCCRFFeatures(vector<Query>& qs);
 
 private:
 
 	LCCRFFeatures _features;
-
-    const vector<X>* _xs;
-    const vector<Y>* _ys;
     vector<double> _weights;
 };
 

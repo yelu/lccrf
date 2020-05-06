@@ -15,15 +15,15 @@ Decoder::~Decoder(void)
 
 std::vector<uint16_t> Decoder::Decode(const Query& q)
 {
-    int n_step = q.Length();
+    size_t n_step = q.Length();
     uint16_t n_state = _model.GetFeatures().LabelCount();
 
     // for feature doesn't exists, should assume it's like a feature with weight 0.0
     vector<double> pi(n_state, 0.0);
-    vector<vector<uint16_t>> backtrace(n_step, vector<uint16_t>(n_state, -1));
-    for (int j = 0; j < n_step; j++)
+    vector<vector<uint16_t>> backtrace(n_step, vector<uint16_t>(n_state, 0));
+    for (size_t j = 0; j < n_step; j++)
     {
-        vector<double> new_pi(n_state, std::numeric_limits<double>::min());
+        vector<double> new_pi(n_state, -1e10);
         if (j != 0)
         {
             for (int s1 = 0; s1 < n_state; s1++)
@@ -61,14 +61,13 @@ std::vector<uint16_t> Decoder::Decode(const Query& q)
     }
 
     // find the optimal path.
-    std::vector<uint16_t> res(n_step, -1);
-    uint16_t last = std::distance(pi.begin(), std::max_element(pi.begin(), pi.end()));
+    std::vector<uint16_t> res(n_step, 0);
+    uint16_t last = (uint16_t)std::distance(pi.begin(), std::max_element(pi.begin(), pi.end()));
     res[n_step - 1] = last;
-    for (int j = n_step - 1; j > 0; j--)
+    for (int j = (int)n_step - 1; j > 0; j--)
     {
-        res[j - 1] = backtrace[j][res[j]];
+        res[j-1] = backtrace[j][res[j]];
     }
 
     return res;
-
 }

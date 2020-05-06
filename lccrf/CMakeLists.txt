@@ -6,21 +6,27 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 ENDIF()
 
-#set(ENV{BOOST_ROOT} ${CMAKE_SOURCE_DIR}/../installed/boost/arm64-v8a CACHE PATH "boost root directory" FORCE)
-find_package(Boost REQUIRED COMPONENTS program_options filesystem thread PATHS ${CMAKE_INSTALL_PREFIX}/../boost)
-message("Boost_FOUND=${Boost_FOUND} Boost_LIBRARIES=${Boost_LIBRARIES} Boost_INCLUDE_DIRS=${Boost_INCLUDE_DIRS}")
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/../spdlog)
 find_package(spdlog REQUIRED)
 
 message("CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
-file(GLOB LCCRF_SOURCES
-    "*.cpp"
-    "RapidXml/*.hpp")
-file(GLOB LCCRF_HEADERS
-    "*.h")
+set(LCCRF_SOURCES
+    "decoder.cpp"
+    "hash.cpp"
+    "lccrf.cpp"
+    "perceptron.cpp"
+    "viterbi.cpp")
+set(LCCRF_HEADERS
+    "features.h"
+    "hash.h"
+    "lccrf.h"
+    "multi_array.h"
+    "perceptron.h"
+    "query.h"
+    "viterbi.h")
 
-add_library(lccrf SHARED ${LCCRF_SOURCES} ${LCCRF_HEADERS} ${PROTO_FILES})
+add_library(lccrf STATIC ${LCCRF_SOURCES} ${LCCRF_HEADERS} ${PROTO_FILES})
 
 target_compile_definitions(lccrf PUBLIC -DNOMINMAX -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
 target_include_directories(lccrf 
@@ -29,9 +35,6 @@ target_include_directories(lccrf
         $<INSTALL_INTERFACE:include>)
 target_link_libraries(lccrf 
     PUBLIC
-        $<BUILD_INTERFACE:Boost::filesystem>
-        $<BUILD_INTERFACE:Boost::program_options>
-        $<BUILD_INTERFACE:Boost::thread>
         $<BUILD_INTERFACE:spdlog::spdlog_header_only>)
 
 if(UNIX)

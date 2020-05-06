@@ -19,14 +19,9 @@ class PerceptronTrainer
 public:
     PerceptronTrainer(
         const vector<Query>& qs,
-		LCCRF& model) :
-        _qs(qs),
-		_model(model),
-        _weights(model.GetWeights())
-    {
-    }
+        LCCRF& model);
 
-    virtual ~PerceptronTrainer(void) {}
+    virtual ~PerceptronTrainer(void) = default;
 
     const vector<double>& Run(double learningRate, int max_iter = 20);
 

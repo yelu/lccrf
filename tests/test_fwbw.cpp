@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #define private public
-#include "..\lib\LCCRF.h"
+#include "../lib/LCCRF.h"
 #include "../lib/FWBW.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
