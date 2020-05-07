@@ -13,7 +13,7 @@ message("CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 set(LCCRF_TESTS_SOURCES
     "test_lccrf.cpp"
-    "test_perf.cpp")
+    "test_perceptron.cpp")
 
 add_executable(lccrf_tests ${LCCRF_TESTS_SOURCES})
 

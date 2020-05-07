@@ -15,9 +15,15 @@ LCCRF::~LCCRF(void)
 {
 }
 
-void LCCRF::Fit(vector<Query>& qs, 
+double LCCRF::Fit(vector<Query>& qs, 
                 int max_iter,  double learning_rate, double l1)
 {
+	if (qs.size() == 0)
+	{
+		spdlog::error("no query data found");
+		throw std::runtime_error("no query data found");
+	}
+
 	// iterate through all queries to construct lccrf features.
 	_features.Clear();
 	_GenerateLCCRFFeatures(qs);
@@ -28,10 +34,10 @@ void LCCRF::Fit(vector<Query>& qs,
 	_weights.swap(zero_weights);
     PerceptronTrainer trainer(qs, *this);
 	trainer.Run(learning_rate, max_iter);
+	return trainer.GetBestLoss();
 }
 
-void LCCRF::Fit(std::string& dataFile, int max_iter, 
-			    double learning_rate, double l1)
+vector<Query> LCCRF::LoadData(std::string& dataFile)
 {
 	std::ifstream infile(dataFile);
 
@@ -65,8 +71,8 @@ void LCCRF::Fit(std::string& dataFile, int max_iter,
 		{
 			vector<string> fields = split(ite->c_str(), ':');
 			int xid = atoi(fields[0].c_str());
-			if (xid < 0) 
-			{ 
+			if (xid < 0)
+			{
 				throw std::runtime_error("feature id must ne positive");
 			}
 			float val = 1.0;
@@ -76,20 +82,21 @@ void LCCRF::Fit(std::string& dataFile, int max_iter,
 			}
 			t.AddFeature(xid, val);
 		}
-		q.AddToken(t);			
+		q.AddToken(t);
 	}
 	if (q.Length() != 0)
 	{
 		qs.push_back(std::move(q));
 	}
 
-	if (qs.size() == 0)
-	{
-		spdlog::error("no query data found");
-		throw std::runtime_error("no query data found");
-	}
+	return qs;
+}
 
-	Fit(qs, max_iter, learning_rate, l1);
+double LCCRF::Fit(std::string& dataFile, int max_iter, 
+			    double learning_rate, double l1)
+{
+	std::vector<Query> qs = LoadData(dataFile);
+	return Fit(qs, max_iter, learning_rate, l1);
 }
 
 double LCCRF::GetEdgeWeight(uint16_t from_label, uint16_t to_label)

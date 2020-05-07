@@ -13,11 +13,13 @@ message("CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 set(LCCRF_SOURCES
     "decoder.cpp"
+    "evaluator.cpp"
     "hash.cpp"
     "lccrf.cpp"
     "perceptron.cpp"
     "viterbi.cpp")
 set(LCCRF_HEADERS
+    "evaluator.h"
     "features.h"
     "hash.h"
     "lccrf.h"

@@ -18,14 +18,14 @@ public:
     LCCRF();
     virtual ~LCCRF(void);
 
-    void Fit(vector<Query>& xs, 
+    double Fit(vector<Query>& xs, 
              int maxIteration = 1, 
-             double learningRate = 0.001, 
+             double learningRate = 0.1, 
              double l1 = 0.001);
 
-	void Fit(std::string& dataFile,
+	double Fit(std::string& dataFile,
 		    int maxIteration = 1,
-			double learningRate = 0.001,
+			double learningRate = 0.1,
 			double l1 = 0.001);
 
     std::vector<uint16_t> Predict(const Query& x);
@@ -36,11 +36,11 @@ public:
     LCCRFFeatures& GetFeatures() { return this->_features; }
     double GetEdgeWeight(uint16_t from_label, uint16_t to_label);
     double GetNodeWeight(uint32_t id, uint16_t label);
+    vector<Query> LoadData(std::string& dataFile);
 
     void Save(const string& path);
     void Load(const string& path);
 	
-
 private:
 	void _GenerateLCCRFFeatures(vector<Query>& qs);
 

@@ -71,7 +71,7 @@ public:
 	Query()
 	{
 	};
-    
+
 	Query(size_t i)
     {
 		_tokens.resize(i);

@@ -1,3 +1,4 @@
+#include <random>
 #include "spdlog/spdlog.h"
 #include "perceptron.h"
 #include "features.h"
@@ -10,8 +11,15 @@ PerceptronTrainer::PerceptronTrainer(
     _qs(qs),
     _model(model),
     _weights(model.GetWeights()),
-    _learning_rate(0.001)
+    _learning_rate(0.001),
+    _best_iter(-1),
+    _best_loss(1e20)
 {
+}
+
+double PerceptronTrainer::GetBestLoss()
+{
+    return _best_loss;
 }
 
 uint32_t PerceptronTrainer::GetErrors(const Query& q, const vector<uint16_t> predicted)
@@ -36,10 +44,21 @@ uint32_t PerceptronTrainer::GetErrors(const Query& q, const vector<uint16_t> pre
     return error;
 }
 
+float LearningRateDecay(float rate, float inital_value, uint32_t iter_idx, uint32_t num_of_data)
+{
+    // exponential learning rate decay.
+    float new_rate = rate * pow(inital_value, 1.0f * static_cast<float>(iter_idx) / num_of_data);
+    return new_rate;
+}
+
 const vector<double>& PerceptronTrainer::Run(double learning_rate, int max_iter)
 {
     const double early_stop_threshold = 1e-3;
+    const float decay_init_value = 0.7;
     double pre_loss = 1e20;
+    bool shuffle_data = true;
+    _best_loss = pre_loss;
+    _best_iter = 0;
     _learning_rate = learning_rate;
 
     // initialize weights
@@ -48,29 +67,47 @@ const vector<double>& PerceptronTrainer::Run(double learning_rate, int max_iter)
         item = 0.0;
     }
 
+    std::vector<uint32_t> iter_order(_qs.size(), 0);
+    for (auto i = 0; i < iter_order.size(); i++)
+    {
+        iter_order[i] = i;
+    }
+
     for (int i = 0; i < max_iter; i++)
     {
+        if (shuffle_data)
+        {
+            std::shuffle(iter_order.begin(), iter_order.end(), std::default_random_engine(/*RANDOM_SEED = */ 0));
+        }
+
+        _learning_rate = LearningRateDecay(_learning_rate, decay_init_value, i, _qs.size());
         double loss = 0.0;
         int cnt = 0;
         // calculate loss for every training sample(aka, mini-batch=1).
-        for (auto ite = _qs.begin(); ite != _qs.end(); ite++)
+        for (auto ite = iter_order.begin(); ite != iter_order.end(); ite++)
         {
-            loss += UpdateWeights(*ite);
+            loss += UpdateWeights(_qs[*ite]);
             cnt += 1;
             if(cnt % 10000 == 0)
             {
-                spdlog::info("{0}/{1} training samples processed", cnt, _qs.size());
+                //spdlog::info("{0}/{1} training samples processed", cnt, _qs.size());
             }
         }
-        spdlog::info("{0}/{1} training samples processed", cnt, _qs.size());
+        //spdlog::info("{0}/{1} training samples processed", cnt, _qs.size());
 
-        // one iteration(epoch) finished, check it converged.
-        double loss_diff = pre_loss - loss;
-        double loss_diff_percent = loss_diff / pre_loss;       
-        spdlog::info("#iteration {0}/{1}, loss {2}, diff {3} ({4}{5:.2f})", i + 1, max_iter, 
-            loss, loss_diff, loss_diff >= 0? "+" : "", loss_diff_percent);
-        if ((std::isnan(std::abs(loss_diff_percent)) && std::abs(pre_loss - loss) < early_stop_threshold) ||
-            std::abs(loss_diff_percent) < early_stop_threshold)
+        if (loss < _best_loss)
+        {
+            _best_loss = loss;
+            _best_iter = i + 1;
+        }
+
+        // one iteration(epoch) finished, check the convergency.
+        double loss_delta = pre_loss - loss;
+        double loss_improve = loss_delta / pre_loss;       
+        spdlog::info("#iteration {0}/{1}, loss {2}, delta {3}, learning rate {4}", i + 1, max_iter,
+            loss, loss_improve, _learning_rate);
+        if ((std::isnan(std::abs(loss_improve)) && std::abs(pre_loss - loss) < early_stop_threshold) ||
+            std::abs(loss_improve) < early_stop_threshold)
         {
             spdlog::info("converged, early stop.");
             break;

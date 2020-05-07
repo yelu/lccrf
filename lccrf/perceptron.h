@@ -28,6 +28,7 @@ public:
     double UpdateWeights(const Query& q);
 
     uint32_t GetErrors(const Query& q, const vector<uint16_t> expected);
+    double GetBestLoss();
 
 private:
 
@@ -38,4 +39,6 @@ private:
 	LCCRF& _model;
     vector<double>& _weights;
     double _learning_rate;
+    double _best_loss;
+    int _best_iter;
 };
