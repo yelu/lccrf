@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>
-#include "hash.h"
 #include "query.h"
 using std::wstring;
 using std::vector;

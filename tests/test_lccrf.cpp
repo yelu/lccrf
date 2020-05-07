@@ -22,7 +22,7 @@ TEST(TestLCCRF, TestFitAndPredict)
 	lccrf = new LCCRF();
 
 	// fit
-	lccrf->Fit(qs, 1000, 0.1, 0.1);
+	lccrf->Fit(qs, 10, 0.1, 0.1);
 
 	// predit
 	auto res = lccrf->Predict(qs.front());

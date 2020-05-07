@@ -9,7 +9,6 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include "hash.h"
 using std::wstring;
 using std::vector;
 using std::set;
