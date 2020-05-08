@@ -1,9 +1,9 @@
 #include <fstream>
+#include <boost/algorithm/string.hpp>
 #include <spdlog/spdlog.h>
 #include "lccrf.h"
 #include "perceptron.h"
 #include "decoder.h"
-#include "str.h"
 using std::ofstream;
 using std::ifstream;
 
@@ -47,7 +47,7 @@ vector<Query> LCCRF::LoadData(std::string& dataFile)
 	Query q;
 	while (std::getline(infile, line))
 	{
-		trim(line);
+		boost::algorithm::trim(line);
 		if (line.size() == 0)
 		{
 			if (q.Length() != 0)
@@ -59,24 +59,41 @@ vector<Query> LCCRF::LoadData(std::string& dataFile)
 		}
 
 		Token t;
-		vector<string> xids = split(line, ' ');
-		int label = atoi(xids[0].c_str());
-		if (label > (int)UINT16_MAX)
+
+		size_t first_scroll = line.find_first_of('|');
+		if (first_scroll == std::string::npos)
 		{
-			throw std::runtime_error("query label can not be bigger than UINT16_MAX");
+			throw std::runtime_error("invalid line");
+		}
+
+		// [label] ([importance]) ([text])
+		string label_seg = line.substr(0, first_scroll);
+		boost::algorithm::trim(label_seg);
+		vector<string> label_seg_fields;
+		boost::split(label_seg_fields, label_seg, boost::is_any_of(" "), boost::token_compress_on);
+		int label = atoi(label_seg_fields[0].c_str());
+		if (label < 0 || label > (int)UINT16_MAX)
+		{
+			throw std::runtime_error("query label must be of type UINT16_T");
 		}
 		t.SetLabel((uint16_t)label);
 
-		for (auto ite = xids.begin() + 1; ite != xids.end(); ite++)
+		// | [f1]:[val] [f2]:[val]
+		string feat_seg = line.substr(first_scroll + 1);
+		boost::algorithm::trim(feat_seg);
+		vector<string> feat_seg_fields;
+		boost::split(feat_seg_fields, feat_seg, boost::is_any_of(" "), boost::token_compress_on);
+		for (auto ite = feat_seg_fields.begin(); ite != feat_seg_fields.end(); ite++)
 		{
-			vector<string> fields = split(ite->c_str(), ':');
-			int xid = atoi(fields[0].c_str());
-			if (xid < 0)
+			vector<string> fields;
+		    boost::split(fields, *ite, boost::is_any_of(":"));
+			int64_t xid = strtoll(fields[0].c_str(), NULL, 10);
+			if (xid < 0 || xid > (int64_t)UINT32_MAX)
 			{
-				throw std::runtime_error("feature id must ne positive");
+				throw std::runtime_error("feature id must be of type UINT32_T");
 			}
 			float val = 1.0;
-			if (fields.size() > 1)
+			if (fields.size() > 1 && fields[1].size() != 0)
 			{
 				val = atof(fields[1].c_str());
 			}

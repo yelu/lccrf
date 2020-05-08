@@ -24,28 +24,20 @@ class Token
 public:
 	Token() :_label(std::numeric_limits<uint16_t>::max()) {}
 
-	Token(const std::unordered_map<uint32_t, float>& features, uint16_t label):Token()
+	Token(const std::vector<std::pair<uint32_t, float>>& features, uint16_t label):Token()
 	{
 		_features = features;
 		_label = label;
 	}
 
-	const std::unordered_map<uint32_t, float>& Features() const
+	const std::vector<std::pair<uint32_t, float>>& Features() const
 	{
 		return _features;
 	}
 
 	void AddFeature(uint32_t fid, float fval = 1.0)
 	{
-		auto ite = _features.find(fid);
-		if (ite == _features.end())
-		{
-			_features[fid] = fval;
-		}
-		else
-		{
-			_features[fid] += fval;
-		}
+		_features.push_back(std::pair<uint32_t, float>(fid, fval));
 	}
 
 	void SetLabel(uint16_t label)
@@ -58,10 +50,21 @@ public:
 		return _label;
 	}
 
+	void SetText(const char* text)
+	{
+		_text = text;
+	}
+
+	const std::string& GetText() const
+	{
+		return _text;
+	}
+
 private:
 	// feature_id on x -> numeric importance
-	std::unordered_map<uint32_t, float> _features;
+	std::vector<std::pair<uint32_t, float>> _features;
 	uint16_t _label;
+	std::string _text;
 };
 
 class Query

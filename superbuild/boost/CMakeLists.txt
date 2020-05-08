@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 include(ExternalProject)
 set(BOOST_VER 1.70.0)
-set(BOOST_COMPONENTS headers program_options filesystem thread)
+set(BOOST_COMPONENTS headers)
 set(BOOST_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/boost")
 
 list(TRANSFORM BOOST_COMPONENTS PREPEND "--with-" OUTPUT_VARIABLE BOOST_WITH_LIBRARIES)

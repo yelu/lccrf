@@ -1,7 +1,7 @@
 import os
 
 def convert_to_vw():
-    with open('train.lccrf.converted.dat', 'r') as f1, open('lccrf.vw.dat', 'w') as f2:
+    with open('lccrf.original.dat', 'r') as f1, open('lccrf.vw.dat', 'w') as f2:
         for line in f1:
             line = line.strip()
             if len(line) == 0:
@@ -26,4 +26,4 @@ def convert_to_internal():
 
 
 if __name__ == "__main__":
-    convert_to_internal()
+    convert_to_vw()

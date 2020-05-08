@@ -1,6 +1,7 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <boost/container/small_vector.hpp>
 #include "decoder.h"
 #include "lccrf.h"
 
@@ -19,11 +20,11 @@ std::vector<uint16_t> Decoder::Decode(const Query& q)
     uint16_t n_state = _model.GetFeatures().LabelCount();
 
     // for feature doesn't exists, should assume it's like a feature with weight 0.0
-    vector<double> pi(n_state, 0.0);
+    boost::container::small_vector<double, 1024> pi(n_state, 0.0);
     vector<vector<uint16_t>> backtrace(n_step, vector<uint16_t>(n_state, 0));
     for (size_t j = 0; j < n_step; j++)
     {
-        vector<double> new_pi(n_state, -1e10);
+        boost::container::small_vector<double, 1024> new_pi(n_state, -1e10);
         if (j != 0)
         {
             for (int s1 = 0; s1 < n_state; s1++)
@@ -50,10 +51,12 @@ std::vector<uint16_t> Decoder::Decode(const Query& q)
             float val = item.second;
             auto ite = _model.GetFeatures().UnigramFeatures.find(id);
             if (ite == _model.GetFeatures().UnigramFeatures.end()) { continue; }
-            for (auto label_id = ite->second->begin(); label_id != ite->second->end(); label_id++)
+            std::unordered_map<uint16_t, uint32_t>& features = *(ite->second);
+            for (const auto& label_id : features)
             {
-                double w = _model.GetWeights()[label_id->second];
-                new_pi[label_id->first] += (val * w);
+                double w = _model.GetWeights()[label_id.second];
+                uint16_t label = label_id.first;
+                new_pi[label] += (val * w);
             }
         }
 

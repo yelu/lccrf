@@ -26,7 +26,7 @@ target_link_libraries(lccrf_tests
 add_custom_command(
     TARGET lccrf_tests POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_SOURCE_DIR}/train.lccrf.converted.dat
+            ${CMAKE_CURRENT_SOURCE_DIR}/lccrf.vw.dat
             $<TARGET_FILE_DIR:lccrf_tests>)
 
 if(UNIX)

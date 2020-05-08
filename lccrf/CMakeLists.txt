@@ -6,6 +6,8 @@ IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 ENDIF()
 
+find_package(Boost REQUIRED COMPONENTS headers PATHS ${CMAKE_INSTALL_PREFIX}/../boost)
+message("Boost_LIBRARIES=${Boost_LIBRARIES}")
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/../spdlog)
 find_package(spdlog REQUIRED)
 
@@ -35,7 +37,8 @@ target_include_directories(lccrf
         $<INSTALL_INTERFACE:include>)
 target_link_libraries(lccrf 
     PUBLIC
-        $<BUILD_INTERFACE:spdlog::spdlog_header_only>)
+        $<BUILD_INTERFACE:spdlog::spdlog_header_only>
+        $<BUILD_INTERFACE:Boost::headers>)
 
 if(UNIX)
     target_link_libraries(lccrf PRIVATE ${CMAKE_DL_LIBS})
