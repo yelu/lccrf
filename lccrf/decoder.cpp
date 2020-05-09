@@ -49,9 +49,9 @@ std::vector<uint16_t> Decoder::Decode(const Query& q)
         {
             uint32_t id = item.first;
             float val = item.second;
-            auto ite = _model.GetFeatures().UnigramFeatures.find(id);
-            if (ite == _model.GetFeatures().UnigramFeatures.end()) { continue; }
-            std::unordered_map<uint16_t, uint32_t>& features = *(ite->second);
+            auto ite = _model.GetFeatures().GetUnigramFeatures().find(id);
+            if (ite == _model.GetFeatures().GetUnigramFeatures().end()) { continue; }
+            const std::vector<std::pair<uint16_t, uint32_t>>& features = ite->second;
             for (const auto& label_id : features)
             {
                 double w = _model.GetWeights()[label_id.second];

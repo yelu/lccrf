@@ -33,7 +33,7 @@ public:
 
     const vector<double>& GetWeights() const { return _weights; }
     vector<double>& GetWeights() { return this->_weights; }
-    LCCRFFeatures& GetFeatures() { return this->_features; }
+    inline LCCRFFeatures& GetFeatures() { return this->_features; }
     double GetEdgeWeight(uint16_t from_label, uint16_t to_label);
     double GetNodeWeight(uint32_t id, uint16_t label);
     vector<Query> LoadData(std::string& dataFile);

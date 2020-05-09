@@ -167,16 +167,16 @@ void LCCRF::Save(const string& path)
               _features.LabelCount());
     ofstream ofs(path.c_str());
     ofs << _features.FeatureCount() << "\t" << _features.LabelCount() << std::endl;
-	for (auto xIte = _features.UnigramFeatures.begin(); 
-	     xIte != _features.UnigramFeatures.end(); xIte++)
+	for (auto xIte = _features.GetUnigramFeatures().begin(); 
+	     xIte != _features.GetUnigramFeatures().end(); xIte++)
 	{
-		for (auto labelIte = xIte->second->begin(); labelIte != xIte->second->end(); labelIte++)
+		for (auto label_ids = xIte->second.begin(); label_ids != xIte->second.end(); label_ids++)
 		{
 			ofs << "U" << "\t"
-				<< labelIte->second << "\t"
+				<< label_ids->second << "\t"
 				<< xIte->first << "\t"
-				<< labelIte->first << "\t"
-				<< _weights[labelIte->second]
+				<< label_ids->first << "\t"
+				<< _weights[label_ids->second]
 				<< std::endl;
 		}
 	}
